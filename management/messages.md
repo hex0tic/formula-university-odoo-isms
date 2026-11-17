@@ -324,3 +324,6 @@ D08 нэрийн өөрчлөлтийг company/menu/canonical data/policies/rep
 
 ## 2026-11-17 — Codex: GitHub репозитор бэлтгэв
 Хэрэглэгчийн хүсэлтээр `hex0tic/formula-university-odoo-isms` private репозиторт нийтлэх тусдаа Git хуулбар бэлтгэв. Эх `University-coursework` репозиторын remote/history болон ажиллаж буй Odoo DB-г өөрчлөөгүй. `.gitignore`-д локал нууц, хувийн нотолгоо, runtime state/cache-ийг тодорхой хасав; код, DOCX/PDF/PPTX тайлан, canonical өгөгдөл, бодлого, management болон test/UI evidence-ийг багтаав. Шинэ clone-ийн нууц үг ба DB-г локал setup-аар үүсгэнэ.
+
+## 2026-11-17 — Codex: GitHub push амжилттай
+`https://github.com/hex0tic/formula-university-odoo-isms` private репозитор үүсгэж `main` branch руу push хийв. Анхны commit `9db325e16a4bc256f9174bf4f30c7f89ccc73720` локал болон GitHub дээр таарсан; remote tree 282 файлтай, нууц зам/тохиргоо агуулаагүй. Тайлангийн DOCX/PDF, PPTX GitHub дээр байгааг шалгав. Локал Git хуулбар ба цааш өөрчлөх зааврыг `management/github.md`-д хадгалав.
