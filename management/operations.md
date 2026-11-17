@@ -15,13 +15,15 @@ docker compose ps
 
 ## Бүх regression тест
 
-`odoo/` дотор ажиллуулна. Веб процесс түр зогсож, тест дуусмагц буцаж асна.
+`odoo/` дотор ажиллуулна. 2026-11-18-аас тестийг **ашиглалтын `orgil_isms` DB дээр биш**, шинээр үүсгэсэн түр `isms_ci_<огноо>` DB дээр ажиллуулж, дуусмагц устгана (A.8.31). Вэб процесс зогсохгүй.
 
 ```bash
-./scripts/odoo-cli.sh -u campus_university,campus_isms_bridge,university_isms,university_isms_stock,university_isms_helpdesk --without-demo=all --test-enable --test-tags /campus_university,/campus_isms_bridge,/university_isms,/university_isms_stock,/university_isms_helpdesk
+./scripts/run-tests.sh
 ```
 
-Скрипт `management/runtime.lock`-ийг өөрөө авдаг. Гаднаас ижил түгжээ давхар авахгүй. Эцсийн run: 39 тест, 0 failed, 0 errors (11+3+18+1+6). Лог: `evidence/tests/final-regression-20261116.log`.
+Скрипт `management/runtime.lock`-ийг өөрөө авдаг. Эцсийн run (2026-11-18): **47 тест, 0 failed, 0 errors** (campus 11 + bridge 4 + ISMS 25 + stock 1 + Helpdesk 6), `evidence/tests/regression-20261118.json`. Өмнөх 39 тестийн run (2026-11-16, ашиглалтын DB дээр): `evidence/tests/final-regression.json`.
+
+Ашиглалтын DB-д кодын өөрчлөлтийг тестгүйгээр шилжүүлэх: `./scripts/odoo-cli.sh -u university_isms,...`.
 
 ## Шинэ тусдаа орчинд босгох дараалал
 
@@ -31,7 +33,7 @@ docker compose ps
 2. `odoo/` дотор `scripts/setup.sh` ажиллуулна. Admin login-д ашиглах санамсаргүй `ODOO_ADMIN_PASSWORD` утгыг `.env` файлд хамгаалж нэмнэ. `ADMIN_PASSWD` нь database manager-ийн тусдаа нууц үг юм.
 3. `scripts/init-db.sh` нь суурь модулиуд ба Монгол хэлийг бэлтгэнэ.
 4. `scripts/odoo-cli.sh -i university_isms,university_isms_stock,campus_university,campus_isms_bridge,helpdesk_mgmt,university_isms_helpdesk,university_isms_inventory_catalog --without-demo=all` ажиллуулна.
-5. `scripts/odoo-shell.sh scripts/bootstrap.py`, дараа `scripts/odoo-shell.sh scripts/import_case_data.py` ажиллуулна. Эх data-ийн policy огноо нь кейсийн simulation metadata; бодит workflow approval-ийн actor/time нь тусдаа evidence юм.
+5. `scripts/odoo-shell.sh scripts/bootstrap.py`, дараа `scripts/odoo-shell.sh scripts/import_case_data.py` ажиллуулна. Импорт төгсгөлдөө workflow-ийн нийцлийг (CISO-гийн хүлээн зөвшөөрөлт, үлдэгдэл батлалт, Risk Treatment даалгавар) шалгаж засна. Эх data-ийн policy огноо нь кейсийн simulation metadata; бодит workflow approval-ийн actor/time нь тусдаа evidence юм.
 6. Вебийг асааж, үндсэн хавтаснаас `python3 odoo/addons/campus_university/scripts/run_demo_seed.py` ажиллуулна. Энэ helper гаднаас `management/runtime.lock`-оор зохицуулалт шаарддаг. Нууц үг stdout-д гарахгүй.
 7. `scripts/odoo-shell.sh ../evidence/tools/seed_inventory_catalog.py` ажиллуулж 16 product ба 5 DEMO serial үүсгэнэ. Өмнөх incident-ийг `env['isms.incident'].search([])._sync_helpdesk_tickets()`-ээр нэг удаа sync хийнэ; шинэ incident автоматаар холбогдоно.
 8. Regression болон UI allow/deny-г дахин шалгана. Шинэ орчны evidence-г тусад нь үүсгэж, хуучин логийг шинэ run гэж нэрлэхгүй.

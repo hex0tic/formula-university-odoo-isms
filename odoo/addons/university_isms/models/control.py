@@ -32,15 +32,15 @@ class IsmsControl(models.Model):
         ('partial', 'Хэсэгчилсэн'),
         ('no', 'Үгүй'),
     ], 'Хэрэгжсэн үү?', default='no', tracking=True)
-    justification = fields.Text('Тайлбар / шалтгаан, үндэслэл')
-    odoo_implementation = fields.Text('Odoo дахь хэрэгжилт')
-    evidence = fields.Text('Нотолгоо')
+    justification = fields.Text('Тайлбар / шалтгаан, үндэслэл', groups='university_isms.group_isms_asset_owner,university_isms.group_isms_auditor')
+    odoo_implementation = fields.Text('Odoo дахь хэрэгжилт', groups='university_isms.group_isms_asset_owner,university_isms.group_isms_auditor')
+    evidence = fields.Text('Нотолгоо', groups='university_isms.group_isms_asset_owner,university_isms.group_isms_auditor')
     responsible_id = fields.Many2one('res.users', 'Хариуцагч', tracking=True)
     risk_ids = fields.Many2many('isms.risk', 'isms_risk_control_rel', 'control_id', 'risk_id',
-                                string='Холбогдох эрсдэл')
+                                string='Холбогдох эрсдэл', groups='university_isms.group_isms_asset_owner,university_isms.group_isms_auditor')
     asset_ids = fields.Many2many('isms.asset', 'isms_asset_control_rel', 'control_id', 'asset_id',
-                                 string='Холбогдох хөрөнгө')
-    risk_count = fields.Integer('Эрсдэлийн тоо', compute='_compute_risk_count')
+                                 string='Холбогдох хөрөнгө', groups='university_isms.group_isms_asset_owner,university_isms.group_isms_auditor')
+    risk_count = fields.Integer('Эрсдэлийн тоо', compute='_compute_risk_count', groups='university_isms.group_isms_asset_owner,university_isms.group_isms_auditor')
 
     _sql_constraints = [('code_uniq', 'unique(code)', 'Хяналтын дугаар давхардахгүй.')]
 

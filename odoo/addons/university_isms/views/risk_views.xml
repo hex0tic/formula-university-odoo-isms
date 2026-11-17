@@ -37,7 +37,11 @@
             <form>
                 <header>
                     <button name="action_next_stage" type="object" string="Дараагийн үе шат" class="btn-primary"
-                            invisible="state == 'residual'" groups="university_isms.group_isms_analyst"/>
+                            invisible="state in ('implement', 'residual')" groups="university_isms.group_isms_analyst"/>
+                    <button name="action_accept_residual" type="object" string="Үлдэгдэл эрсдэлийг батлах (6.1.3 f)"
+                            class="btn-primary" invisible="state != 'implement'"
+                            groups="university_isms.group_isms_asset_owner"
+                            confirm="Эрсдэл хариуцагчийн хувьд үлдэгдэл эрсдэлийг хүлээн зөвшөөрч батлах уу?"/>
                     <button name="action_accept_risk" type="object" string="Эрсдэлийг хүлээн зөвшөөрөх"
                             invisible="state not in ('evaluate', 'respond') or accepted_by_id"
                             groups="university_isms.group_isms_manager"
@@ -95,6 +99,8 @@
                                    decoration-warning="residual_level == 'medium'"
                                    decoration-success="residual_level == 'low'"/>
                             <field name="current_level"/>
+                            <field name="residual_accepted_by_id" invisible="not residual_accepted_by_id"/>
+                            <field name="residual_accepted_date" invisible="not residual_accepted_by_id"/>
                         </group>
                     </group>
                     <notebook>
@@ -138,6 +144,8 @@
                 <separator/>
                 <filter name="f_mine" string="Миний хариуцсан" domain="[('owner_id', '=', uid)]"/>
                 <filter name="f_accept" string="Хүлээн зөвшөөрсөн" domain="[('treatment', '=', 'accept')]"/>
+                <filter name="f_overdue" string="Хугацаа хэтэрсэн" domain="[('is_overdue', '=', True)]"/>
+                <filter name="f_residual_pending" string="Үлдэгдэл батлалт хүлээж буй" domain="[('state', '=', 'implement')]"/>
                 <filter name="f_archived" string="Архивласан" domain="[('active', '=', False)]"/>
                 <group>
                     <filter name="g_level" string="Түвшин" context="{'group_by': 'level'}"/>

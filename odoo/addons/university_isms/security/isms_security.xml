@@ -18,7 +18,8 @@
         <field name="name">1. Мэдээлэгч (Reporter)</field>
         <field name="category_id" ref="module_category_isms"/>
         <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
-        <field name="comment">Багш, ажилтан: инцидент мэдээлэх, өөрийн мэдээлсэн инцидент, батлагдсан бодлогыг харах.</field>
+        <field name="users" eval="[(4, ref('base.user_admin'))]"/>
+        <field name="comment">Багш, ажилтан, оюутан: инцидент мэдээлэх, өөрийн мэдээлсэн инцидент, батлагдсан бодлогыг харах. Хөрөнгийн бүртгэл, эрсдэл харахгүй.</field>
     </record>
     <record id="group_isms_asset_owner" model="res.groups">
         <field name="name">2. Хөрөнгө эзэмшигч (Asset Owner)</field>
@@ -42,7 +43,8 @@
         <field name="name">5. МАБ менежер (CISO)</field>
         <field name="category_id" ref="module_category_isms"/>
         <field name="implied_ids" eval="[(4, ref('group_isms_analyst')), (4, ref('group_isms_auditor'))]"/>
-        <field name="users" eval="[(4, ref('base.user_root')), (4, ref('base.user_admin'))]"/>
+        <!-- A.5.3: техникийн admin данс CISO-гийн бизнес эрхгүй (зөвхөн Reporter + Settings) -->
+        <field name="users" eval="[(4, ref('base.user_root'))]"/>
         <field name="comment">Эрсдэл хүлээн зөвшөөрөх, бодлого батлах, инцидент хаах, SoA-г батлах.</field>
     </record>
 

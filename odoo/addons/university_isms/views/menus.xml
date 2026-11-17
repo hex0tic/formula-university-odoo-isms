@@ -58,6 +58,10 @@
               action="action_server_print_risks" sequence="2"/>
     <menuitem id="menu_isms_report_assets" name="Хөрөнгийн бүртгэл PDF" parent="menu_isms_report_top"
               action="action_server_print_assets" sequence="3"/>
+    <menuitem id="menu_isms_report_management_review" name="Удирдлагын дүн шинжилгээ (9.3) PDF" parent="menu_isms_report_top"
+              action="action_server_print_management_review" sequence="4"/>
+    <menuitem id="menu_isms_run_monitoring" name="Мониторинг одоо шалгах" parent="menu_isms_report_top"
+              action="action_server_run_monitoring" sequence="10" groups="group_isms_manager"/>
 
     <menuitem id="menu_isms_audit_log" name="Аудит лог" parent="menu_isms_root" sequence="70"
               action="action_isms_audit_log" groups="group_isms_auditor,base.group_system"/>

@@ -7,3 +7,4 @@ from . import risk
 from . import incident
 from . import policy
 from . import project_task
+from . import monitoring

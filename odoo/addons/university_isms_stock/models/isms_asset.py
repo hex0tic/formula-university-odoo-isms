@@ -20,8 +20,8 @@ class IsmsAsset(models.Model):
 class StockLot(models.Model):
     _inherit = 'stock.lot'
 
-    isms_asset_ids = fields.One2many('isms.asset', 'lot_id', 'ISMS хөрөнгө')
-    isms_asset_count = fields.Integer('ISMS хөрөнгө', compute='_compute_isms_asset_count')
+    isms_asset_ids = fields.One2many('isms.asset', 'lot_id', 'ISMS хөрөнгө', groups='university_isms.group_isms_asset_owner,university_isms.group_isms_auditor')
+    isms_asset_count = fields.Integer('ISMS хөрөнгө', compute='_compute_isms_asset_count', groups='university_isms.group_isms_asset_owner,university_isms.group_isms_auditor')
 
     def _compute_isms_asset_count(self):
         for lot in self:

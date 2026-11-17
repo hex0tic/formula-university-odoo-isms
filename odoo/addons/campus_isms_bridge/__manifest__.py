@@ -1,6 +1,6 @@
 {
     "name": "Formula Campus ISMS Integration",
-    "version": "18.0.1.0.0",
+    "version": "18.0.1.1.0",
     "summary": "Trace academic records and grade approvals in the ISMS audit log",
     "author": "Formula 5",
     "license": "AGPL-3",

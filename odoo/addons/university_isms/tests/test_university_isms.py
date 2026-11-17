@@ -1,4 +1,7 @@
 """university_isms: эрсдэлийн арга зүй, RBAC, workflow, аудит логийн бодит шалгалт."""
+from datetime import timedelta
+
+from odoo import fields
 from odoo.exceptions import AccessError, UserError
 from odoo.tests import TransactionCase, new_test_user, tagged
 
@@ -94,8 +97,9 @@ class TestUniversityIsms(TransactionCase):
     def test_07_incident_workflow_and_separation(self):
         Incident = self.env['isms.incident']
         inc = Incident.with_user(self.reporter).create({
-            'name': 'Сэжигтэй «дүн засах» и-мэйл', 'category': 'phishing', 'severity': 'high',
-            'asset_ids': [(6, 0, self.asset.ids)]})
+            'name': 'Сэжигтэй «дүн засах» и-мэйл', 'category': 'phishing', 'severity': 'high'})
+        # Хөрөнгийн холбоосыг МАБ-ын баг хийнэ (мэдээлэгч хөрөнгийн бүртгэл харахгүй)
+        inc.with_user(self.analyst).write({'asset_ids': [(6, 0, self.asset.ids)]})
         other = Incident.with_user(self.owner2).create({'name': 'Өөр хүний мэдээлэл'})
         self.assertEqual(Incident.with_user(self.reporter).search([]), inc, 'Мэдээлэгч зөвхөн өөрийнхөө')
         self.assertIn(inc, Incident.with_user(self.owner).search([]), 'Эзэмшигч өөрийн хөрөнгийн инцидентийг харна')
@@ -268,3 +272,119 @@ class TestUniversityIsms(TransactionCase):
         self.assertEqual((ack.user_id, ack.version), (self.reporter, policy.version))
         with self.assertRaises(AccessError):
             ack.with_user(self.reporter).write({'version': '0.1'})
+
+    # ------------------------------------------- 2026-11-18 нэмэлт (аудитын олдвор)
+    def test_19_reporter_cannot_read_restricted_registers(self):
+        with self.assertRaises(AccessError):
+            self.env['isms.asset'].with_user(self.reporter).search([])
+        control = self.env['isms.control'].search([('code', '=', '8.5')])
+        self.assertTrue(control.with_user(self.reporter).read(['code', 'name_mn']))
+        with self.assertRaises(AccessError):
+            control.with_user(self.reporter).read(['odoo_implementation'])
+        with self.assertRaises(AccessError):
+            self.env['isms.incident'].with_user(self.reporter).create({
+                'name': 'хөрөнгө холбох оролдлого', 'asset_ids': [(6, 0, self.asset.ids)]})
+        self.assertTrue(self.env['isms.asset'].with_user(self.owner).search_count([]))
+        self.assertTrue(self.env['isms.asset'].with_user(self.auditor).search_count([]), 'Аудитор хөрөнгийн бүртгэлийг уншина')
+        with self.assertRaises(AccessError):
+            self.asset.with_user(self.auditor).write({'location': 'аудитор засахгүй'})
+
+    def test_20_residual_risk_accepted_by_risk_owner(self):
+        risk = self._risk(self.asset, '4', '5', treatment='mitigate', state='implement', owner_id=self.owner.id,
+                          control_ids=[(6, 0, self.env['isms.control'].search([('code', '=', '8.5')]).ids)])
+        task = risk._ensure_treatment_tasks()
+        self.assertEqual(len(task), 1)
+        with self.assertRaises(UserError):  # үлдэгдэл үнэлгээгүй
+            risk.with_user(self.owner).action_accept_residual()
+        risk.with_user(self.analyst).write({'residual_likelihood': '2', 'residual_impact': '3'})
+        with self.assertRaises(UserError):  # Project даалгавар дуусаагүй
+            risk.with_user(self.owner).action_accept_residual()
+        task.stage_id = self.env.ref('university_isms.task_stage_done')
+        with self.assertRaises(AccessError):  # шинжээч эрсдэл хариуцагч биш
+            risk.with_user(self.analyst).action_accept_residual()
+        with self.assertRaises(AccessError):  # kanban drag ч мөн адил
+            risk.with_user(self.analyst).write({'state': 'residual'})
+        risk.with_user(self.owner).action_accept_residual()
+        self.assertEqual((risk.state, risk.residual_accepted_by_id), ('residual', self.owner))
+        self.assertEqual(self.asset.risk_level, 'medium')
+        with self.assertRaises(AccessError):
+            risk.with_user(self.analyst).write({'residual_accepted_by_id': self.analyst.id})
+        risk.with_user(self.analyst).write({'residual_impact': '5'})
+        self.assertEqual(risk.state, 'implement', 'Дахин үнэлбэл хариуцагч дахин батална')
+        self.assertFalse(risk.residual_accepted_by_id)
+
+    def test_21_treatment_task_created_on_implement(self):
+        risk = self._risk(self.asset, '3', '4', treatment='mitigate', state='respond', owner_id=self.analyst.id,
+                          treatment_plan='<p>MFA нэвтрүүлэх</p>')
+        risk.with_user(self.analyst).action_next_stage()
+        self.assertEqual(risk.state, 'implement')
+        self.assertEqual(len(risk.task_ids), 1)
+        self.assertEqual(risk.task_ids.stage_id, self.env.ref('university_isms.task_stage_doing'))
+        risk._ensure_treatment_tasks()
+        self.assertEqual(len(risk.task_ids), 1, 'Давхар даалгавар үүсгэхгүй')
+
+    def test_22_bruteforce_login_creates_incident(self):
+        Log = self.env['isms.audit.log'].sudo()
+        Incident = self.env['isms.incident']
+        login = 'victim@formula.example'
+        for _i in range(4):
+            Log.create({'action': 'login_failed', 'login': login, 'ip_address': '10.0.0.66'})
+        self.assertFalse(Incident._isms_detect_bruteforce(login))
+        Log.create({'action': 'login_failed', 'login': login, 'ip_address': '10.0.0.66'})
+        incident = Incident._isms_detect_bruteforce(login)
+        self.assertEqual((incident.state, incident.category, incident.reporter_type),
+                         ('report', 'unauthorized_access', 'system'))
+        self.assertIn('10.0.0.66', incident.description)
+        self.assertEqual(Incident._isms_detect_bruteforce(login), incident, 'Нээлттэй бол давхардуулахгүй')
+        self.assertIn(incident, Incident.with_user(self.analyst).search([('detection_key', '!=', False)]))
+        with self.assertRaises(AccessError):
+            incident.with_user(self.analyst).write({'detection_key': False})
+
+    def test_23_monitoring_reminders_kpis_and_report(self):
+        today = fields.Date.context_today(self.env['isms.risk'])
+        policy = self.env['isms.policy'].with_user(self.analyst).create({'name': 'Хянах хугацаа ойртсон бодлого'})
+        policy.with_user(self.manager).action_approve()
+        policy.sudo().write({'next_review_date': today + timedelta(days=5)})
+        risk = self._risk(self.asset, '3', '3', treatment='mitigate', state='respond', owner_id=self.analyst.id,
+                          due_date=today - timedelta(days=3))
+        incident = self.env['isms.incident'].sudo().create({
+            'name': 'SLA хэтэрсэн', 'severity': 'critical', 'assignee_id': self.analyst.id,
+            'detected_at': fields.Datetime.now() - timedelta(days=2)})
+        self.assertIn(incident, self.env['isms.incident'].search([('sla_status', '=', 'breached')]))
+        self.assertIn(risk, self.env['isms.risk'].search([('is_overdue', '=', True)]))
+        Monitoring = self.env['isms.monitoring']
+        first = Monitoring._cron_daily_monitoring()
+        self.assertTrue(first['policy_review'] >= 1 and first['risk_overdue'] >= 1 and first['incident_sla'] >= 1)
+        for record in (policy, risk, incident):
+            self.assertTrue(record.activity_ids, record._name)
+        second = Monitoring._cron_daily_monitoring()
+        self.assertEqual(second, {'policy_review': 0, 'risk_overdue': 0, 'incident_sla': 0}, 'Давхар сануулгагүй')
+        kpi = Monitoring._isms_kpis()
+        self.assertEqual(kpi['soa_total'], 93)
+        self.assertGreaterEqual(kpi['risks_overdue'], 1)
+        report = self.env['ir.actions.report']
+        html = report.with_user(self.auditor)._render_qweb_html(
+            'university_isms.report_management_review', self.env.company.ids)[0]
+        self.assertIn(b'Clause 9.3', html)
+        with self.assertRaises(AccessError):
+            report.with_user(self.reporter)._render_qweb_html(
+                'university_isms.report_management_review', self.env.company.ids)
+
+    def test_24_admin_account_has_no_ciso_rights(self):
+        admin = self.env.ref('base.user_admin')
+        self.assertFalse(admin.has_group('university_isms.group_isms_manager'))
+        self.assertTrue(admin.has_group('university_isms.group_isms_reporter'))
+        self.assertTrue(admin.has_group('base.group_system'))
+
+    def test_25_report_menus_work_for_read_only_auditor(self):
+        for xmlid in ('action_server_print_soa', 'action_server_print_risks', 'action_server_print_assets',
+                      'action_server_print_management_review'):
+            action = self.env.ref('university_isms.' + xmlid)
+            result = action.with_user(self.auditor).run()
+            self.assertEqual(result.get('type'), 'ir.actions.report', xmlid)
+            with self.assertRaises(AccessError):
+                action.with_user(self.reporter).run()
+        monitoring = self.env.ref('university_isms.action_server_run_monitoring')
+        self.assertEqual(monitoring.with_user(self.manager).run().get('tag'), 'display_notification')
+        with self.assertRaises(AccessError):
+            monitoring.with_user(self.analyst).run()

@@ -75,3 +75,14 @@ class TestCampusIsmsBridge(TransactionCase):
             log.with_user(self.registrar).write({"changes": "forged"})
         with self.assertRaises(UserError):
             log.with_user(self.registrar).unlink()
+
+    def test_campus_users_can_report_security_events(self):
+        """A.6.8: сургалтын албаны хэрэглэгч ISMS-д инцидент мэдээлж, хөрөнгийн бүртгэл харахгүй."""
+        self.assertTrue(self.registrar.has_group("university_isms.group_isms_reporter"))
+        incident = self.env["isms.incident"].with_user(self.registrar).create({
+            "name": "Сэжигтэй «дүн засах» и-мэйл ирсэн", "category": "phishing", "reporter_type": "staff",
+        })
+        incident.with_user(self.registrar).action_report()
+        self.assertEqual((incident.state, incident.reporter_id), ("report", self.registrar))
+        with self.assertRaises(AccessError):
+            self.env["isms.asset"].with_user(self.registrar).search([])

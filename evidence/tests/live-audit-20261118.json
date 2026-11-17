@@ -1,0 +1,48 @@
+{
+  "result": "PASS",
+  "checked_at": "2026-11-18T07:33+08:00",
+  "method": "Бодит HTTP JSON-RPC (127.0.0.1:8069), кейсийн хэрэглэгчийн session; нууц үгийг evidence/private-ээс уншсан, гаргаагүй",
+  "migration_18_0_1_1_0": {
+    "accepted_by_repaired": [
+      "RSK-14"
+    ],
+    "residual_acceptance_repaired": [
+      "RSK-03",
+      "RSK-14"
+    ],
+    "treatment_tasks_created": 10,
+    "admin_isms_groups_after": "1. Мэдээлэгч (Reporter)"
+  },
+  "canonical_fix": {
+    "INC-2026-0001": "notification_done=True, notification_note нь data/incidents.csv-ээс (scripts/sync_incident_notifications.py)"
+  },
+  "bruteforce_detection": {
+    "rule": "5 login_failed / 15 мин / нэг login",
+    "test_login": "bruteforce.drill@formula-university.example (байхгүй данс)",
+    "incident": "INC-2026-0070",
+    "state": "report",
+    "severity": "high",
+    "helpdesk_ticket_linked": true
+  },
+  "role_matrix": {
+    "telmuun (Дотоод аудитор)": {
+      "SoA PDF": "allowed",
+      "Удирдлагын дүн шинжилгээ PDF": "allowed",
+      "Мониторинг ажиллуулах": "AccessError",
+      "isms.asset search_count": 16
+    },
+    "dorjsembe (CISO)": {
+      "SoA PDF": "allowed",
+      "Удирдлагын дүн шинжилгээ PDF": "allowed",
+      "Мониторинг ажиллуулах": "allowed"
+    },
+    "lecturer_cs (Мэдээлэгч)": {
+      "isms.asset read": "AccessError",
+      "SoA odoo_implementation": "AccessError",
+      "incident asset_ids link": "AccessError",
+      "product isms_catalog_classification": "AccessError",
+      "SoA/удирдлагын PDF": "AccessError / HTTP 403"
+    }
+  },
+  "reports": "evidence/reports/2026-11-18/*.pdf"
+}

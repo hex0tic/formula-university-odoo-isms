@@ -18,7 +18,7 @@ Formula 5 багийн их сургуулийн шинэ кейс, академ
 
 ## Баталгаажуулалт
 
-16 хөрөнгө ба 16 Inventory product; 14 эрсдэл; 25 сонгосон хяналт (15 yes,10 partial); 7 incident/7Helpdesk ticket; 39 тест 0failed0errors; локалrestore190attachmentchecksumтаарсан. Хүний хариуцах үүрэг нь хэрэглэгчийн баталсан хуваарь;AI тусламжтай хийсэн ажлыг хүн өөрөө хийсэн гэж зохиогоогүй.
+16 хөрөнгө ба 16 Inventory product; 14 эрсдэл; 25 сонгосон хяналт (15 yes,10 partial); 7 incident/7Helpdesk ticket (2026-11-18-ны brute-force илрүүлэлтийн шалгалтаар +1); 47 тест 0 failed 0 errors (тусдаа түр DB дээр, `evidence/tests/regression-20261118.json`); локалrestore190attachmentchecksumтаарсан. Хүний хариуцах үүрэг нь хэрэглэгчийн баталсан хуваарь;AI тусламжтай хийсэн ажлыг хүн өөрөө хийсэн гэж зохиогоогүй.
 
 Гуравдагч талын эх ба лиценз: `THIRD_PARTY.md`.
 

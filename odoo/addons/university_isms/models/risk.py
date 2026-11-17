@@ -102,18 +102,23 @@ class IsmsRisk(models.Model):
                                       tracking=True)
     current_level = fields.Selection(LEVELS, 'Одоогийн түвшин', compute='_compute_scores', store=True,
                                      help='Үлдэгдэл үнэлгээ хийгдсэн бол үлдэгдэл, эс бөгөөс анхны түвшин')
+    residual_accepted_by_id = fields.Many2one('res.users', 'Үлдэгдэл эрсдэлийг баталсан', readonly=True,
+                                              tracking=True, copy=False,
+                                              help='ISO/IEC 27001:2022 6.1.3 f): эрсдэл хариуцагч эсвэл CISO')
+    residual_accepted_date = fields.Date('Үлдэгдэл баталсан огноо', readonly=True, copy=False)
 
     task_ids = fields.One2many('project.task', 'isms_risk_id', 'Хариу арга хэмжээний даалгавар')
     task_count = fields.Integer('Даалгавар', compute='_compute_task_count')
     incident_ids = fields.Many2many('isms.incident', 'isms_incident_risk_rel', 'risk_id', 'incident_id',
                                     string='Холбогдох инцидент')
-    is_overdue = fields.Boolean('Хугацаа хэтэрсэн', compute='_compute_is_overdue')
+    is_overdue = fields.Boolean('Хугацаа хэтэрсэн', compute='_compute_is_overdue', search='_search_is_overdue')
 
     _sql_constraints = [('code_uniq', 'unique(code)', 'Эрсдэлийн код давхардахгүй байх ёстой.')]
 
     # Хүлээн зөвшөөрөлт, үе шатыг зөвхөн сервер талын workflow өөрчилнө (RPC/kanban drag ч шалгагдана)
-    _PROTECTED = {'accepted_by_id', 'accepted_date'}
+    _PROTECTED = {'accepted_by_id', 'accepted_date', 'residual_accepted_by_id', 'residual_accepted_date'}
     _ASSESSMENT_FIELDS = {'likelihood', 'impact', 'treatment', 'asset_ids'}
+    _RESIDUAL_FIELDS = {'residual_likelihood', 'residual_impact'}
 
     @api.model_create_multi
     def create(self, vals_list):
@@ -141,9 +146,19 @@ class IsmsRisk(models.Model):
                 accepted._isms_internal().write({'accepted_by_id': False, 'accepted_date': False})
                 for rec in accepted:
                     rec.message_post(body=_('Үнэлгээ өөрчлөгдсөн тул өмнөх хүлээн зөвшөөрөлт хүчингүй боллоо.'))
+        if self._RESIDUAL_FIELDS & set(vals):
+            # Батлагдсан үлдэгдэл эрсдэл дахин үнэлэгдвэл хариуцагч дахин батална (6.1.3 f)
+            stale = self.filtered('residual_accepted_by_id')
+            if stale:
+                stale._isms_internal().write({'residual_accepted_by_id': False, 'residual_accepted_date': False,
+                                              'state': 'implement'})
+                for rec in stale:
+                    rec.message_post(body=_('Үлдэгдэл үнэлгээ өөрчлөгдсөн тул эрсдэл хариуцагч дахин батална.'))
         if target:
             for rec in self.filtered(lambda r: r.state != target):
-                if target == NEXT_STATE.get(rec.state):
+                if target == 'residual' and rec.state == 'implement':
+                    rec.action_accept_residual()
+                elif target == NEXT_STATE.get(rec.state):
                     rec.action_next_stage()
                 elif target == 'identify':
                     rec.action_back_to_identify()
@@ -182,6 +197,14 @@ class IsmsRisk(models.Model):
         for rec in self:
             rec.is_overdue = bool(rec.due_date and rec.due_date < today and rec.state != 'residual')
 
+    def _search_is_overdue(self, operator, value):
+        domain = [('due_date', '<', fields.Date.context_today(self)), ('state', '!=', 'residual')]
+        positive = (operator == '=') == bool(value)
+        if positive:
+            return domain
+        return ['|', ('due_date', '=', False), '|', ('due_date', '>=', fields.Date.context_today(self)),
+                ('state', '=', 'residual')]
+
     # ------------------------------------------------------------ workflow
     def _check_transition(self, target):
         for rec in self:
@@ -206,18 +229,109 @@ class IsmsRisk(models.Model):
             raise AccessError(_('Эрсдэлийн үе шатыг зөвхөн МАБ шинжээч өөрчилнө.'))
 
     def action_next_stage(self):
-        self._require_analyst()
         for rec in self:
             target = NEXT_STATE.get(rec.state)
             if not target:
                 continue
+            if target == 'residual':
+                # Үлдэгдэл эрсдэлийг шинжээч биш, эрсдэл хариуцагч/CISO батална (6.1.3 f)
+                rec.action_accept_residual()
+                continue
+            rec._require_analyst()
             rec._check_transition(target)
             rec._isms_internal().write({'state': target})
+            if target == 'implement':
+                rec._ensure_treatment_tasks()
         return True
 
     def action_back_to_identify(self):
         self._require_analyst()
-        self._isms_internal().write({'state': 'identify', 'accepted_by_id': False, 'accepted_date': False})
+        self._isms_internal().write({'state': 'identify', 'accepted_by_id': False, 'accepted_date': False,
+                                     'residual_accepted_by_id': False, 'residual_accepted_date': False})
+
+    def _treatment_tasks_open(self):
+        self.ensure_one()
+        return self.task_ids.filtered(
+            lambda t: not t.stage_id.fold and t.state not in ('1_done', '1_canceled'))
+
+    def action_accept_residual(self):
+        """ISO/IEC 27001:2022 6.1.3 f): эрсдэл хариуцагч үлдэгдэл эрсдэлийг батлана."""
+        is_manager = self.env.su or self.env.user.has_group('university_isms.group_isms_manager')
+        for rec in self:
+            if rec.state != 'implement':
+                raise UserError(_('%s: үлдэгдэл эрсдэлийг хэрэгжүүлэлтийн дараа (5-р үе шат) батална.') % rec.code)
+            if not is_manager and rec.owner_id != self.env.user:
+                raise AccessError(_('%s: үлдэгдэл эрсдэлийг зөвхөн эрсдэл хариуцагч (%s) эсвэл CISO батална.')
+                                  % (rec.code, rec.owner_id.name or '-'))
+            rec._check_transition('residual')
+            open_tasks = rec.sudo()._treatment_tasks_open()
+            if open_tasks:
+                raise UserError(_('%s: хариу арга хэмжээний %d даалгавар дуусаагүй байна (Project).')
+                                % (rec.code, len(open_tasks)))
+            # Эрх дээр шалгагдсан: эрсдэл хариуцагч нь write ACL-гүй (хөрөнгө эзэмшигч) байж болох тул
+            # зөвхөн энэ батлалтын талбаруудыг sudo-оор бичнэ; аудит лог ба chatter-т бодит хэрэглэгч үлдэнэ.
+            rec.sudo()._isms_internal().write({
+                'state': 'residual',
+                'residual_accepted_by_id': self.env.user.id,
+                'residual_accepted_date': fields.Date.context_today(self),
+            })
+            rec.sudo().message_post(body=_('Үлдэгдэл эрсдэлийг (%s) %s баталлаа.')
+                                    % (dict(LEVELS).get(rec.residual_level), self.env.user.name),
+                                    author_id=self.env.user.partner_id.id)
+        return True
+
+    @api.model
+    def _isms_repair_workflow_consistency(self, reason):
+        """Импорт/хуучин өгөгдлийг workflow-ийн дүрэмтэй нийцүүлнэ (тайлбарыг chatter-т үлдээнэ).
+
+        * «Хүлээн зөвшөөрөх» эрсдэл 5–6-р үе шатанд CISO-гийн батлалтгүй бол эрсдэл хариуцагч нь CISO
+          тохиолдолд батлалтыг бүртгэнэ; эс бөгөөс анхааруулга буцаана.
+        * 6-р үе шатны эрсдэлд үлдэгдэл батлалт байхгүй бол эрсдэл хариуцагчаар бүртгэнэ (6.1.3 f).
+        * Хариу арга хэмжээтэй эрсдэлд Risk Treatment Plan даалгавар үүсгэнэ.
+        """
+        risks = self.sudo().with_context(active_test=False).search([])
+        today = fields.Date.context_today(self)
+        manager = 'university_isms.group_isms_manager'
+        report = {'accepted': [], 'residual': [], 'warnings': [], 'tasks': 0}
+        for rec in risks.filtered(lambda r: r.treatment == 'accept' and r.state in ('implement', 'residual')
+                                  and not r.accepted_by_id):
+            if rec.owner_id and rec.owner_id.has_group(manager):
+                rec._isms_internal().write({'accepted_by_id': rec.owner_id.id, 'accepted_date': today})
+                rec.message_post(body=_('Workflow-ийн нийцлийн засвар (%s): «Хүлээн зөвшөөрөх» шийдвэрийг эрсдэл '
+                                        'хариуцагч CISO %s-ээр бүртгэв.') % (reason, rec.owner_id.name))
+                report['accepted'].append(rec.code)
+            else:
+                report['warnings'].append('%s: CISO батлалт шаардлагатай' % rec.code)
+        for rec in risks.filtered(lambda r: r.state == 'residual' and not r.residual_accepted_by_id and r.owner_id):
+            rec._isms_internal().write({'residual_accepted_by_id': rec.owner_id.id, 'residual_accepted_date': today})
+            rec.message_post(body=_('Workflow-ийн нийцлийн засвар (%s): canonical өгөгдөлд 6-р үе шатанд байсан тул '
+                                    'үлдэгдэл эрсдэлийн батлалтыг эрсдэл хариуцагч %s-ээр бүртгэв.')
+                             % (reason, rec.owner_id.name))
+            report['residual'].append(rec.code)
+        report['tasks'] = len(risks._ensure_treatment_tasks())
+        return report
+
+    def _ensure_treatment_tasks(self):
+        """Хариу арга хэмжээтэй эрсдэл бүрт Risk Treatment Plan төслийн даалгавар байлгана (Clause 6.1.3 e, 8.3)."""
+        project = self.env.ref('university_isms.project_risk_treatment')
+        stage_by_state = {
+            'respond': self.env.ref('university_isms.task_stage_todo'),
+            'implement': self.env.ref('university_isms.task_stage_doing'),
+            'residual': self.env.ref('university_isms.task_stage_done'),
+        }
+        tasks = self.env['project.task']
+        for rec in self.filtered(lambda r: r.treatment in ('mitigate', 'transfer', 'avoid')
+                                 and r.state in stage_by_state and not r.task_ids):
+            tasks |= self.env['project.task'].create({
+                'name': '[%s] %s — хариу арга хэмжээ' % (rec.code, rec.name),
+                'project_id': project.id,
+                'stage_id': stage_by_state[rec.state].id,
+                'isms_risk_id': rec.id,
+                'user_ids': [(6, 0, rec.owner_id.ids)],
+                'date_deadline': rec.due_date or (fields.Date.context_today(self) + timedelta(days=30)),
+                'description': rec.treatment_plan,
+            })
+        return tasks
 
     def action_accept_risk(self):
         if not self.env.user.has_group('university_isms.group_isms_manager'):
