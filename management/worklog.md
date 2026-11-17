@@ -111,3 +111,6 @@ D08 нэрийн өөрчлөлтийг company/menu/canonical data/policies/rep
 12. Bootstrap-д хуучин нэрийн website/email, лого хоосон → Formula University лого, `formula-university.example`.
 **Нэмэлт боломж:** brute-force нэвтрэлтийн автомат инцидент (A.8.16), өдөр тутмын мониторинг cron (бодлогын хяналт, хугацаа хэтэрсэн эрсдэл, SLA), Clause 9.3 удирдлагын дүн шинжилгээний PDF, «Хугацаа хэтэрсэн», «SLA хэтэрсэн», «Автомат илрүүлэлт» шүүлтүүр.
 **Шалгалт:** `run-tests.sh` → 47/47 PASS (`evidence/tests/regression-20261118.json`). Бодит HTTP: brute-force → INC-2026-0070 (Report, Helpdesk тасалбартай); аудитор SoA/удирдлагын PDF хэвлэнэ, мониторинг хориотой; CISO бүгд; багш бүх хязгаарлагдмал бүртгэлээс татгалзагдсан (`evidence/tests/live-audit-20261118.json`). PDF: `evidence/reports/2026-11-18/`; 11-16-ны түүхэн PDF-ийг санамсаргүй дарж бичсэнээ git хуулбараас сэргээв.
+
+## 2026-11-18 07:39 — Claude Code: GitHub push
+- `hex0tic/formula-university-odoo-isms` → branch `claude/audit-fixes-20261118`, commit `7a43fe0805b40237a309ac1fb9fcadf8ca1baf3a` (48 файл, +1007/−70). Remote SHA таарсан. Push хийхээс өмнө өөрчлөгдсөн 47 файлыг `odoo/.env` ба `evidence/private/`-ийн 22 нууц утгатай тулгаж шалгав — нууц үг ороогүй. `main` руу merge хийх эсэхийг хэрэглэгч шийднэ.
