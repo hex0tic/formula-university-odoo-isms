@@ -114,3 +114,11 @@ D08 нэрийн өөрчлөлтийг company/menu/canonical data/policies/rep
 
 ## 2026-11-18 07:39 — Claude Code: GitHub push
 - `hex0tic/formula-university-odoo-isms` → branch `claude/audit-fixes-20261118`, commit `7a43fe0805b40237a309ac1fb9fcadf8ca1baf3a` (48 файл, +1007/−70). Remote SHA таарсан. Push хийхээс өмнө өөрчлөгдсөн 47 файлыг `odoo/.env` ба `evidence/private/`-ийн 22 нууц утгатай тулгаж шалгав — нууц үг ороогүй. `main` руу merge хийх эсэхийг хэрэглэгч шийднэ.
+
+## 2026-11-18 07:54 — Claude Code: өнөөдрийн ажлын нэгтгэл ба merge
+1. **Аудит:** ажиллаж буй Odoo-гийн төлөв (Odoo 18, 14 модуль, 39 тест), runtime лог, DB-ийн өгөгдлийн чанар, бүх custom модулийн код, бодит HTTP-ийн үүргийн allow/deny-г шалгав.
+2. **Засвар:** 11 олдвор (импортын workflow зөрчил ×2, Project ашиглагдаагүй, 6.1.3 f) дутуу, Reporter-ийн мэдээлэл задрал, campus мэдээлэх эрхгүй, admin=CISO, аудитор хэвлэж чадахгүй, тест ашиглалтын DB дээр, PG segfault, token context урсах, хуучин нэр).
+3. **Нэмэлт:** brute-force илрүүлэлт, мониторинг cron, Clause 9.3 тайлан, шүүлтүүр; `university_isms` 18.0.1.1.0 + migration.
+4. **Баталгаа:** 47/47 тест тусдаа DB дээр; бодит HTTP-ээр аудитор/CISO/багшийн эрх; INC-2026-0070 автомат инцидент.
+5. **Баримт:** `management/audit-20261118.md` — засвар бүрийн «яагаад» үндэслэл ба ISO заалт; `odoo-guide.md`, `schema-university_isms.md` v1.1, `operations.md`, `README.md` шинэчилсэн.
+6. **GitHub:** branch `claude/audit-fixes-20261118` (commit 7a43fe0, a5ad1d3) → үндэслэл бүхий merge commit-оор `main` руу.
