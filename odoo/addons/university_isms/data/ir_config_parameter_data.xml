@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <!-- A.8.16: нэг нэвтрэх нэр дээр window_minutes хугацаанд threshold удаа амжилтгүй нэвтрэлт → автомат инцидент -->
+    <record id="param_bruteforce_threshold" model="ir.config_parameter">
+        <field name="key">university_isms.bruteforce_threshold</field>
+        <field name="value">5</field>
+    </record>
+    <record id="param_bruteforce_window" model="ir.config_parameter">
+        <field name="key">university_isms.bruteforce_window_minutes</field>
+        <field name="value">15</field>
+    </record>
+</odoo>

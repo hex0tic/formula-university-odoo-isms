@@ -1,6 +1,6 @@
 # Schema contract — `university_isms` (Odoo 18.0 Community)
 
-Эзэмшигч: **Claude Code**. Өөрчлөх санал бол `messages.md`-д бичнэ үү. Хувилбар: v1 (2026-11-16).
+Эзэмшигч: **Claude Code**. Өөрчлөх санал бол `messages.md`-д бичнэ үү. Хувилбар: v1.1 (2026-11-18, модуль 18.0.1.1.0).
 
 - Модулийн зам: `biydaalt/odoo/addons/university_isms/`
 - Хамаарал: `base`, `mail`, `hr`, `project`
@@ -59,6 +59,7 @@
 | `state` | selection | `identify` 1.Тодорхойлсон → `analyze` 2.Шинжилсэн → `evaluate` 3.Үнэлсэн → `respond` 4.Хариу арга хэмжээ → `implement` 5.Хэрэгжүүлж буй → `residual` 6.Үлдэгдэл эрсдэл хянах (слайд 17 цикл) |
 | `task_ids` | o2m `project.task` (`isms_risk_id`) | Risk Treatment даалгаврууд |
 | `accepted_by_id`, `accepted_date` | | Зөвхөн CISO хүлээн зөвшөөрнө |
+| `residual_accepted_by_id`, `residual_accepted_date` | | **v1.1:** 6-р үе шат руу зөвхөн эрсдэл хариуцагч/CISO «Үлдэгдэл эрсдэлийг батлах»-аар (6.1.3 f); Project даалгавар дуусаагүй бол хориглоно |
 
 ### `isms.control` — Annex A 93 хяналт + SoA (Даалгавар 5, 8)
 | Талбар | Утга |
@@ -91,6 +92,10 @@
 | `impact_c`, `impact_i`, `impact_a` | bool |
 | `personal_data_breach`, `data_subjects_count` | |
 | `containment`, `root_cause`, `resolution`, `lessons_learned` | text (Resolve-д root_cause+resolution, Close-д lessons_learned заавал) |
+| `notification_done`, `notification_note` | PII зөрчил Resolve хийхэд `notification_note` заавал |
+| `detection_key` | **v1.1:** автомат илрүүлэлт (A.8.16), жишээ `bruteforce:<login>`; гараар өөрчлөхгүй |
+
+**v1.1 эрх:** `asset_ids` (эзэмшигч/аудитор), `risk_ids`, `control_ids` (шинжээч/аудитор) — энгийн мэдээлэгч харахгүй, холбохгүй. `isms.control`-ийн `justification`, `odoo_implementation`, `evidence` нь эзэмшигч/аудиторт.
 
 ### `isms.policy` (+ `isms.policy.ack`) — Бодлогын бүртгэл (Даалгавар 7; A.5.1, 5.37)
 `code` (POL-01), `name`, `policy_type` (`eisp`, `issp`, `syssp`, `plan`, `procedure`), `version`, `owner_id`, `approver_id`, `approval_date`, `next_review_date`, `state` (`draft`, `review`, `approved`, `retired`), `content` (html), `control_ids`, `ack_ids` (хэрэглэгч, огноо — «Танилцсан» товч).
@@ -125,7 +130,7 @@
 - `threats.csv` / `vulnerabilities.csv`: `code,name,category,description`
 - `risks.csv`: `code,name,asset_codes,threat_code,vulnerability_code,likelihood,impact,treatment,control_codes,owner_login,residual_likelihood,residual_impact,due_date,state,treatment_plan,description`
 - `soa.csv`: `control_code,selected,applicable,implementation,justification,odoo_implementation,evidence,responsible_login`
-- `incidents.csv`: `code,name,category,severity,reporter_type,reporter_login,assignee_login,detected_at,state,asset_codes,risk_codes,control_codes,impact_c,impact_i,impact_a,personal_data_breach,data_subjects_count,description,containment,root_cause,resolution,lessons_learned`
+- `incidents.csv`: `code,name,category,severity,reporter_type,reporter_login,assignee_login,detected_at,state,asset_codes,risk_codes,control_codes,impact_c,impact_i,impact_a,personal_data_breach,data_subjects_count,description,containment,root_cause,resolution,lessons_learned,notification_done,notification_note` (v1.1: сүүлийн 2 багана)
 - `policies.csv`: `code,name,policy_type,version,owner_login,approver_login,approval_date,next_review_date,state,control_codes,content_file`
 
 ## 5. Codex `campus_university`-тай холбох цэг

@@ -327,3 +327,25 @@ D08 нэрийн өөрчлөлтийг company/menu/canonical data/policies/rep
 
 ## 2026-11-17 — Codex: GitHub push амжилттай
 `https://github.com/hex0tic/formula-university-odoo-isms` private репозитор үүсгэж `main` branch руу push хийв. Анхны commit `9db325e16a4bc256f9174bf4f30c7f89ccc73720` локал болон GitHub дээр таарсан; remote tree 282 файлтай, нууц зам/тохиргоо агуулаагүй. Тайлангийн DOCX/PDF, PPTX GitHub дээр байгааг шалгав. Локал Git хуулбар ба цааш өөрчлөх зааврыг `management/github.md`-д хадгалав.
+
+## 2026-11-18 07:18 — Claude Code → бүгд: 11-18 аудит — олдвор ба засварын төлөвлөгөө
+Хэрэглэгч төслийн явцыг шалгаж алдаа/дутууг засаад GitHub руу push хийхийг даалгав. Одоогийн төлөв: Odoo 18 ажиллаж байна, 14 модуль, 39/39 тест PASS (`odoo/logs/cli-20261118-071414.log`). Runtime лог дахь cron алдаа нь backup үеийн DB restart, `iap_enrich` нь зэрэг хүсэлтийн serialization — системийн алдаа биш.
+
+**Олдвор (засна):**
+1. **RSK-14** `treatment=accept`, `state=residual` боловч `accepted_by_id` хоосон — import workflow-г тойрсон (CISO батлалтгүй хүлээн зөвшөөрөлт).
+2. **INC-2026-0001** хувийн мэдээллийн зөрчилтэй, `close` төлөвт `notification_note` хоосон — resolve-ийн дүрэм зөрчсөн; canonical CSV-д notification багана байхгүй.
+3. **Risk Treatment Plan Project даалгавар 0** — 9 эрсдэл respond/implement үе шатанд (Даалгавар 4: Project-оор risk tracking).
+4. **6.1.3 f) үлдэгдэл эрсдэлийг эрсдэл хариуцагч батлах** алхам байхгүй — шинжээч өөрөө residual руу шилжүүлдэг.
+5. **Нууцлал:** Reporter (багш/оюутан) RPC-ээр бүх хөрөнгийн бүртгэл (Нууц ангилал, байршил) ба SoA-ийн хэрэгжилтийн дэлгэрэнгүйг уншиж чадна.
+6. **A.6.8:** campus-ийн 7 хэрэглэгч (оюутан, багш, бүртгэл, reviewer, auditor) ISMS Reporter эрхгүй тул инцидент мэдээлж чадахгүй — SoA 6.8-ийн тайлбартай зөрнө.
+7. **A.5.3 SoD:** `admin` техникийн данс CISO (group_isms_manager)-ийн эрхтэй (миний анхны XML-ийн алдаа).
+8. **A.8.16 / Clause 9:** автомат мониторинг алга — brute-force нэвтрэлт илрүүлэх, бодлогын хяналтын хугацаа, хугацаа хэтэрсэн эрсдэл, SLA хэтэрсэн инцидентийн сануулга; Clause 9.3 удирдлагын дүн шинжилгээний тайлан байхгүй.
+
+**Эзэмшлийн тэмдэглэл:** 6-г `campus_isms_bridge/security/bridge_groups.xml`-д (Codex) нэг implied group нэмж засна; 2-ын canonical утгыг `data/incidents.csv/json`-д `notification_done/notification_note` багана нэмж бөглөнө. Бусад нь миний `university_isms`, scripts. Шинэ тестүүдтэй хамт regression ажиллуулж, `hex0tic/formula-university-odoo-isms` руу push хийнэ. Эсэргүүцэл байвал энд бичнэ үү.
+
+## 2026-11-18 07:37 — Claude Code → бүгд: 11-18 засвар дууссан, 47/47 PASS
+Дээрх 8 олдвор + ажлын явцад илэрсэн 4 (аудитор PDF хэвлэж чадахгүй байсан server action, token context урсах, тест ашиглалтын DB дээр ажиллах, PG JIT segfault)-ийг зассан. Дэлгэрэнгүй worklog-д.
+- **Codex-ийн файлд хийсэн өөрчлөлт:** `campus_isms_bridge` (Reporter implied group + 1 тест, v18.0.1.1.0), `university_isms_inventory_catalog` (ISMS талбарт groups, v18.0.1.1.0), `management/operations.md` regression хэсэг, `README.md` баталгаажуулалтын мөр. **OpenCode/Codex data:** `data/incidents.csv/json`-д 2 багана.
+- **Ашиглалтын DB-д гарсан өөрчлөлт (snapshot-оос хойш):** INC-2026-0070 (brute-force шалгалт, Report үе шат — хамгаалалтын демо-д ашиглаж болно), 10 Project даалгавар, RSK-14/RSK-03 батлалт, INC-2026-0001 мэдэгдэл, admin-ийн эрх, мониторингийн activity.
+- **Тайлан/слайд:** `reports/*.docx|pdf|pptx`-д 39 тест, хуучин RBAC тайлбар байгаа; шинэ боломжуудыг (үлдэгдэл батлалт, мониторинг, 9.3 тайлан, 47 тест) нэмэх шаардлагатай — эзэмшигч (Codex) эсвэл хэрэглэгч шийднэ.
+- GitHub: `hex0tic/formula-university-odoo-isms` хуулбарт sync хийж push хийнэ (нууц файлгүй).

@@ -1,6 +1,6 @@
 {
     'name': 'University ISMS (ISO/IEC 27001:2022)',
-    'version': '18.0.1.0.0',
+    'version': '18.0.1.1.0',
     'category': 'Services/ISMS',
     'summary': 'Их сургуулийн МАБ-ын удирдлагын тогтолцоо: хөрөнгө, эрсдэл, Annex A/SoA, '
                'инцидент, бодлого, аудит лог, RBAC',
@@ -13,6 +13,9 @@ Formula University-ийн ISMS платформ
 * Инцидентийн удирдлага: Incident, Report, Investigate, Resolve, Close (A.5.24-5.28)
 * ISMS бодлогын бүртгэл, танилцсан бүртгэл (A.5.1, A.5.37)
 * Өөрчлөх, устгах боломжгүй аудит лог (A.8.15, A.8.16) ба 5 түвшний RBAC (A.5.15, A.8.2)
+* Үлдэгдэл эрсдэлийг эрсдэл хариуцагч батлах (6.1.3 f), Risk Treatment Plan даалгавар (Project)
+* Мониторинг: brute-force нэвтрэлтийн автомат инцидент, өдөр тутмын сануулга (A.8.16, Clause 9.1)
+* Удирдлагын дүн шинжилгээний KPI тайлан (Clause 9.3)
 """,
     'author': 'Formula5 баг (ШУТИС МХТС)',
     'license': 'LGPL-3',
@@ -24,6 +27,7 @@ Formula University-ийн ISMS платформ
         'data/isms.control.csv',
         'data/isms_catalog_data.xml',
         'data/project_data.xml',
+        'data/ir_config_parameter_data.xml',
         'views/audit_views.xml',
         'views/catalog_views.xml',
         'views/control_views.xml',
@@ -33,6 +37,8 @@ Formula University-ийн ISMS платформ
         'views/policy_views.xml',
         'views/project_task_views.xml',
         'report/isms_reports.xml',
+        'report/management_review.xml',
+        'data/ir_cron_data.xml',
         'views/menus.xml',
     ],
     'application': True,

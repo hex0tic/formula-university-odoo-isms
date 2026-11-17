@@ -1,5 +1,5 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_asset_reporter,asset reporter,model_isms_asset,group_isms_reporter,1,0,0,0
+access_asset_auditor,asset auditor,model_isms_asset,group_isms_auditor,1,0,0,0
 access_asset_owner,asset owner,model_isms_asset,group_isms_asset_owner,1,1,0,0
 access_asset_analyst,asset analyst,model_isms_asset,group_isms_analyst,1,1,1,0
 access_asset_manager,asset manager,model_isms_asset,group_isms_manager,1,1,1,1

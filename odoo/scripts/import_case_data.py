@@ -262,6 +262,8 @@ for r in rows('incidents.csv'):
         'description': r.get('description') or False, 'containment': r.get('containment') or False,
         'root_cause': r.get('root_cause') or False, 'resolution': r.get('resolution') or False,
         'lessons_learned': r.get('lessons_learned') or False,
+        'notification_done': boolean(r.get('notification_done')),
+        'notification_note': r.get('notification_note') or False,
     }
     if not vals['detected_at']:
         vals.pop('detected_at')
@@ -299,6 +301,21 @@ for r in rows('policies.csv'):
     elif state != 'approved':
         pol.state = state
 
+# 9. Workflow-ийн нийцэл (university_isms 18.0.1.1.0+): CSV-ийн төлөвийг шууд бичсэн тул дүрэмтэй тулгана
+if hasattr(env['isms.risk'], '_isms_repair_workflow_consistency'):
+    repair = env['isms.risk']._isms_repair_workflow_consistency('canonical import')
+    print('workflow repair:', repair)
+problems = []
+for inc in env['isms.incident'].search([('state', 'in', ('resolve', 'close'))]):
+    if not (inc.root_cause and inc.resolution):
+        problems.append('%s: root_cause/resolution хоосон' % inc.code)
+    if inc.personal_data_breach and not inc.notification_note:
+        problems.append('%s: хувийн мэдээллийн зөрчлийн notification_note хоосон' % inc.code)
+    if inc.state == 'close' and not inc.lessons_learned:
+        problems.append('%s: lessons_learned хоосон' % inc.code)
+for pol in env['isms.policy'].search([('state', '=', 'approved'), ('approver_id', '=', False)]):
+    problems.append('%s: батлагдсан бодлогын батлагч хоосон' % pol.code)
+print('consistency problems:', problems or 'байхгүй')
 print('IMPORT %s' % ('DRY-RUN (rollback)' if DRY_RUN else 'OK'), stats)
 print('counts: assets=%d risks=%d selected_controls=%d incidents=%d policies=%d users_isms=%d' % (
     env['isms.asset'].search_count([]), env['isms.risk'].search_count([]),

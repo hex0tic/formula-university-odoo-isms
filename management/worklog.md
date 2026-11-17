@@ -93,3 +93,21 @@ D08 нэрийн өөрчлөлтийг company/menu/canonical data/policies/rep
 
 ## 2026-11-17 — Codex: GitHub push амжилттай
 `https://github.com/hex0tic/formula-university-odoo-isms` private репозитор үүсгэж `main` branch руу push хийв. Анхны commit `9db325e16a4bc256f9174bf4f30c7f89ccc73720` локал болон GitHub дээр таарсан; remote tree 282 файлтай, нууц зам/тохиргоо агуулаагүй. Тайлангийн DOCX/PDF, PPTX GitHub дээр байгааг шалгав. Локал Git хуулбар ба цааш өөрчлөх зааврыг `management/github.md`-д хадгалав.
+
+## 2026-11-18 07:37 — Claude Code: төслийн аудит, алдаа засвар, нэмэлт (university_isms 18.0.1.1.0)
+**Эхний төлөв:** Odoo 18.0-20261112 + PG16 ажиллаж байсан, 14 custom/CE модуль, 16 хөрөнгө, 14 эрсдэл, 25 сонгосон хяналт, 7 инцидент/7 тасалбар, 516 аудит бичлэг; 39/39 тест (ашиглалтын DB дээр). Runtime лог дахь cron алдаа нь backup үеийн DB restart (benign).
+**Олдсон алдаа/дутуу ба засвар:**
+1. RSK-14 «Хүлээн зөвшөөрөх» CISO-гийн батлалтгүй 6-р үе шатанд — импорт workflow-г тойрсон → `_isms_repair_workflow_consistency` + migration (эрсдэл хариуцагч нь CISO тул батлалтыг бүртгэв, chatter-т тэмдэглэв); импорт цаашид өөрөө тулгана.
+2. INC-2026-0001 (PII) мэдэгдлийн шийдвэргүйгээр хаагдсан; canonical CSV-д багана байгаагүй → `data/incidents.csv/json`-д `notification_done/notification_note`, импорт дэмжих, `sync_incident_notifications.py`-оор DB-д.
+3. Risk Treatment Plan Project даалгавар 0 → 5-р үе шатанд автоматаар үүсгэх, migration 10 даалгавар үүсгэв.
+4. ISO 6.1.3 f) үлдэгдэл эрсдэлийг эрсдэл хариуцагч/CISO батлах алхам байгаагүй → `action_accept_residual` (Project даалгавар дуусаагүй бол хориглоно, дахин үнэлбэл хүчингүй).
+5. Нууцлал: Reporter (багш/оюутан) RPC-ээр бүх хөрөнгийн бүртгэл, SoA-ийн хэрэгжилт, Inventory/lot дээрх ISMS ангилал/байршлыг уншиж чаддаг байсан → ACL хасаж, field groups + create/write-ийн холбоосын шалгалт (Odoo 18 field groups create-д хамгаалдаггүйг тест илрүүлэв). Аудиторт хөрөнгө унших ACL тусад нь.
+6. A.6.8: campus-ийн 7 хэрэглэгч инцидент мэдээлж чаддаггүй байсан → `campus_university.group_campus_user` ⇒ ISMS Reporter (campus_isms_bridge 18.0.1.1.0).
+7. A.5.3: `admin` техникийн данс CISO эрхтэй байсан → Reporter + Settings л үлдээв (migration).
+8. Тайлангийн server action-ууд Odoo 18-д моделийн write эрх шаарддаг тул **аудитор PDF хэвлэж чаддаггүй** байсан → `groups_id` тохируулав.
+9. Дотоод token-той context бичлэгтэй хамт дуудагч руу «урсаж» дараагийн хэрэглэгчийн үйлдэлд хамгаалалтыг тойрох боломж (тест илрүүлэв) → шинэ context-той буцаадаг болгов.
+10. A.8.31: regression тест ашиглалтын DB дээр ажиллаж sequence дугаар идэж байсан (INC 0021→0070 гэх мэт) → `scripts/run-tests.sh` түр DB.
+11. Нэг тест run-д PostgreSQL backend signal 11 (segfault) → дахин PASS; Alpine/musl LLVM JIT-ийг унтраав (ALTER SYSTEM + compose).
+12. Bootstrap-д хуучин нэрийн website/email, лого хоосон → Formula University лого, `formula-university.example`.
+**Нэмэлт боломж:** brute-force нэвтрэлтийн автомат инцидент (A.8.16), өдөр тутмын мониторинг cron (бодлогын хяналт, хугацаа хэтэрсэн эрсдэл, SLA), Clause 9.3 удирдлагын дүн шинжилгээний PDF, «Хугацаа хэтэрсэн», «SLA хэтэрсэн», «Автомат илрүүлэлт» шүүлтүүр.
+**Шалгалт:** `run-tests.sh` → 47/47 PASS (`evidence/tests/regression-20261118.json`). Бодит HTTP: brute-force → INC-2026-0070 (Report, Helpdesk тасалбартай); аудитор SoA/удирдлагын PDF хэвлэнэ, мониторинг хориотой; CISO бүгд; багш бүх хязгаарлагдмал бүртгэлээс татгалзагдсан (`evidence/tests/live-audit-20261118.json`). PDF: `evidence/reports/2026-11-18/`; 11-16-ны түүхэн PDF-ийг санамсаргүй дарж бичсэнээ git хуулбараас сэргээв.

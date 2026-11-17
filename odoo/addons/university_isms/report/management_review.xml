@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_report_management_review" model="ir.actions.report">
+        <field name="name">ISMS удирдлагын дүн шинжилгээ (Clause 9.3)</field>
+        <field name="model">res.company</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">university_isms.report_management_review</field>
+        <field name="report_file">university_isms.report_management_review</field>
+        <field name="print_report_name">'ISMS_Management_Review'</field>
+        <field name="paperformat_id" ref="paperformat_isms_landscape"/>
+    </record>
+
+    <template id="report_management_review">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <div class="page" style="font-size: 9.5pt;">
+                        <h4>ISMS удирдлагын дүн шинжилгээний оролт (ISO/IEC 27001:2022, Clause 9.1, 9.3)</h4>
+                        <p>Байгууллага: <b t-out="o.name"/> · огноо <span t-out="kpi['date']"/> ·
+                            Odoo-ийн бодит бүртгэлээс автоматаар тооцсон үзүүлэлт.</p>
+                        <div class="row">
+                            <div class="col-6">
+                                <h5>1. Хөрөнгө (A.5.9, A.5.12)</h5>
+                                <table class="table table-sm table-bordered">
+                                    <tr><td>Нийт хөрөнгө</td><td class="text-end" t-out="kpi['assets_total']"/></tr>
+                                    <tr><td>Хувийн мэдээлэлтэй</td><td class="text-end" t-out="kpi['assets_pii']"/></tr>
+                                    <tr><td>Өндөр эрсдэлтэй</td><td class="text-end" t-out="kpi['assets_high_risk']"/></tr>
+                                    <tr t-foreach="kpi['assets_by_class']" t-as="row">
+                                        <td>· <t t-out="row[0]"/></td><td class="text-end" t-out="row[1]"/>
+                                    </tr>
+                                </table>
+                                <h5>2. Эрсдэл (Clause 6.1.2–6.1.3, 8.2–8.3)</h5>
+                                <table class="table table-sm table-bordered">
+                                    <tr><th>Түвшин</th><th class="text-end">Анхны</th><th class="text-end">Одоогийн</th></tr>
+                                    <tr t-foreach="range(len(kpi['risks_by_level']))" t-as="i">
+                                        <td t-out="kpi['risks_by_level'][i][0]"/>
+                                        <td class="text-end" t-out="kpi['risks_by_level'][i][1]"/>
+                                        <td class="text-end" t-out="kpi['risks_by_current'][i][1]"/>
+                                    </tr>
+                                    <tr><td>Нийт</td><td class="text-end" colspan="2" t-out="kpi['risks_total']"/></tr>
+                                    <tr><td>Хугацаа хэтэрсэн хариу арга хэмжээ</td><td class="text-end" colspan="2" t-out="kpi['risks_overdue']"/></tr>
+                                    <tr><td>CISO хүлээн зөвшөөрсөн</td><td class="text-end" colspan="2" t-out="kpi['risks_accepted']"/></tr>
+                                    <tr><td>Үлдэгдэл эрсдэл батлагдсан (6.1.3 f)</td><td class="text-end" colspan="2" t-out="kpi['risks_residual_approved']"/></tr>
+                                    <tr><td>Treatment даалгавар (дууссан / нийт)</td>
+                                        <td class="text-end" colspan="2"><t t-out="kpi['tasks_done']"/> / <t t-out="kpi['tasks_total']"/></td></tr>
+                                </table>
+                                <table class="table table-sm table-bordered">
+                                    <tr t-foreach="kpi['risks_by_state']" t-as="row">
+                                        <td t-out="row[0]"/><td class="text-end" t-out="row[1]"/>
+                                    </tr>
+                                </table>
+                            </div>
+                            <div class="col-6">
+                                <h5>3. SoA (Clause 6.1.3 d)</h5>
+                                <table class="table table-sm table-bordered">
+                                    <tr><td>Annex A хяналт / хамааралтай</td>
+                                        <td class="text-end"><t t-out="kpi['soa_total']"/> / <t t-out="kpi['soa_applicable']"/></td></tr>
+                                    <tr t-foreach="kpi['soa_by_impl']" t-as="row">
+                                        <td>· Хэрэгжсэн үү: <t t-out="row[0]"/></td><td class="text-end" t-out="row[1]"/>
+                                    </tr>
+                                    <tr><td>Controls Mapping-д сонгосон</td><td class="text-end" t-out="kpi['soa_selected']"/></tr>
+                                </table>
+                                <h5>4. Инцидент (A.5.24–5.28)</h5>
+                                <table class="table table-sm table-bordered">
+                                    <tr t-foreach="kpi['incidents_by_state']" t-as="row">
+                                        <td t-out="row[0]"/><td class="text-end" t-out="row[1]"/>
+                                    </tr>
+                                    <tr><td>SLA хэтэрсэн</td><td class="text-end" t-out="kpi['incidents_sla_breached']"/></tr>
+                                    <tr><td>Хувийн мэдээллийн зөрчил</td><td class="text-end" t-out="kpi['incidents_pii']"/></tr>
+                                    <tr><td>Автомат илрүүлэлтээр үүссэн (A.8.16)</td><td class="text-end" t-out="kpi['incidents_auto']"/></tr>
+                                    <tr><td>Шийдвэрлэх дундаж хугацаа, цаг (бодит хугацаатай <t t-out="kpi['incident_avg_hours_n']"/> инцидент)</td>
+                                        <td class="text-end" t-out="kpi['incident_avg_hours'] if kpi['incident_avg_hours_n'] else '—'"/></tr>
+                                </table>
+                                <h5>5. Бодлого ба хандалт (A.5.1, A.5.15–5.18, A.8.15)</h5>
+                                <table class="table table-sm table-bordered">
+                                    <tr><td>Батлагдсан бодлого / 30 хоногт хянах</td>
+                                        <td class="text-end"><t t-out="kpi['policies_approved']"/> / <t t-out="kpi['policies_review_due']"/></td></tr>
+                                    <tr><td>Бодлоготой танилцсан хэрэглэгч / дотоод хэрэглэгч</td>
+                                        <td class="text-end"><t t-out="kpi['policy_ack_users']"/> / <t t-out="kpi['users_internal']"/></td></tr>
+                                    <tr><td>MFA (TOTP) идэвхжүүлсэн хэрэглэгч</td><td class="text-end" t-out="kpi['users_totp']"/></tr>
+                                    <tr t-foreach="kpi['users_by_role']" t-as="row">
+                                        <td>· <t t-out="row[0]"/></td><td class="text-end" t-out="row[1]"/>
+                                    </tr>
+                                    <tr><td>30 хоногийн аудит бичлэг / амжилтгүй нэвтрэлт / эрхийн өөрчлөлт</td>
+                                        <td class="text-end"><t t-out="kpi['audit_events_30d']"/> / <t t-out="kpi['failed_logins_30d']"/> / <t t-out="kpi['access_changes_30d']"/></td></tr>
+                                </table>
+                            </div>
+                        </div>
+                        <p class="small text-muted">Удирдлагын шийдвэр (сайжруулах боломж, нөөц, эрсдэлийн шалгуурын өөрчлөлт) нь
+                            хурлын тэмдэглэлд бичигдэнэ; энэ хуудас нь Clause 9.3.2-ийн оролтын үзүүлэлт.</p>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+    <record id="action_server_print_management_review" model="ir.actions.server">
+        <field name="name">Удирдлагын дүн шинжилгээ PDF</field>
+        <field name="model_id" ref="base.model_res_company"/>
+        <!-- Odoo 18: groups_id байхгүй бол server action моделийн write эрх шаарддаг (аудитор хэвлэж чадахгүй) -->
+        <field name="groups_id" eval="[(4, ref('group_isms_analyst')), (4, ref('group_isms_auditor'))]"/>
+        <field name="state">code</field>
+        <field name="code">action = env.ref('university_isms.action_report_management_review').report_action(env.company)</field>
+    </record>
+    <record id="action_server_run_monitoring" model="ir.actions.server">
+        <field name="name">Мониторинг одоо шалгах</field>
+        <field name="model_id" ref="model_isms_monitoring"/>
+        <!-- Odoo 18: groups_id байхгүй бол server action моделийн write эрх шаарддаг (аудитор хэвлэж чадахгүй) -->
+        <field name="groups_id" eval="[(4, ref('group_isms_manager'))]"/>
+        <field name="state">code</field>
+        <field name="code">result = model._cron_daily_monitoring()
+action = {'type': 'ir.actions.client', 'tag': 'display_notification', 'params': {
+    'title': 'ISMS мониторинг', 'type': 'success', 'sticky': False,
+    'message': 'Шинэ сануулга — бодлого: %(policy_review)s, хугацаа хэтэрсэн эрсдэл: %(risk_overdue)s, SLA: %(incident_sla)s' % result}}</field>
+    </record>
+</odoo>

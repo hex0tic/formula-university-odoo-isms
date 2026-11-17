@@ -89,6 +89,7 @@
                             <field name="risk_ids" widget="many2many_tags" readonly="state == 'close'"/>
                             <field name="control_ids" widget="many2many_tags" readonly="state == 'close'"/>
                             <field name="notification_done" invisible="not personal_data_breach" readonly="state == 'close'"/>
+                            <field name="detection_key" invisible="not detection_key"/>
                         </group>
                     </group>
                     <notebook>
@@ -160,6 +161,8 @@
                 <filter name="f_open" string="Нээлттэй" domain="[('state', '!=', 'close')]"/>
                 <filter name="f_critical" string="Өндөр / Ноцтой" domain="[('severity', 'in', ('high', 'critical'))]"/>
                 <filter name="f_pii" string="Хувийн мэдээллийн зөрчил" domain="[('personal_data_breach', '=', True)]"/>
+                <filter name="f_sla_breached" string="SLA хэтэрсэн" domain="[('sla_status', '=', 'breached')]"/>
+                <filter name="f_auto" string="Автомат илрүүлэлт (A.8.16)" domain="[('detection_key', '!=', False)]"/>
                 <filter name="f_detected" string="Илэрсэн огноо" date="detected_at"/>
                 <group>
                     <filter name="g_state" string="Үе шат" context="{'group_by': 'state'}"/>

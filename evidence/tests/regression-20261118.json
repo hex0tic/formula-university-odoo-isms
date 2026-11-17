@@ -1,0 +1,18 @@
+{
+  "result": "PASS",
+  "tests": 47,
+  "failed": 0,
+  "errors": 0,
+  "modules": {
+    "campus_university": 11,
+    "campus_isms_bridge": 4,
+    "university_isms": 25,
+    "university_isms_stock": 1,
+    "university_isms_helpdesk": 6
+  },
+  "database": "түр DB (isms_ci_<timestamp>), шинэ суулгалт --without-demo=all, тестийн дараа устгасан (A.8.31)",
+  "command": "odoo/scripts/run-tests.sh",
+  "local_log": "odoo/logs/tests-isms_ci_20261118073432.log (runtime лог, git-д оруулаагүй)",
+  "note": "Өмнөх 39 тест ашиглалтын orgil_isms DB дээр ажилладаг байсан; одооноос тусдаа DB. Нэг run-д Postgres backend signal 11 гарсан тул дахин ажиллуулж PASS; JIT унтраасан.",
+  "tested_at": "2026-11-18T07:35:19+08:00"
+}

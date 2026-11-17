@@ -14,13 +14,13 @@ company.write({
     'currency_id': mnt.id,
     'city': 'Улаанбаатар',
     'street': 'Төв кампус, I байр',
-    'website': 'https://orgil-uni.example',
-    'email': 'isms@orgil-uni.example',
+    'website': 'https://formula-university.example',
+    'email': 'isms@formula-university.example',
     'company_registry': 'ЗОХИОМОЛ КЕЙС',
 })
-logo = '/mnt/extra-addons/university_isms/static/img/orgil_logo.png'
+logo = '/mnt/extra-addons/university_isms/static/img/formula_logo.png'
 if os.path.exists(logo):
-    company.logo = False  # Formula University: old case logo retired
+    company.logo = base64.b64encode(open(logo, 'rb').read())  # D08: Formula University
 
 admin = env.ref('base.user_admin')
 password = os.environ.get('ODOO_ADMIN_PASSWORD')

@@ -174,18 +174,24 @@
     <record id="action_server_print_soa" model="ir.actions.server">
         <field name="name">SoA PDF (бүх 93 хяналт)</field>
         <field name="model_id" ref="model_isms_control"/>
+        <!-- Odoo 18: groups_id байхгүй бол server action моделийн write эрх шаарддаг (аудитор хэвлэж чадахгүй) -->
+        <field name="groups_id" eval="[(4, ref('group_isms_analyst')), (4, ref('group_isms_auditor'))]"/>
         <field name="state">code</field>
         <field name="code">action = env.ref('university_isms.action_report_soa').report_action(model.search([]))</field>
     </record>
     <record id="action_server_print_risks" model="ir.actions.server">
         <field name="name">Эрсдэлийн бүртгэл PDF</field>
         <field name="model_id" ref="model_isms_risk"/>
+        <!-- Odoo 18: groups_id байхгүй бол server action моделийн write эрх шаарддаг (аудитор хэвлэж чадахгүй) -->
+        <field name="groups_id" eval="[(4, ref('group_isms_analyst')), (4, ref('group_isms_auditor'))]"/>
         <field name="state">code</field>
         <field name="code">action = env.ref('university_isms.action_report_risk_register').report_action(model.search([]))</field>
     </record>
     <record id="action_server_print_assets" model="ir.actions.server">
         <field name="name">Хөрөнгийн бүртгэл PDF</field>
         <field name="model_id" ref="model_isms_asset"/>
+        <!-- Odoo 18: groups_id байхгүй бол server action моделийн write эрх шаарддаг (аудитор хэвлэж чадахгүй) -->
+        <field name="groups_id" eval="[(4, ref('group_isms_analyst')), (4, ref('group_isms_auditor'))]"/>
         <field name="state">code</field>
         <field name="code">action = env.ref('university_isms.action_report_asset_register').report_action(model.search([]))</field>
     </record>

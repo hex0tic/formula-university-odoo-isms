@@ -47,6 +47,12 @@ class ResUsers(models.Model):
                                + ('' if user else '\nТийм нэвтрэх нэртэй хэрэглэгч байхгүй'),
                     'ip_address': client_ip(),
                 })
+                if action == 'login_failed':
+                    try:
+                        with cr.savepoint():
+                            env['isms.incident']._isms_detect_bruteforce(login)
+                    except Exception:  # илрүүлэлтийн алдаа лог болон нэвтрэлтийг саатуулахгүй
+                        _logger.exception('ISMS monitoring: brute-force detection failed for %s', login)
         except Exception:  # аудит лог алдаа нэвтрэлтийг саатуулахгүй
             _logger.exception('ISMS audit: failed to log %s for %s', action, login)
 
