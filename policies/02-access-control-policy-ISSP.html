@@ -1,0 +1,111 @@
+<div class="o_isms_policy_doc">
+<h2>ХАНДАЛТЫН ХЯНАЛТ БА ТАНИЛТЫН УДИРДЛАГЫН БОДЛОГО (ACCESS CONTROL POLICY — ISSP)</h2>
+<table class="table table-bordered table-sm"><thead><tr>
+<th>Баримт бичгийн код</th>
+<th><code>POL-02</code></th>
+<th>Ангилал</th>
+<th>Дотоод хэрэглээнд (<code>internal</code>)</th>
+</tr></thead><tbody>
+<tr>
+<td><strong>Бодлогын төрөл</strong></td>
+<td>Тодорхой асуудлын бодлого (<code>ISSP</code>)</td>
+<td><strong>Хувилбар</strong></td>
+<td><code>v1.2</code></td>
+</tr>
+<tr>
+<td><strong>Байгууллага</strong></td>
+<td>Formula University (сургалтын зохиомол кейс)</td>
+<td><strong>Төлөв</strong></td>
+<td>Батлагдсан (<code>approved</code>)</td>
+</tr>
+<tr>
+<td><strong>Боловсруулсан (Owner)</strong></td>
+<td>Мэдээллийн аюулгүй байдлын менежер (CISO) — <code>dorjsembe</code></td>
+<td><strong>Батлагдсан огноо</strong></td>
+<td><code>2026-11-16</code></td>
+</tr>
+<tr>
+<td><strong>Батлагч (Approver)</strong></td>
+<td>Formula University-ийн Ректор — <code>dorjsembe</code></td>
+<td><strong>Дахин хянах огноо</strong></td>
+<td><code>2027-05-16</code> (Хагас жил тутам)</td>
+</tr>
+<tr>
+<td><strong>Холбогдох стандарт</strong></td>
+<td>MNS ISO/IEC 27001:2023 Annex A <code>5.3</code>, <code>5.15</code>, <code>5.16</code>, <code>5.17</code>, <code>5.18</code>, <code>6.5</code>, <code>8.2</code>, <code>8.3</code>, <code>8.5</code>, <code>8.15</code></td>
+<td></td>
+<td></td>
+</tr>
+</tbody></table>
+<hr/>
+<h3>1. Зорилго ба хамрах хүрээ</h3>
+<p>Энэхүү бодлого нь «Formula University» (Formula University)-ийн мэдээллийн систем, өгөгдлийн сан, сүлжээ болон серверийн өрөөнд хандах эрхийг «Хамгийн бага эрхийн зарчим» (Least Privilege), «Мэдэх шаардлагын зарчим» (Need-to-Know) болон «Үүрэг салгах зарчим» (Segregation of Duties, A.5.3)-д тулгуурлан зохицуулахад оршино. Бодлого нь Formula University-ийн Odoo ERP + ISMS систем, <code>campus_university</code> сургалтын систем, Moodle LMS, Кибер-Физик Судалгааны Лабораторийн орчин болон гэрээт нийлүүлэгчийн алсын хандалтад үйлчилнэ.</p>
+<h3>2. Танилт ба баталгаажуулалтын шаардлага (Identification &amp; Authentication — A.5.16, A.5.17, A.8.5)</h3>
+<ul>
+<li><strong>Нэг хүн — нэг бүртгэл:</strong> Ажилтан, багш, оюутан бүр зөвхөн өөрийн нэр дээрх цор ганц хэрэглэгчийн бүртгэл (<code>login</code>) ашиглана. Дундын (shared/generic) бүртгэлээр сургалтын болон ISMS системд нэвтрэхийг хатуу хориглоно.</li>
+<li><strong>Нууц үгийн стандарт (<code>auth_password_policy</code>):</strong></li>
+<li>Ердийн хэрэглэгчийн нууц үг <strong>12-оос доошгүй тэмдэгттэй</strong>, том ба жижиг үсэг, тоо, тусгай тэмдэгт оролцсон байна.</li>
+<li>Системийн админ болон давуу эрхтэй (privileged) бүртгэлийн нууц үг <strong>16-аас доошгүй тэмдэгттэй</strong> байна.</li>
+<li><strong>Олон хүчин зүйлт баталгаажуулалт (<code>auth_totp</code> — MFA, A.8.5):</strong></li>
+<li>Сургалтын алба, багш, МАБ шинжээч, CISO, дотоод аудитор, системийн админ болон алсын VPN хандалттай бүх хэрэглэгч TOTP-д суурилсан хоёр хүчин зүйлт баталгаажуулалтыг <strong>заавал</strong> идэвхжүүлнэ.</li>
+</ul>
+<h3>3. Дүрд суурилсан хандалтын хяналт (RBAC) ба Үүрэг салгалт (A.5.3, A.5.15, A.8.2, A.8.3)</h3>
+<p>Formula University-ийн Odoo ERP + ISMS системд хандах эрхийг дараах <strong>6 түвшний RBAC бүлгээр</strong> ялгаж тохируулна:</p>
+<table class="table table-bordered table-sm"><thead><tr>
+<th>Түвшин</th>
+<th>RBAC Бүлгийн нэр (<code>xml_id</code>)</th>
+<th>Зөвшөөрөгдсөн үйлдэл (ACL ба Record Rule)</th>
+<th>Хориглосон үйлдэл (Үүрэг салгалт — SoD)</th>
+</tr></thead><tbody>
+<tr>
+<td>1</td>
+<td><strong>Мэдээлэгч</strong> (<code>group_isms_reporter</code>)</td>
+<td>МАБ-ын инцидент мэдээлэх (<code>isms.incident</code> үүсгэх), өөрийн мэдээлсэн тасалбарыг харах, батлагдсан бодлого уншиж «Танилцсан» дарах.</td>
+<td>Бусдын инцидент, эрсдэлийн бүртгэл, аудит лог харах, хөрөнгө/эрсдэл засах.</td>
+</tr>
+<tr>
+<td>2</td>
+<td><strong>Хөрөнгө эзэмшигч</strong> (<code>group_isms_asset_owner</code>)</td>
+<td>Бүх хөрөнгө, эрсдэл, хяналтыг унших; зөвхөн өөрийн эзэмшлийн (<code>owner_id = user.id</code>) хөрөнгийн мэдээллийг шинэчлэх.</td>
+<td>Эрсдэл хүлээн зөвшөөрөх, бусдын хөрөнгө устгах, SoA батлах.</td>
+</tr>
+<tr>
+<td>3</td>
+<td><strong>Дотоод аудитор</strong> (<code>group_isms_auditor</code>)</td>
+<td>Бүх хөрөнгө, эрсдэл, SoA, инцидент, бодлого, дүнгийн өөрчлөлтийн хүсэлт болон <strong>Аудит лог (<code>isms.audit.log</code>)</strong>-ийг <strong>зөвхөн унших (Read-Only)</strong>.</td>
+<td>Аливаа бичлэг үүсгэх, засах, устгах, батлах (Аудитор өөрийн шалгах процессыг өөрөө гүйцэтгэхгүй — A.5.3).</td>
+</tr>
+<tr>
+<td>4</td>
+<td><strong>МАБ шинжээч</strong> (<code>group_isms_analyst</code>)</td>
+<td>Хөрөнгө, эрсдэл, аюул занал, эмзэг байдал, инцидент үүсгэх ба шинэчлэх; инцидентийг <code>Report → Investigate → Resolve</code> шатанд шилжүүлэх.</td>
+<td>Үлдэгдэл эрсдэлийг эцэслэн хүлээн зөвшөөрөх (<code>accept</code>), бодлого батлах, инцидентийг <code>Close</code> болгох.</td>
+</tr>
+<tr>
+<td>5</td>
+<td><strong>МАБ менежер / CISO</strong> (<code>group_isms_manager</code>)</td>
+<td>ISMS-ийн бүх бүртгэлийг удирдах, SoA болон бодлого хянах/батлах, үлдэгдэл эрсдэлийг хүлээн зөвшөөрөх, инцидентийг эцэслэн хаах (<code>Close</code>).</td>
+<td>Сургалтын дүнг шууд засах эсвэл өөрийн гаргасан хүсэлтийг батлах; аудит логийг засах/устгах.</td>
+</tr>
+<tr>
+<td>6</td>
+<td><strong>Системийн Админ</strong> (<code>base.group_system</code>)</td>
+<td>Хэрэглэгч ба эрхийн бүлэг тохируулах, модуль суулгах, техникийн тохиргоо хийх.</td>
+<td><code>isms.audit.log</code> бичлэгийг засах эсвэл устгах (моделийн түвшинд <code>write</code>/<code>unlink</code> хаалттай).</td>
+</tr>
+</tbody></table>
+<h4>Академик дүн засварын үүрэг салгалт (`campus_university` — A.5.3)</h4>
+<ul>
+<li>Хичээлийн дүн (<code>campus.enrollment.score</code>)-г хүснэгтээс шууд засахыг хориглоно.</li>
+<li>Багш эсвэл сургалтын ажилтан зөвхөн <strong>Дүн өөрчлөх хүсэлт (<code>campus.grade.change</code>)</strong> үүсгэж илгээнэ (<code>Draft → Submitted</code>).</li>
+<li>Хүсэлтийг <strong>хүсэлт гаргагчаас өөр</strong> эрх бүхий Сургалтын албаны батлагч (<code>requester_id != approver_id</code>) хянаж баталгаажуулснаар (<code>Approved</code>) дүн болон <code>grade_revision</code> шинэчлэгдэж, <code>isms.audit.log</code>-д бичигдэнэ.</li>
+</ul>
+<h3>4. Хэрэглэгчийн эрхийн амьдралын мөчлөг — JML Процесс (A.5.18, A.6.5)</h3>
+<ul>
+<li><strong>Ажилд орох (Joiner):</strong> Хүний нөөцийн албаны тушаал болон CISO/нэгжийн даргын зөвшөөрлөөр эрх нээж, нууцлалын баталгаа (NDA) болон <code>POL-01</code>, <code>POL-04</code> бодлоготой танилцуулна.</li>
+<li><strong>Албан тушаал өөрчлөгдөх (Mover):</strong> Ажилтан өөр тэнхим, албанд шилжихэд хуучин албан тушаалын эрхийг <strong>24 цагийн дотор</strong> хурааж, шинэ үүргийн эрхийг олгоно (эрх давхардуулан хуримтлуулахыг хориглоно).</li>
+<li><strong>Ажлаас гарах / Гэрээ дуусах (Leaver):</strong> Ажилтан, цагийн багш, туслах ажилтан ажлаас чөлөөлөгдөх өдөр бүх системийн нэвтрэх эрх, идэвхтэй сесс, API токен, VPN эрхийг <strong>ажлын 4 цагийн дотор</strong> идэвхгүй болгоно.</li>
+<li><strong>Гэрээт нийлүүлэгчийн хандалт (A.5.19–5.21):</strong> Кибер-Физик лабораторийн тоног төхөөрөмжийн нийлүүлэгчид байнгын нээлттэй алсын хандалт олгохгүй; зөвхөн CISO-ийн зөвшөөрсөн хугацааны цонхонд (Just-in-Time access, ≤8 цаг) MFA болон сесс бичлэгтэйгээр нэвтрүүлнэ.</li>
+<li><strong>Тогтмол хяналт:</strong> CISO болон Дотоод аудитор улирал тутам бүх хэрэглэгчийн эрхийн бүлэг болон сүүлийн нэвтрэлтийн огноог тулган шалгана.</li>
+</ul>
+</div>

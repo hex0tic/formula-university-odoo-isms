@@ -1,0 +1,82 @@
+<odoo>
+    <record id="view_program_list" model="ir.ui.view">
+        <field name="name">campus.program.list</field><field name="model">campus.program</field>
+        <field name="arch" type="xml"><list><field name="code"/><field name="name"/><field name="department"/><field name="owner_id"/></list></field>
+    </record>
+    <record id="view_program_form" model="ir.ui.view">
+        <field name="name">campus.program.form</field><field name="model">campus.program</field>
+        <field name="arch" type="xml"><form><sheet><group><field name="code"/><field name="name"/><field name="department"/><field name="owner_id"/><field name="active"/></group></sheet></form></field>
+    </record>
+    <record id="action_program" model="ir.actions.act_window"><field name="name">Хөтөлбөрүүд</field><field name="res_model">campus.program</field><field name="view_mode">list,form</field></record>
+
+    <record id="view_student_list" model="ir.ui.view">
+        <field name="name">campus.student.list</field><field name="model">campus.student</field>
+        <field name="arch" type="xml"><list><field name="student_code"/><field name="name"/><field name="program_id"/><field name="institutional_email"/><field name="status" widget="badge"/></list></field>
+    </record>
+    <record id="view_student_form" model="ir.ui.view">
+        <field name="name">campus.student.form</field><field name="model">campus.student</field>
+        <field name="arch" type="xml"><form><sheet><div class="oe_title"><h1><field name="name"/></h1></div><group><group><field name="student_code"/><field name="program_id"/><field name="status"/></group><group><field name="user_id"/><field name="institutional_email"/><field name="active"/></group></group><notebook><page string="Хичээл ба дүн"><field name="enrollment_ids" readonly="1"><list><field name="offering_id"/><field name="score"/><field name="grade_revision"/></list></field></page></notebook></sheet></form></field>
+    </record>
+    <record id="view_student_search" model="ir.ui.view">
+        <field name="name">campus.student.search</field><field name="model">campus.student</field>
+        <field name="arch" type="xml"><search><field name="name"/><field name="student_code"/><field name="program_id"/><filter name="active_students" string="Суралцаж буй" domain="[('status','=','active')]"/><group expand="0" string="Бүлэглэх"><filter name="group_program" string="Хөтөлбөр" context="{'group_by':'program_id'}"/></group></search></field>
+    </record>
+    <record id="action_student" model="ir.actions.act_window"><field name="name">Оюутны бүртгэл</field><field name="res_model">campus.student</field><field name="view_mode">list,form</field></record>
+
+    <record id="view_course_list" model="ir.ui.view">
+        <field name="name">campus.course.list</field><field name="model">campus.course</field>
+        <field name="arch" type="xml"><list><field name="code"/><field name="name"/><field name="credits"/><field name="program_id"/></list></field>
+    </record>
+    <record id="view_course_form" model="ir.ui.view">
+        <field name="name">campus.course.form</field><field name="model">campus.course</field>
+        <field name="arch" type="xml"><form><sheet><group><field name="code"/><field name="name"/><field name="credits"/><field name="program_id"/></group></sheet></form></field>
+    </record>
+    <record id="action_course" model="ir.actions.act_window"><field name="name">Хичээлийн каталог</field><field name="res_model">campus.course</field><field name="view_mode">list,form</field></record>
+
+    <record id="view_offering_list" model="ir.ui.view">
+        <field name="name">campus.offering.list</field><field name="model">campus.offering</field>
+        <field name="arch" type="xml"><list><field name="name"/><field name="course_id"/><field name="semester"/><field name="lecturer_id"/><field name="state" widget="badge"/></list></field>
+    </record>
+    <record id="view_offering_form" model="ir.ui.view">
+        <field name="name">campus.offering.form</field><field name="model">campus.offering</field>
+        <field name="arch" type="xml"><form><header><button name="action_open" type="object" string="Нээх" groups="campus_university.group_campus_registrar" invisible="state == 'open'"/><button name="action_lock" type="object" string="Улирал хаах" groups="campus_university.group_campus_registrar" invisible="state != 'open'"/><field name="state" widget="statusbar"/></header><sheet><group><field name="name"/><field name="course_id"/><field name="semester"/><field name="lecturer_id"/></group><field name="enrollment_ids" readonly="1"><list><field name="student_id"/><field name="score"/><field name="grade_revision"/></list></field></sheet></form></field>
+    </record>
+    <record id="action_offering" model="ir.actions.act_window"><field name="name">Улирлын хичээл</field><field name="res_model">campus.offering</field><field name="view_mode">list,form</field></record>
+
+    <record id="view_enrollment_list" model="ir.ui.view">
+        <field name="name">campus.enrollment.list</field><field name="model">campus.enrollment</field>
+        <field name="arch" type="xml"><list><field name="student_id"/><field name="offering_id"/><field name="score"/><field name="grade_revision"/></list></field>
+    </record>
+    <record id="view_enrollment_form" model="ir.ui.view">
+        <field name="name">campus.enrollment.form</field><field name="model">campus.enrollment</field>
+        <field name="arch" type="xml"><form><sheet><group><field name="student_id"/><field name="offering_id"/><field name="score"/><field name="grade_revision"/></group><div class="alert alert-info" role="alert">Баталгаат дүнг өөрчлөхдөө «Дүн өөрчлөх хүсэлт» цэсээр хүсэлт гаргаж, тусдаа ажилтнаар батлуулна.</div><field name="change_ids" readonly="1"><list><field name="name"/><field name="old_score"/><field name="proposed_score"/><field name="requester_id"/><field name="approver_id"/><field name="state" widget="badge"/></list></field></sheet></form></field>
+    </record>
+    <record id="action_enrollment" model="ir.actions.act_window"><field name="name">Хичээл ба баталгаат дүн</field><field name="res_model">campus.enrollment</field><field name="view_mode">list,form</field></record>
+
+    <record id="view_grade_change_list" model="ir.ui.view">
+        <field name="name">campus.grade.change.list</field><field name="model">campus.grade.change</field>
+        <field name="arch" type="xml"><list decoration-success="state == 'approved'" decoration-danger="state == 'rejected'"><field name="name"/><field name="student_id"/><field name="offering_id"/><field name="old_score"/><field name="proposed_score"/><field name="requester_id"/><field name="approver_id"/><field name="state" widget="badge"/></list></field>
+    </record>
+    <record id="view_grade_change_form" model="ir.ui.view">
+        <field name="name">campus.grade.change.form</field><field name="model">campus.grade.change</field>
+        <field name="arch" type="xml"><form><header><button name="action_submit" type="object" string="Хянуулахаар илгээх" class="oe_highlight" groups="campus_university.group_campus_lecturer,campus_university.group_campus_registrar" invisible="state != 'draft'"/><button name="action_approve" type="object" string="Батлах" class="oe_highlight" groups="campus_university.group_campus_registrar" invisible="state != 'submitted'"/><button name="action_reject" type="object" string="Татгалзах" groups="campus_university.group_campus_registrar" invisible="state != 'submitted'"/><field name="state" widget="statusbar" statusbar_visible="draft,submitted,approved"/></header><sheet><div class="oe_title"><h1><field name="name"/></h1></div><group><group><field name="enrollment_id" readonly="id" options="{'no_create': True}"/><field name="student_id"/><field name="offering_id"/><field name="old_score"/><field name="old_revision"/><field name="proposed_score" readonly="state != 'draft'"/></group><group><field name="requester_id"/><field name="submitted_at"/><field name="approver_id"/><field name="approved_at"/><field name="evidence_ref" readonly="state != 'draft'"/></group></group><group><field name="reason" readonly="state != 'draft'"/><field name="review_note" readonly="state != 'submitted'" groups="campus_university.group_campus_registrar"/></group><div class="alert alert-info" role="alert">Хүсэлт гаргагч өөрийн хүсэлтийг батлахгүй. Шийдвэр гарахаас өмнө дүн өөрчлөгдсөн бол шинэ хүсэлт гаргана.</div></sheet><chatter/></form></field>
+    </record>
+    <record id="view_grade_change_search" model="ir.ui.view">
+        <field name="name">campus.grade.change.search</field><field name="model">campus.grade.change</field>
+        <field name="arch" type="xml"><search><field name="name"/><field name="student_id"/><field name="offering_id"/><filter name="awaiting_review" string="Хяналт хүлээж буй" domain="[('state','=','submitted')]"/><filter name="my_requests" string="Миний хүсэлт" domain="[('requester_id','=',uid)]"/><group expand="0" string="Бүлэглэх"><filter name="group_state" string="Төлөв" context="{'group_by':'state'}"/></group></search></field>
+    </record>
+    <record id="view_grade_change_graph" model="ir.ui.view">
+        <field name="name">campus.grade.change.graph</field><field name="model">campus.grade.change</field>
+        <field name="arch" type="xml"><graph string="Дүнгийн хүсэлтийн төлөв" type="bar"><field name="state"/></graph></field>
+    </record>
+    <record id="action_grade_change" model="ir.actions.act_window"><field name="name">Дүн өөрчлөх хүсэлт</field><field name="res_model">campus.grade.change</field><field name="view_mode">list,form,graph</field></record>
+
+    <menuitem id="menu_campus_root" name="Formula Campus" sequence="5" groups="group_campus_user"/>
+    <menuitem id="menu_grade_change" name="Дүн өөрчлөх хүсэлт" parent="menu_campus_root" action="action_grade_change" sequence="10"/>
+    <menuitem id="menu_enrollment" name="Хичээл ба дүн" parent="menu_campus_root" action="action_enrollment" sequence="20"/>
+    <menuitem id="menu_student" name="Оюутны бүртгэл" parent="menu_campus_root" action="action_student" sequence="30"/>
+    <menuitem id="menu_catalog" name="Сургалтын бүтэц" parent="menu_campus_root" sequence="40"/>
+    <menuitem id="menu_offering" name="Улирлын хичээл" parent="menu_catalog" action="action_offering" sequence="10"/>
+    <menuitem id="menu_course" name="Хичээлийн каталог" parent="menu_catalog" action="action_course" sequence="20"/>
+    <menuitem id="menu_program" name="Хөтөлбөрүүд" parent="menu_catalog" action="action_program" sequence="30"/>
+</odoo>

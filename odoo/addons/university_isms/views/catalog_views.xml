@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="isms_threat_view_list" model="ir.ui.view">
+        <field name="name">isms.threat.list</field>
+        <field name="model">isms.threat</field>
+        <field name="arch" type="xml">
+            <list editable="bottom">
+                <field name="code"/>
+                <field name="name"/>
+                <field name="category"/>
+                <field name="description" optional="hide"/>
+                <field name="active" column_invisible="True"/>
+            </list>
+        </field>
+    </record>
+    <record id="action_isms_threat" model="ir.actions.act_window">
+        <field name="name">Аюул занал</field>
+        <field name="res_model">isms.threat</field>
+        <field name="view_mode">list</field>
+    </record>
+
+    <record id="isms_vulnerability_view_list" model="ir.ui.view">
+        <field name="name">isms.vulnerability.list</field>
+        <field name="model">isms.vulnerability</field>
+        <field name="arch" type="xml">
+            <list editable="bottom">
+                <field name="code"/>
+                <field name="name"/>
+                <field name="category"/>
+                <field name="description" optional="hide"/>
+                <field name="active" column_invisible="True"/>
+            </list>
+        </field>
+    </record>
+    <record id="action_isms_vulnerability" model="ir.actions.act_window">
+        <field name="name">Эмзэг байдал</field>
+        <field name="res_model">isms.vulnerability</field>
+        <field name="view_mode">list</field>
+    </record>
+</odoo>

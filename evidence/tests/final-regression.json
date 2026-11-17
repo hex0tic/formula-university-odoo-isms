@@ -1,0 +1,15 @@
+{
+  "result": "PASS",
+  "tests": 39,
+  "failed": 0,
+  "errors": 0,
+  "modules": {
+    "campus_university": 11,
+    "campus_isms_bridge": 3,
+    "university_isms": 18,
+    "university_isms_stock": 1,
+    "university_isms_helpdesk": 6
+  },
+  "log": "evidence/tests/final-regression-20261116.log",
+  "tested_at": "2026-11-16T11:45:10+08:00"
+}

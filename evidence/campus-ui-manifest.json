@@ -1,0 +1,27 @@
+[
+  {
+    "file": "evidence/screenshots/01-grade-request-draft.png",
+    "description": "Lecturer creates a grade correction request using the real Odoo form.",
+    "url": "http://127.0.0.1:8069/odoo/action-264/39",
+    "captured_at": "2026-11-16T03:22:35.772Z"
+  },
+  {
+    "file": "evidence/screenshots/02-grade-request-submitted.png",
+    "description": "Submitted request with original score, requested score, requester and evidence reference.",
+    "url": "http://127.0.0.1:8069/odoo/action-264/39",
+    "captured_at": "2026-11-16T03:22:39.195Z",
+    "verification": "Raw image reviewed: submitted status selected, before reviewer decision."
+  },
+  {
+    "file": "evidence/screenshots/03-grade-approved-independent-reviewer.png",
+    "description": "A different registrar approves the request; actor and approval time are visible.",
+    "url": "http://127.0.0.1:8069/odoo/action-264/39",
+    "captured_at": "2026-11-16T03:22:39.195Z"
+  },
+  {
+    "file": "evidence/screenshots/04-student-own-grade.png",
+    "description": "Student sees their own enrollment and the approved grade 85; unrelated students are absent.",
+    "url": "http://127.0.0.1:8069/odoo/action-263",
+    "captured_at": "2026-11-16T03:22:42.508Z"
+  }
+]

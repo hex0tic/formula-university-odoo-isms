@@ -1,0 +1,11 @@
+{
+  "executed_at": "2026-11-16T10:59:19.572203+08:00",
+  "module": "campus_university",
+  "odoo": "18.0-20261112",
+  "database": "orgil_isms",
+  "native_test_cases": 10,
+  "failed": 0,
+  "errors": 0,
+  "result_line": "2026-11-16 02:54:21,719 1 INFO orgil_isms odoo.tests.result: 0 failed, 0 error(s) of 10 tests when loading database 'orgil_isms' ",
+  "log": "evidence/tests/campus-install-test-20261116.log"
+}

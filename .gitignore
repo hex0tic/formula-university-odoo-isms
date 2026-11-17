@@ -1,0 +1,21 @@
+# Local secrets and private evidence
+.env
+.env.*
+!.env.example
+**/credentials*.json
+**/*-credentials.json
+**/*-credentials.csv
+/evidence/private/
+/odoo/config/odoo.conf
+
+# Local runtime state and generated caches
+/odoo/logs/
+/management/runtime.lock
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+node_modules/
+.DS_Store
+Thumbs.db
+~$*

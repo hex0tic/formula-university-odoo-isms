@@ -1,0 +1,18 @@
+<odoo>
+    <record id="view_incident_helpdesk" model="ir.ui.view">
+        <field name="name">isms.incident.helpdesk.bridge</field><field name="model">isms.incident</field>
+        <field name="inherit_id" ref="university_isms.isms_incident_view_form"/>
+        <field name="arch" type="xml"><xpath expr="//header" position="inside"><button name="action_open_helpdesk" type="object" string="Community Helpdesk"/></xpath></field>
+    </record>
+    <record id="view_ticket_isms" model="ir.ui.view">
+        <field name="name">helpdesk.ticket.isms.bridge</field><field name="model">helpdesk.ticket</field>
+        <field name="inherit_id" ref="helpdesk_mgmt.ticket_view_form"/>
+        <field name="arch" type="xml"><xpath expr="//header" position="inside"><button name="action_open_isms_incident" type="object" string="ISMS бүртгэл" invisible="not isms_incident_id"/></xpath><xpath expr="//sheet" position="inside"><group><field name="isms_incident_id"/></group></xpath></field>
+    </record>
+    <record id="action_isms_helpdesk" model="ir.actions.act_window">
+        <field name="name">ISMS Community Helpdesk</field><field name="res_model">helpdesk.ticket</field>
+        <field name="view_mode">kanban,list,form</field><field name="domain">[('isms_incident_id', '!=', False)]</field>
+        <field name="context" eval="{'default_team_id': ref('team_security'), 'isms_helpdesk_only': True}"/>
+    </record>
+    <menuitem id="menu_isms_helpdesk" name="ISMS Community Helpdesk" action="action_isms_helpdesk" sequence="7" groups="university_isms.group_isms_analyst,university_isms.group_isms_auditor"/>
+</odoo>

@@ -1,0 +1,167 @@
+{
+  "company": "Formula University",
+  "screenshot_count": 16,
+  "images": [
+    {
+      "file": "evidence/screenshots/01-grade-request-draft.png",
+      "sha256": "aeaf717a2224fbf1877072dc67a7d75c0450aad40cad2b2253e58bd55cc54c25",
+      "pixels": [
+        1600,
+        1000
+      ],
+      "file_mtime_utc": "2026-11-16T03:22:35.770453+00:00",
+      "branding": "historical pre-rebrand capture"
+    },
+    {
+      "file": "evidence/screenshots/02-grade-request-submitted.png",
+      "sha256": "3ebff19c56dca0aa057d392b1562f3083f8998783d4bf785ab8e0311ceb9e36b",
+      "pixels": [
+        1600,
+        1000
+      ],
+      "file_mtime_utc": "2026-11-16T03:22:39.194600+00:00",
+      "branding": "historical pre-rebrand capture"
+    },
+    {
+      "file": "evidence/screenshots/03-grade-approved-independent-reviewer.png",
+      "sha256": "7d64be493caa0df4c1f8537720f00c258a4ddda80ffaabd3f66627a330155f80",
+      "pixels": [
+        1600,
+        740
+      ],
+      "file_mtime_utc": "2026-11-16T04:13:09.111639+00:00",
+      "branding": "Formula University current UI"
+    },
+    {
+      "file": "evidence/screenshots/04-student-own-grade.png",
+      "sha256": "75361f54156c167bace775f68255f5d81ea9645f8cf942da2cf5eb08b7f28fa4",
+      "pixels": [
+        1600,
+        1000
+      ],
+      "file_mtime_utc": "2026-11-16T04:13:12.188730+00:00",
+      "branding": "Formula University current UI"
+    },
+    {
+      "file": "evidence/screenshots/05-asset-register.png",
+      "sha256": "55ef13176ca52be9656f559accb44263a0ffb3df3d847fe8d1d49818e1209fdb",
+      "pixels": [
+        1800,
+        828
+      ],
+      "file_mtime_utc": "2026-11-16T04:13:46.669762+00:00",
+      "branding": "Formula University current UI"
+    },
+    {
+      "file": "evidence/screenshots/06-risk-register.png",
+      "sha256": "2dbdaea47bafb149b422a58d0d03dcb488a26c6beddcd5777ce14fad32832e90",
+      "pixels": [
+        1800,
+        1100
+      ],
+      "file_mtime_utc": "2026-11-16T04:13:47.783795+00:00",
+      "branding": "Formula University current UI"
+    },
+    {
+      "file": "evidence/screenshots/07-risk-matrix.png",
+      "sha256": "de6629c20b9dec5d378782918946edce0f7e89d06384b3db9dca795dce40825a",
+      "pixels": [
+        1800,
+        490
+      ],
+      "file_mtime_utc": "2026-11-16T04:13:48.572819+00:00",
+      "branding": "Formula University current UI"
+    },
+    {
+      "file": "evidence/screenshots/08-controls-mapping.png",
+      "sha256": "5dc240a02c02add5b7ac99642175208db88d79e14ec0d6d6f7cefff2eb60067b",
+      "pixels": [
+        1800,
+        1100
+      ],
+      "file_mtime_utc": "2026-11-16T04:13:49.407844+00:00",
+      "branding": "Formula University current UI"
+    },
+    {
+      "file": "evidence/screenshots/09-incident-kanban.png",
+      "sha256": "947a3b31c85a1718fe8c0f9e403a474a310248dc8eb075b664fbbf35719f0a48",
+      "pixels": [
+        1800,
+        605
+      ],
+      "file_mtime_utc": "2026-11-16T04:13:50.239869+00:00",
+      "branding": "Formula University current UI"
+    },
+    {
+      "file": "evidence/screenshots/10-helpdesk-kanban.png",
+      "sha256": "0b04767a68fb466302f8fffda84d0717931b9db1bbfaea836abae0c2fde659e3",
+      "pixels": [
+        1800,
+        669
+      ],
+      "file_mtime_utc": "2026-11-16T04:13:51.547908+00:00",
+      "branding": "Formula University current UI"
+    },
+    {
+      "file": "evidence/screenshots/11-audit-log.png",
+      "sha256": "401da200237bc9e6644cb3aaa66bcec8460835337981f216b4f96ebd901bad47",
+      "pixels": [
+        1800,
+        1100
+      ],
+      "file_mtime_utc": "2026-11-16T04:13:52.677942+00:00",
+      "branding": "Formula University current UI"
+    },
+    {
+      "file": "evidence/screenshots/12-policy-register.png",
+      "sha256": "8a9717d1962a469dcfc137368d935a9411060bed5fc1be6b1d9145a2a542ac18",
+      "pixels": [
+        1800,
+        442
+      ],
+      "file_mtime_utc": "2026-11-16T04:18:07.119582+00:00",
+      "branding": "Formula University current UI"
+    },
+    {
+      "file": "evidence/screenshots/13-incident-closed.png",
+      "sha256": "d23d68ac9032eb0efd1399345b02e6ae40ea856c29c749f3dd94c059ac5faac6",
+      "pixels": [
+        1800,
+        1100
+      ],
+      "file_mtime_utc": "2026-11-16T04:18:08.191615+00:00",
+      "branding": "Formula University current UI"
+    },
+    {
+      "file": "evidence/screenshots/14-inventory-catalog.png",
+      "sha256": "d97462e0013b2901fdf5937fb757320f9d09b75f6fba3351c856117f60536bc6",
+      "pixels": [
+        1800,
+        805
+      ],
+      "file_mtime_utc": "2026-11-16T04:13:53.907979+00:00",
+      "branding": "Formula University current UI"
+    },
+    {
+      "file": "evidence/screenshots/15-internal-users.png",
+      "sha256": "31e336b12a54e8710c5f030033d6ab55fa0b7279b09302fa2bd304fc32e3e562",
+      "pixels": [
+        1800,
+        960
+      ],
+      "file_mtime_utc": "2026-11-16T04:13:59.499146+00:00",
+      "branding": "Formula University current UI"
+    },
+    {
+      "file": "evidence/screenshots/16-grade-audit-detail.png",
+      "sha256": "c58d7a2e1bb4436c938bb7ad98c0d3447d23feedd2798331a7ff284b72710533",
+      "pixels": [
+        1800,
+        780
+      ],
+      "file_mtime_utc": "2026-11-16T04:14:00.238168+00:00",
+      "branding": "Formula University current UI"
+    }
+  ],
+  "note": "Actual Odoo screenshots. Historical draft/submitted raw captures retain the original name. Current report/deck use recaptured Formula University views. Screenshot pixels were not edited."
+}

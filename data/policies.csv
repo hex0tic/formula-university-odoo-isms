@@ -1,0 +1,5 @@
+code,name,policy_type,version,owner_login,approver_login,approval_date,next_review_date,state,control_codes,content_file
+POL-01,Мэдээллийн аюулгүй байдлын ерөнхий бодлого (EISP),eisp,1.2,dorjsembe,dorjsembe,2026-11-16,2027-11-16,approved,5.1;5.2;5.3;5.31;5.34;5.37,policies/01-information-security-policy-EISP.md
+POL-02,Хандалтын хяналт ба танилтын удирдлагын бодлого (Access Control Policy — ISSP),issp,1.2,dorjsembe,dorjsembe,2026-11-16,2027-05-16,approved,5.3;5.15;5.16;5.17;5.18;6.5;8.2;8.3;8.5;8.15,policies/02-access-control-policy-ISSP.md
+POL-03,Мэдээллийн аюулгүй байдлын эрсдэлийг бууруулах төлөвлөгөө (Risk Treatment Plan — RTP),plan,1.2,dorjsembe,dorjsembe,2026-11-16,2027-02-16,approved,5.3;5.12;5.15;5.19;5.30;8.5;8.13;8.15;8.28,policies/03-risk-treatment-plan-RTP.md
+POL-04,Мэдээллийн хөрөнгийг зохистой ашиглах бодлого (Acceptable Use Policy — AUP),issp,1.2,telmuun,dorjsembe,2026-11-16,2027-11-16,approved,5.10;5.12;5.14;6.7;7.7;8.1;8.12,policies/04-acceptable-use-policy-AUP.md

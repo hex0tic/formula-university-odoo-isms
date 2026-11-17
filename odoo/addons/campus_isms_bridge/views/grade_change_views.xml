@@ -1,0 +1,13 @@
+<odoo>
+    <record id="view_grade_change_isms" model="ir.ui.view">
+        <field name="name">campus.grade.change.isms</field>
+        <field name="model">campus.grade.change</field>
+        <field name="inherit_id" ref="campus_university.view_grade_change_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='evidence_ref']" position="after">
+                <field name="isms_asset_id" groups="university_isms.group_isms_analyst,university_isms.group_isms_auditor"/>
+                <field name="isms_incident_id" groups="university_isms.group_isms_analyst,university_isms.group_isms_auditor"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

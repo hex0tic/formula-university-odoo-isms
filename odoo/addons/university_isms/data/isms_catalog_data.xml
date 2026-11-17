@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Их сургуулийн нөхцөлд түгээмэл аюул занал, эмзэг байдлын суурь каталог (ISO/IEC 27005 жишгээр). -->
+<odoo noupdate="1">
+    <record id="threat_t_01" model="isms.threat"><field name="code">T-01</field><field name="name">Фишинг, итгэмжлэл хулгайлах кампанит ажил</field><field name="category">deliberate</field></record>
+    <record id="threat_t_02" model="isms.threat"><field name="code">T-02</field><field name="name">Ransomware / хортой код</field><field name="category">deliberate</field></record>
+    <record id="threat_t_03" model="isms.threat"><field name="code">T-03</field><field name="name">Вэб аппликейшнд халдах (SQL injection, XSS)</field><field name="category">deliberate</field></record>
+    <record id="threat_t_04" model="isms.threat"><field name="code">T-04</field><field name="name">Дотоод ажилтны санаатай буруу ашиглалт (дүн, диплом хуурамчаар үйлдэх)</field><field name="category">deliberate</field></record>
+    <record id="threat_t_05" model="isms.threat"><field name="code">T-05</field><field name="name">Ажлаас гарсан ажилтны эрхээр зөвшөөрөлгүй хандах</field><field name="category">deliberate</field></record>
+    <record id="threat_t_06" model="isms.threat"><field name="code">T-06</field><field name="name">Мэдээллийг санамсаргүй нийтэд задруулах (буруу хуваалцсан линк, хавсралт)</field><field name="category">accidental</field></record>
+    <record id="threat_t_07" model="isms.threat"><field name="code">T-07</field><field name="name">DDoS / үйлчилгээг ачааллаар зогсоох</field><field name="category">deliberate</field></record>
+    <record id="threat_t_08" model="isms.threat"><field name="code">T-08</field><field name="name">Цахилгаан тасрах, хөргөлт зогсох</field><field name="category">environmental</field></record>
+    <record id="threat_t_09" model="isms.threat"><field name="code">T-09</field><field name="name">Төхөөрөмж алдагдах, хулгайлагдах</field><field name="category">deliberate</field></record>
+    <record id="threat_t_10" model="isms.threat"><field name="code">T-10</field><field name="name">Үүлэн/гуравдагч талын үйлчилгээний тасалдал, буруу тохиргоо</field><field name="category">supplier</field></record>
+    <record id="threat_t_11" model="isms.threat"><field name="code">T-11</field><field name="name">Хадгалах төхөөрөмж, програм хангамжийн доголдол</field><field name="category">technical</field></record>
+    <record id="threat_t_12" model="isms.threat"><field name="code">T-12</field><field name="name">Вэб сайтын нүүрийг өөрчлөх (defacement)</field><field name="category">deliberate</field></record>
+    <record id="vuln_v_01" model="isms.vulnerability"><field name="code">V-01</field><field name="name">Олон хүчин зүйлийн баталгаажуулалт (MFA) байхгүй</field><field name="category">technical</field></record>
+    <record id="vuln_v_02" model="isms.vulnerability"><field name="code">V-02</field><field name="name">МАБ-ын мэдлэгжүүлэлт, фишингийн сургалт хангалтгүй</field><field name="category">people</field></record>
+    <record id="vuln_v_03" model="isms.vulnerability"><field name="code">V-03</field><field name="name">Засвар (patch) хийгдээгүй систем, хавтгай сүлжээ</field><field name="category">technical</field></record>
+    <record id="vuln_v_04" model="isms.vulnerability"><field name="code">V-04</field><field name="name">Нөөцлөлтөөс сэргээх туршилт хийгдээгүй</field><field name="category">process</field></record>
+    <record id="vuln_v_05" model="isms.vulnerability"><field name="code">V-05</field><field name="name">Аюулгүй хөгжүүлэлтийн процесс (SDLC), кодын шалгалт байхгүй</field><field name="category">process</field></record>
+    <record id="vuln_v_06" model="isms.vulnerability"><field name="code">V-06</field><field name="name">Системийн аудит лог унтраалттай / хадгалагддаггүй</field><field name="category">technical</field></record>
+    <record id="vuln_v_07" model="isms.vulnerability"><field name="code">V-07</field><field name="name">Ажилд орох, шилжих, гарах (JML) журам байхгүй</field><field name="category">process</field></record>
+    <record id="vuln_v_08" model="isms.vulnerability"><field name="code">V-08</field><field name="name">Хэт өргөн хандах эрх, үүрэг салгаагүй</field><field name="category">process</field></record>
+    <record id="vuln_v_09" model="isms.vulnerability"><field name="code">V-09</field><field name="name">Файл хуваалцах тохиргооны хяналтгүй</field><field name="category">technical</field></record>
+    <record id="vuln_v_10" model="isms.vulnerability"><field name="code">V-10</field><field name="name">UPS / генераторын нөөцгүй</field><field name="category">physical</field></record>
+    <record id="vuln_v_11" model="isms.vulnerability"><field name="code">V-11</field><field name="name">Зөөврийн компьютерийн дискний шифрлэлтгүй</field><field name="category">technical</field></record>
+    <record id="vuln_v_12" model="isms.vulnerability"><field name="code">V-12</field><field name="name">Хурд хязгаарлалт, CDN, WAF байхгүй</field><field name="category">technical</field></record>
+    <record id="vuln_v_13" model="isms.vulnerability"><field name="code">V-13</field><field name="name">Хоёр шатны батлалтгүй өөрчлөлт</field><field name="category">process</field></record>
+    <record id="vuln_v_14" model="isms.vulnerability"><field name="code">V-14</field><field name="name">CMS, залгаас шинэчлэгдээгүй</field><field name="category">technical</field></record>
+</odoo>

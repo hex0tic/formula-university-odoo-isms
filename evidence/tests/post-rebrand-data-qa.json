@@ -1,0 +1,51 @@
+{
+  "result": "PASS",
+  "company": "Formula University",
+  "inventory_count": 16,
+  "selected_controls": 25,
+  "status_counts": {
+    "yes": 15,
+    "partial": 10,
+    "no": 0
+  },
+  "users": 19,
+  "policies": [
+    {
+      "code": "POL-01",
+      "version": "1.2",
+      "state": "approved",
+      "approver": "dorjsembe",
+      "date": "2026-11-16",
+      "next_review": "2027-11-16",
+      "acks": 1
+    },
+    {
+      "code": "POL-02",
+      "version": "1.2",
+      "state": "approved",
+      "approver": "dorjsembe",
+      "date": "2026-11-16",
+      "next_review": "2027-05-16",
+      "acks": 1
+    },
+    {
+      "code": "POL-03",
+      "version": "1.2",
+      "state": "approved",
+      "approver": "dorjsembe",
+      "date": "2026-11-16",
+      "next_review": "2027-02-16",
+      "acks": 1
+    },
+    {
+      "code": "POL-04",
+      "version": "1.2",
+      "state": "approved",
+      "approver": "dorjsembe",
+      "date": "2026-11-16",
+      "next_review": "2027-11-16",
+      "acks": 1
+    }
+  ],
+  "audit_count": 515
+}

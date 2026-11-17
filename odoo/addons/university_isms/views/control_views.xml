@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="isms_control_view_list" model="ir.ui.view">
+        <field name="name">isms.control.list</field>
+        <field name="model">isms.control</field>
+        <field name="arch" type="xml">
+            <list create="0" decoration-muted="not applicable" decoration-bf="selected">
+                <field name="sequence" column_invisible="True"/>
+                <field name="code" string="Annex A"/>
+                <field name="name_mn"/>
+                <field name="name" optional="hide"/>
+                <field name="theme" optional="show"/>
+                <field name="is_new_2022" optional="hide"/>
+                <field name="selected" widget="boolean_toggle" optional="show"/>
+                <field name="applicable" widget="boolean_toggle"/>
+                <field name="implementation" widget="badge"
+                       decoration-success="implementation == 'yes'"
+                       decoration-warning="implementation == 'partial'"
+                       decoration-danger="implementation == 'no' and applicable"/>
+                <field name="justification" optional="show"/>
+                <field name="odoo_implementation" optional="show"/>
+                <field name="responsible_id" widget="many2one_avatar_user" optional="show"/>
+                <field name="risk_count" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="isms_control_view_form" model="ir.ui.view">
+        <field name="name">isms.control.form</field>
+        <field name="model">isms.control</field>
+        <field name="arch" type="xml">
+            <form create="0">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_open_risks" type="object" class="oe_stat_button" icon="fa-exclamation-triangle">
+                            <field name="risk_count" widget="statinfo" string="Эрсдэл"/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <h1>A.<field name="code" class="oe_inline" readonly="1"/></h1>
+                        <h2><field name="name_mn" readonly="1"/></h2>
+                        <div class="text-muted"><field name="name" readonly="1"/></div>
+                    </div>
+                    <group>
+                        <group string="Ангилал">
+                            <field name="theme" readonly="1"/>
+                            <field name="is_new_2022" readonly="1"/>
+                            <field name="responsible_id"/>
+                        </group>
+                        <group string="Statement of Applicability">
+                            <field name="selected"/>
+                            <field name="applicable"/>
+                            <field name="implementation"/>
+                        </group>
+                    </group>
+                    <group string="Үндэслэл ба хэрэгжилт">
+                        <field name="justification" placeholder="Яагаад хамааралтай/хамааралгүй, юуг хэрэгжүүлсэн бэ?"/>
+                        <field name="odoo_implementation" placeholder="Odoo-д хэрхэн хэрэгжсэн (модуль, тохиргоо, бүлэг, workflow)"/>
+                        <field name="evidence" placeholder="Нотолгоо: дэлгэцийн зургийн нэр, бүртгэлийн дугаар, лог"/>
+                    </group>
+                    <notebook>
+                        <page string="Эрсдэл" name="risks">
+                            <field name="risk_ids" readonly="1">
+                                <list>
+                                    <field name="code"/>
+                                    <field name="name"/>
+                                    <field name="level" widget="badge"
+                                           decoration-danger="level == 'high'"
+                                           decoration-warning="level == 'medium'"
+                                           decoration-success="level == 'low'"/>
+                                    <field name="state"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Хөрөнгө" name="assets">
+                            <field name="asset_ids" readonly="1"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="isms_control_view_search" model="ir.ui.view">
+        <field name="name">isms.control.search</field>
+        <field name="model">isms.control</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="code"/>
+                <field name="name_mn"/>
+                <field name="name"/>
+                <field name="responsible_id"/>
+                <filter name="f_selected" string="Controls Mapping-д сонгосон" domain="[('selected', '=', True)]"/>
+                <filter name="f_applicable" string="Хамааралтай" domain="[('applicable', '=', True)]"/>
+                <filter name="f_not_applicable" string="Хамааралгүй" domain="[('applicable', '=', False)]"/>
+                <separator/>
+                <filter name="f_yes" string="Хэрэгжсэн" domain="[('implementation', '=', 'yes')]"/>
+                <filter name="f_partial" string="Хэсэгчилсэн" domain="[('implementation', '=', 'partial')]"/>
+                <filter name="f_no" string="Хэрэгжээгүй" domain="[('implementation', '=', 'no')]"/>
+                <separator/>
+                <filter name="f_new" string="2022 оны шинэ хяналт" domain="[('is_new_2022', '=', True)]"/>
+                <group>
+                    <filter name="g_theme" string="Сэдэв" context="{'group_by': 'theme'}"/>
+                    <filter name="g_impl" string="Хэрэгжилт" context="{'group_by': 'implementation'}"/>
+                </group>
+                <searchpanel>
+                    <field name="theme" icon="fa-folder" enable_counters="1"/>
+                    <field name="implementation" icon="fa-check-square-o" enable_counters="1"/>
+                </searchpanel>
+            </search>
+        </field>
+    </record>
+
+    <record id="isms_control_view_graph" model="ir.ui.view">
+        <field name="name">isms.control.graph</field>
+        <field name="model">isms.control</field>
+        <field name="arch" type="xml">
+            <graph string="SoA хэрэгжилт" type="bar" stacked="1">
+                <field name="theme"/>
+                <field name="implementation"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="action_isms_control" model="ir.actions.act_window">
+        <field name="name">Annex A хяналтууд</field>
+        <field name="res_model">isms.control</field>
+        <field name="view_mode">list,form,graph</field>
+    </record>
+    <record id="action_isms_control_mapping" model="ir.actions.act_window">
+        <field name="name">Controls Mapping (сонгосон)</field>
+        <field name="res_model">isms.control</field>
+        <field name="view_mode">list,form,graph</field>
+        <field name="context">{'search_default_f_selected': 1}</field>
+    </record>
+    <record id="action_isms_soa" model="ir.actions.act_window">
+        <field name="name">Statement of Applicability (SoA)</field>
+        <field name="res_model">isms.control</field>
+        <field name="view_mode">list,graph,form</field>
+        <field name="context">{'search_default_g_theme': 1}</field>
+    </record>
+</odoo>

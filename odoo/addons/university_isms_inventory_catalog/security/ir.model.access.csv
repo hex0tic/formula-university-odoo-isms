@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_product_isms_analyst,product isms analyst,product.model_product_product,university_isms.group_isms_analyst,1,0,0,0
+access_template_isms_analyst,template isms analyst,product.model_product_template,university_isms.group_isms_analyst,1,0,0,0
+access_product_isms_auditor,product isms auditor,product.model_product_product,university_isms.group_isms_auditor,1,0,0,0
+access_template_isms_auditor,template isms auditor,product.model_product_template,university_isms.group_isms_auditor,1,0,0,0

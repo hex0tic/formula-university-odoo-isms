@@ -1,0 +1,31 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_asset_reporter,asset reporter,model_isms_asset,group_isms_reporter,1,0,0,0
+access_asset_owner,asset owner,model_isms_asset,group_isms_asset_owner,1,1,0,0
+access_asset_analyst,asset analyst,model_isms_asset,group_isms_analyst,1,1,1,0
+access_asset_manager,asset manager,model_isms_asset,group_isms_manager,1,1,1,1
+access_threat_owner,threat owner,model_isms_threat,group_isms_asset_owner,1,0,0,0
+access_threat_auditor,threat auditor,model_isms_threat,group_isms_auditor,1,0,0,0
+access_threat_analyst,threat analyst,model_isms_threat,group_isms_analyst,1,1,1,0
+access_threat_manager,threat manager,model_isms_threat,group_isms_manager,1,1,1,1
+access_vuln_owner,vulnerability owner,model_isms_vulnerability,group_isms_asset_owner,1,0,0,0
+access_vuln_auditor,vulnerability auditor,model_isms_vulnerability,group_isms_auditor,1,0,0,0
+access_vuln_analyst,vulnerability analyst,model_isms_vulnerability,group_isms_analyst,1,1,1,0
+access_vuln_manager,vulnerability manager,model_isms_vulnerability,group_isms_manager,1,1,1,1
+access_risk_owner,risk owner,model_isms_risk,group_isms_asset_owner,1,0,0,0
+access_risk_auditor,risk auditor,model_isms_risk,group_isms_auditor,1,0,0,0
+access_risk_analyst,risk analyst,model_isms_risk,group_isms_analyst,1,1,1,0
+access_risk_manager,risk manager,model_isms_risk,group_isms_manager,1,1,1,1
+access_control_reporter,control reporter,model_isms_control,group_isms_reporter,1,0,0,0
+access_control_analyst,control analyst,model_isms_control,group_isms_analyst,1,1,0,0
+access_control_manager,control manager,model_isms_control,group_isms_manager,1,1,1,0
+access_incident_reporter,incident reporter,model_isms_incident,group_isms_reporter,1,1,1,0
+access_incident_auditor,incident auditor,model_isms_incident,group_isms_auditor,1,0,0,0
+access_incident_analyst,incident analyst,model_isms_incident,group_isms_analyst,1,1,1,0
+access_incident_manager,incident manager,model_isms_incident,group_isms_manager,1,1,1,1
+access_policy_reporter,policy reporter,model_isms_policy,group_isms_reporter,1,0,0,0
+access_policy_analyst,policy analyst,model_isms_policy,group_isms_analyst,1,1,1,0
+access_policy_manager,policy manager,model_isms_policy,group_isms_manager,1,1,1,1
+access_policy_ack_reporter,policy ack reporter,model_isms_policy_ack,group_isms_reporter,1,0,1,0
+access_policy_ack_auditor,policy ack auditor,model_isms_policy_ack,group_isms_auditor,1,0,0,0
+access_audit_log_auditor,audit log auditor,model_isms_audit_log,group_isms_auditor,1,0,0,0
+access_audit_log_system,audit log system admin,model_isms_audit_log,base.group_system,1,0,0,0

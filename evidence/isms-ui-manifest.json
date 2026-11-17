@@ -1,0 +1,15 @@
+[
+  {
+    "file": "evidence/screenshots/12-policy-register.png",
+    "action": "university_isms.action_isms_policy",
+    "description": "Versioned policies and approval status",
+    "url": "http://127.0.0.1:8069/odoo/action-277",
+    "captured_at": "2026-11-16T04:18:07.120Z"
+  },
+  {
+    "file": "evidence/screenshots/13-incident-closed.png",
+    "description": "Live exercise incident with required resolution, lesson and CISO closure",
+    "url": "http://127.0.0.1:8069/odoo/action-274/34",
+    "captured_at": "2026-11-16T04:18:08.192Z"
+  }
+]

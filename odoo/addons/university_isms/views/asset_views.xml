@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="isms_asset_view_list" model="ir.ui.view">
+        <field name="name">isms.asset.list</field>
+        <field name="model">isms.asset</field>
+        <field name="arch" type="xml">
+            <list decoration-danger="risk_level == 'high'" decoration-muted="not active">
+                <field name="code"/>
+                <field name="name"/>
+                <field name="asset_type"/>
+                <field name="owner_id" widget="many2one_avatar_user"/>
+                <field name="department_id" optional="show"/>
+                <field name="classification" widget="badge"
+                       decoration-danger="classification == 'confidential'"
+                       decoration-warning="classification == 'restricted'"
+                       decoration-info="classification == 'internal'"
+                       decoration-success="classification == 'public'"/>
+                <field name="location"/>
+                <field name="confidentiality" optional="hide"/>
+                <field name="integrity" optional="hide"/>
+                <field name="availability" optional="hide"/>
+                <field name="asset_value" optional="show"/>
+                <field name="personal_data" optional="show"/>
+                <field name="risk_count" optional="hide"/>
+                <field name="risk_level" widget="badge"
+                       decoration-danger="risk_level == 'high'"
+                       decoration-warning="risk_level == 'medium'"
+                       decoration-success="risk_level == 'low'"/>
+                <field name="active" column_invisible="True"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="isms_asset_view_form" model="ir.ui.view">
+        <field name="name">isms.asset.form</field>
+        <field name="model">isms.asset</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <field name="lifecycle_stage" widget="statusbar" options="{'clickable': '1'}"/>
+                </header>
+                <sheet>
+                    <widget name="web_ribbon" title="Архивласан" bg_color="text-bg-danger" invisible="active"/>
+                    <div class="oe_title">
+                        <div class="text-muted"><field name="code" readonly="1"/></div>
+                        <h1><field name="name" placeholder="жишээ: Оюутны мэдээллийн систем (SIS)"/></h1>
+                    </div>
+                    <group>
+                        <group string="Ерөнхий">
+                            <field name="asset_type"/>
+                            <field name="department_id"/>
+                            <field name="owner_id" widget="many2one_avatar_user"/>
+                            <field name="custodian_id" widget="many2one_avatar_user"/>
+                            <field name="location"/>
+                            <field name="active" invisible="1"/>
+                        </group>
+                        <group string="Ангилал ба үнэ цэнэ">
+                            <field name="classification"/>
+                            <field name="confidentiality"/>
+                            <field name="integrity"/>
+                            <field name="availability"/>
+                            <field name="asset_value"/>
+                            <field name="criticality"/>
+                            <field name="personal_data"/>
+                            <field name="risk_level" widget="badge"
+                                   decoration-danger="risk_level == 'high'"
+                                   decoration-warning="risk_level == 'medium'"
+                                   decoration-success="risk_level == 'low'"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Тайлбар" name="description">
+                            <field name="description" placeholder="Хөрөнгийн агуулга, хэрэглэгчид, холболт, хадгалах хугацаа..."/>
+                        </page>
+                        <page string="Эрсдэл" name="risks"
+                              groups="university_isms.group_isms_asset_owner,university_isms.group_isms_auditor">
+                            <field name="risk_ids">
+                                <list>
+                                    <field name="code"/>
+                                    <field name="name"/>
+                                    <field name="score"/>
+                                    <field name="level" widget="badge"
+                                           decoration-danger="level == 'high'"
+                                           decoration-warning="level == 'medium'"
+                                           decoration-success="level == 'low'"/>
+                                    <field name="treatment"/>
+                                    <field name="state"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Хяналт" name="controls">
+                            <field name="control_ids">
+                                <list>
+                                    <field name="code"/>
+                                    <field name="name_mn"/>
+                                    <field name="implementation"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Инцидент" name="incidents"
+                              groups="university_isms.group_isms_analyst,university_isms.group_isms_auditor">
+                            <field name="incident_ids" readonly="1">
+                                <list>
+                                    <field name="code"/>
+                                    <field name="name"/>
+                                    <field name="severity"/>
+                                    <field name="state"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="isms_asset_view_search" model="ir.ui.view">
+        <field name="name">isms.asset.search</field>
+        <field name="model">isms.asset</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name" filter_domain="['|', ('name', 'ilike', self), ('code', 'ilike', self)]"/>
+                <field name="owner_id"/>
+                <field name="department_id"/>
+                <field name="location"/>
+                <filter name="f_mine" string="Миний хөрөнгө" domain="['|', ('owner_id', '=', uid), ('custodian_id', '=', uid)]"/>
+                <filter name="f_pii" string="Хувийн мэдээлэлтэй" domain="[('personal_data', '=', True)]"/>
+                <filter name="f_high" string="Өндөр эрсдэлтэй" domain="[('risk_level', '=', 'high')]"/>
+                <filter name="f_confidential" string="Нууц / Хязгаарлагдмал" domain="[('classification', 'in', ('confidential', 'restricted'))]"/>
+                <separator/>
+                <filter name="f_archived" string="Архивласан" domain="[('active', '=', False)]"/>
+                <group>
+                    <filter name="g_type" string="Төрөл" context="{'group_by': 'asset_type'}"/>
+                    <filter name="g_class" string="Ангилал" context="{'group_by': 'classification'}"/>
+                    <filter name="g_dept" string="Нэгж" context="{'group_by': 'department_id'}"/>
+                    <filter name="g_owner" string="Эзэмшигч" context="{'group_by': 'owner_id'}"/>
+                    <filter name="g_risk" string="Эрсдэлийн түвшин" context="{'group_by': 'risk_level'}"/>
+                </group>
+                <searchpanel>
+                    <field name="asset_type" icon="fa-cubes" enable_counters="1"/>
+                    <field name="classification" icon="fa-lock" enable_counters="1"/>
+                </searchpanel>
+            </search>
+        </field>
+    </record>
+
+    <record id="isms_asset_view_kanban" model="ir.ui.view">
+        <field name="name">isms.asset.kanban</field>
+        <field name="model">isms.asset</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="asset_type">
+                <field name="risk_level"/>
+                <templates>
+                    <t t-name="card">
+                        <div class="d-flex">
+                            <field name="code" class="text-muted me-2"/>
+                            <field name="risk_level" widget="badge" class="ms-auto"
+                                   decoration-danger="risk_level == 'high'"
+                                   decoration-warning="risk_level == 'medium'"
+                                   decoration-success="risk_level == 'low'"/>
+                        </div>
+                        <field name="name" class="fw-bold"/>
+                        <div class="d-flex mt-1">
+                            <field name="classification"/>
+                            <field name="owner_id" widget="many2one_avatar_user" class="ms-auto"/>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="isms_asset_view_pivot" model="ir.ui.view">
+        <field name="name">isms.asset.pivot</field>
+        <field name="model">isms.asset</field>
+        <field name="arch" type="xml">
+            <pivot string="Хөрөнгийн бүртгэл">
+                <field name="asset_type" type="row"/>
+                <field name="classification" type="col"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="action_isms_asset" model="ir.actions.act_window">
+        <field name="name">Хөрөнгийн бүртгэл (Asset Register)</field>
+        <field name="res_model">isms.asset</field>
+        <field name="view_mode">list,kanban,form,pivot</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Мэдээллийн хөрөнгө бүртгэх</p>
+            <p>ISO/IEC 27001:2022 A.5.9: мэдээлэл, систем, тоног төхөөрөмж, хүн, байрыг эзэмшигч, ангилал, CIA үнэлгээтэй бүртгэнэ.</p>
+        </field>
+    </record>
+</odoo>

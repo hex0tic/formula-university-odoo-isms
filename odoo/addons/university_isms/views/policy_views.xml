@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="isms_policy_view_list" model="ir.ui.view">
+        <field name="name">isms.policy.list</field>
+        <field name="model">isms.policy</field>
+        <field name="arch" type="xml">
+            <list decoration-muted="state == 'retired'">
+                <field name="code"/>
+                <field name="name"/>
+                <field name="policy_type"/>
+                <field name="version"/>
+                <field name="owner_id" widget="many2one_avatar_user"/>
+                <field name="approval_date"/>
+                <field name="next_review_date"/>
+                <field name="ack_count"/>
+                <field name="state" widget="badge"
+                       decoration-success="state == 'approved'"
+                       decoration-warning="state == 'review'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="isms_policy_view_form" model="ir.ui.view">
+        <field name="name">isms.policy.form</field>
+        <field name="model">isms.policy</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_submit" type="object" string="Хянуулахаар илгээх" class="btn-primary"
+                            invisible="state != 'draft'" groups="university_isms.group_isms_analyst"/>
+                    <button name="action_approve" type="object" string="Батлах" class="btn-primary"
+                            invisible="state not in ('draft', 'review')" groups="university_isms.group_isms_manager"/>
+                    <button name="action_acknowledge" type="object" string="Танилцсан" class="btn-success"
+                            invisible="state != 'approved' or user_has_ack"/>
+                    <button name="action_reset_draft" type="object" string="Ноорог болгох"
+                            invisible="state in ('draft',)" groups="university_isms.group_isms_manager"/>
+                    <button name="action_retire" type="object" string="Хүчингүй болгох"
+                            invisible="state != 'approved'" groups="university_isms.group_isms_manager"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,review,approved"/>
+                </header>
+                <sheet>
+                    <div class="alert alert-success" role="alert" invisible="not user_has_ack">
+                        Та энэ бодлогын одоогийн хувилбартай танилцсан.
+                    </div>
+                    <div class="oe_title">
+                        <div class="text-muted"><field name="code" readonly="1"/></div>
+                        <h1><field name="name" placeholder="жишээ: Хандалтын хяналтын бодлого"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="policy_type"/>
+                            <field name="version"/>
+                            <field name="owner_id" widget="many2one_avatar_user"/>
+                            <field name="control_ids" widget="many2many_tags"/>
+                        </group>
+                        <group>
+                            <field name="approver_id"/>
+                            <field name="approval_date"/>
+                            <field name="next_review_date"/>
+                            <field name="ack_count"/>
+                            <field name="user_has_ack" invisible="1"/>
+                        </group>
+                    </group>
+                    <field name="summary" placeholder="Товч агуулга"/>
+                    <notebook>
+                        <page string="Агуулга" name="content">
+                            <field name="content" readonly="state in ('approved', 'retired')"/>
+                        </page>
+                        <page string="Танилцсан бүртгэл" name="acks"
+                              groups="university_isms.group_isms_analyst,university_isms.group_isms_auditor">
+                            <field name="ack_ids" readonly="1">
+                                <list>
+                                    <field name="user_id"/>
+                                    <field name="version"/>
+                                    <field name="date"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="isms_policy_view_search" model="ir.ui.view">
+        <field name="name">isms.policy.search</field>
+        <field name="model">isms.policy</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="code"/>
+                <filter name="f_approved" string="Батлагдсан" domain="[('state', '=', 'approved')]"/>
+                <filter name="f_draft" string="Ноорог / хянагдаж буй" domain="[('state', 'in', ('draft', 'review'))]"/>
+                <group>
+                    <filter name="g_type" string="Төрөл" context="{'group_by': 'policy_type'}"/>
+                    <filter name="g_state" string="Төлөв" context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_isms_policy" model="ir.actions.act_window">
+        <field name="name">ISMS бодлого</field>
+        <field name="res_model">isms.policy</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

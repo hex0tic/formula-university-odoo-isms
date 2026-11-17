@@ -1,0 +1,103 @@
+<odoo>
+    <record id="module_category_campus" model="ir.module.category">
+        <field name="name">Campus Academic Services</field>
+        <field name="sequence">18</field>
+    </record>
+    <record id="group_campus_user" model="res.groups">
+        <field name="name">Campus Catalog Reader</field>
+        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+    </record>
+    <record id="group_campus_student" model="res.groups">
+        <field name="name">Campus Student</field>
+        <field name="category_id" ref="module_category_campus"/>
+        <field name="implied_ids" eval="[(4, ref('group_campus_user'))]"/>
+    </record>
+    <record id="group_campus_lecturer" model="res.groups">
+        <field name="name">Campus Lecturer</field>
+        <field name="category_id" ref="module_category_campus"/>
+        <field name="implied_ids" eval="[(4, ref('group_campus_user'))]"/>
+    </record>
+    <record id="group_campus_registrar" model="res.groups">
+        <field name="name">Campus Registrar</field>
+        <field name="category_id" ref="module_category_campus"/>
+        <field name="implied_ids" eval="[(4, ref('group_campus_user'))]"/>
+    </record>
+    <record id="group_campus_auditor" model="res.groups">
+        <field name="name">Campus Academic Auditor</field>
+        <field name="category_id" ref="module_category_campus"/>
+        <field name="implied_ids" eval="[(4, ref('group_campus_user'))]"/>
+    </record>
+
+    <record id="rule_student_own" model="ir.rule">
+        <field name="name">Student reads own profile</field>
+        <field name="model_id" ref="model_campus_student"/>
+        <field name="groups" eval="[(4, ref('group_campus_student'))]"/>
+        <field name="domain_force">[('user_id', '=', user.id)]</field>
+    </record>
+    <record id="rule_student_lecturer" model="ir.rule">
+        <field name="name">Lecturer reads assigned students</field>
+        <field name="model_id" ref="model_campus_student"/>
+        <field name="groups" eval="[(4, ref('group_campus_lecturer'))]"/>
+        <field name="domain_force">[('enrollment_ids.offering_id.lecturer_id', '=', user.id)]</field>
+    </record>
+    <record id="rule_student_registry" model="ir.rule">
+        <field name="name">Registrar and auditor read student registry</field>
+        <field name="model_id" ref="model_campus_student"/>
+        <field name="groups" eval="[(4, ref('group_campus_registrar')), (4, ref('group_campus_auditor'))]"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+    </record>
+    <record id="rule_enrollment_student" model="ir.rule">
+        <field name="name">Student reads own grades</field>
+        <field name="model_id" ref="model_campus_enrollment"/>
+        <field name="groups" eval="[(4, ref('group_campus_student'))]"/>
+        <field name="domain_force">[('student_id.user_id', '=', user.id)]</field>
+    </record>
+    <record id="rule_enrollment_lecturer" model="ir.rule">
+        <field name="name">Lecturer reads assigned grades</field>
+        <field name="model_id" ref="model_campus_enrollment"/>
+        <field name="groups" eval="[(4, ref('group_campus_lecturer'))]"/>
+        <field name="domain_force">[('offering_id.lecturer_id', '=', user.id)]</field>
+    </record>
+    <record id="rule_enrollment_registry" model="ir.rule">
+        <field name="name">Registrar and auditor read grade ledger</field>
+        <field name="model_id" ref="model_campus_enrollment"/>
+        <field name="groups" eval="[(4, ref('group_campus_registrar')), (4, ref('group_campus_auditor'))]"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+    </record>
+    <record id="rule_change_student" model="ir.rule">
+        <field name="name">Student reads own grade decisions</field>
+        <field name="model_id" ref="model_campus_grade_change"/>
+        <field name="groups" eval="[(4, ref('group_campus_student'))]"/>
+        <field name="domain_force">[('student_id.user_id', '=', user.id)]</field>
+    </record>
+    <record id="rule_change_lecturer" model="ir.rule">
+        <field name="name">Lecturer manages own requests</field>
+        <field name="model_id" ref="model_campus_grade_change"/>
+        <field name="groups" eval="[(4, ref('group_campus_lecturer'))]"/>
+        <field name="domain_force">[('requester_id', '=', user.id)]</field>
+    </record>
+    <record id="rule_change_registry" model="ir.rule">
+        <field name="name">Registrar and auditor inspect grade decisions</field>
+        <field name="model_id" ref="model_campus_grade_change"/>
+        <field name="groups" eval="[(4, ref('group_campus_registrar')), (4, ref('group_campus_auditor'))]"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+    </record>
+    <record id="rule_offering_lecturer" model="ir.rule">
+        <field name="name">Lecturer reads assigned offerings</field>
+        <field name="model_id" ref="model_campus_offering"/>
+        <field name="groups" eval="[(4, ref('group_campus_lecturer'))]"/>
+        <field name="domain_force">[('lecturer_id', '=', user.id)]</field>
+    </record>
+    <record id="rule_offering_student" model="ir.rule">
+        <field name="name">Student reads enrolled offerings</field>
+        <field name="model_id" ref="model_campus_offering"/>
+        <field name="groups" eval="[(4, ref('group_campus_student'))]"/>
+        <field name="domain_force">[('enrollment_ids.student_id.user_id', '=', user.id)]</field>
+    </record>
+    <record id="rule_offering_registry" model="ir.rule">
+        <field name="name">Registrar and auditor inspect offerings</field>
+        <field name="model_id" ref="model_campus_offering"/>
+        <field name="groups" eval="[(4, ref('group_campus_registrar')), (4, ref('group_campus_auditor'))]"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+    </record>
+</odoo>

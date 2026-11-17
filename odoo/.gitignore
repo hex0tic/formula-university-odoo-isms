@@ -1,0 +1,4 @@
+.env
+config/odoo.conf
+logs/
+__pycache__/

@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="paperformat_isms_landscape" model="report.paperformat">
+        <field name="name">ISMS A4 хэвтээ</field>
+        <field name="format">A4</field>
+        <field name="orientation">Landscape</field>
+        <field name="margin_top">42</field>
+        <field name="margin_bottom">18</field>
+        <field name="margin_left">8</field>
+        <field name="margin_right">8</field>
+        <field name="header_spacing">36</field>
+        <field name="dpi">90</field>
+    </record>
+
+    <record id="action_report_soa" model="ir.actions.report">
+        <field name="name">Statement of Applicability (SoA)</field>
+        <field name="model">isms.control</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">university_isms.report_soa</field>
+        <field name="report_file">university_isms.report_soa</field>
+        <field name="print_report_name">'SoA_ISO27001_2022'</field>
+        <field name="paperformat_id" ref="paperformat_isms_landscape"/>
+        <field name="binding_model_id" ref="model_isms_control"/>
+        <field name="binding_type">report</field>
+    </record>
+    <record id="action_report_risk_register" model="ir.actions.report">
+        <field name="name">Эрсдэлийн бүртгэл (Risk Register)</field>
+        <field name="model">isms.risk</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">university_isms.report_risk_register</field>
+        <field name="report_file">university_isms.report_risk_register</field>
+        <field name="print_report_name">'Risk_Register'</field>
+        <field name="paperformat_id" ref="paperformat_isms_landscape"/>
+        <field name="binding_model_id" ref="model_isms_risk"/>
+        <field name="binding_type">report</field>
+    </record>
+    <record id="action_report_asset_register" model="ir.actions.report">
+        <field name="name">Хөрөнгийн бүртгэл (Asset Register)</field>
+        <field name="model">isms.asset</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">university_isms.report_asset_register</field>
+        <field name="report_file">university_isms.report_asset_register</field>
+        <field name="print_report_name">'Asset_Register'</field>
+        <field name="paperformat_id" ref="paperformat_isms_landscape"/>
+        <field name="binding_model_id" ref="model_isms_asset"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <template id="report_soa">
+        <t t-call="web.html_container">
+            <t t-call="web.external_layout">
+                <t t-set="controls" t-value="docs.sorted('sequence')"/>
+                <div class="page" style="font-size: 9pt;">
+                    <h4>Хэрэглэх боломжийн мэдэгдэл — Statement of Applicability (ISO/IEC 27001:2022, Clause 6.1.3 d)</h4>
+                    <p>
+                        Нийт <b t-out="len(controls)"/> хяналт ·
+                        хамааралтай <b t-out="len(controls.filtered('applicable'))"/> ·
+                        хэрэгжсэн <b t-out="len(controls.filtered(lambda c: c.applicable and c.implementation == 'yes'))"/> ·
+                        хэсэгчилсэн <b t-out="len(controls.filtered(lambda c: c.applicable and c.implementation == 'partial'))"/> ·
+                        хэрэгжээгүй <b t-out="len(controls.filtered(lambda c: c.applicable and c.implementation == 'no'))"/> ·
+                        огноо <span t-out="context_timestamp(datetime.datetime.now()).strftime('%Y-%m-%d')"/>
+                    </p>
+                    <table class="table table-sm table-bordered">
+                        <thead>
+                            <tr>
+                                <th style="width: 6%;">Annex A</th>
+                                <th style="width: 24%;">Хяналт</th>
+                                <th style="width: 8%;">Хамааралтай</th>
+                                <th style="width: 9%;">Хэрэгжсэн үү?</th>
+                                <th style="width: 27%;">Тайлбар / шалтгаан, үндэслэл</th>
+                                <th style="width: 26%;">Odoo дахь хэрэгжилт</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-foreach="controls" t-as="c">
+                                <tr t-att-style="'font-weight: bold;' if c.selected else ''">
+                                    <td>A.<t t-out="c.code"/></td>
+                                    <td><t t-out="c.name_mn"/><br/><small class="text-muted" t-out="c.name"/></td>
+                                    <td><t t-out="'Тийм' if c.applicable else 'Үгүй'"/></td>
+                                    <td><t t-if="c.applicable" t-out="dict(c._fields['implementation']._description_selection(c.env)).get(c.implementation)"/><t t-else="">—</t></td>
+                                    <td t-out="c.justification or ''"/>
+                                    <td t-out="c.odoo_implementation or ''"/>
+                                </tr>
+                            </t>
+                        </tbody>
+                    </table>
+                    <p class="small text-muted">Тодоор харуулсан мөр — багийн Controls Mapping-д сонгосон хяналт.</p>
+                </div>
+            </t>
+        </t>
+    </template>
+
+    <template id="report_risk_register">
+        <t t-call="web.html_container">
+            <t t-call="web.external_layout">
+                <t t-set="risks" t-value="docs.sorted(lambda r: (-r.score, r.code))"/>
+                <div class="page" style="font-size: 8.5pt;">
+                    <h4>Мэдээллийн аюулгүй байдлын эрсдэлийн бүртгэл (Risk Register)</h4>
+                    <p>Эрсдэлийн түвшин = Нөлөө × Магадлал; 5×5 матриц (Бага / Дунд / Өндөр). Нийт <b t-out="len(risks)"/> эрсдэл ·
+                        Өндөр <b t-out="len(risks.filtered(lambda r: r.level == 'high'))"/> ·
+                        Дунд <b t-out="len(risks.filtered(lambda r: r.level == 'medium'))"/> ·
+                        Бага <b t-out="len(risks.filtered(lambda r: r.level == 'low'))"/></p>
+                    <table class="table table-sm table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Код</th><th>Эрсдэл</th><th>Хөрөнгө</th><th>Аюул занал (Threat)</th>
+                                <th>Эмзэг байдал (Vulnerability)</th><th>М</th><th>Н</th><th>Оноо</th><th>Түвшин</th>
+                                <th>Хариу арга хэмжээ</th><th>Annex A</th><th>Үлдэгдэл</th><th>Хариуцагч</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-foreach="risks" t-as="r">
+                                <tr>
+                                    <td t-out="r.code"/>
+                                    <td t-out="r.name"/>
+                                    <td t-out="', '.join(r.asset_ids.mapped('code'))"/>
+                                    <td t-out="r.threat_id.name or ''"/>
+                                    <td t-out="r.vulnerability_id.name or ''"/>
+                                    <td t-out="r.likelihood"/>
+                                    <td t-out="r.impact"/>
+                                    <td t-out="r.score"/>
+                                    <td t-att-style="'background-color: %s;' % {'high': '#f8b4b4', 'medium': '#fde68a', 'low': '#bbf7d0'}.get(r.level, '#fff')"
+                                        t-out="dict(r._fields['level']._description_selection(r.env)).get(r.level)"/>
+                                    <td t-out="dict(r._fields['treatment']._description_selection(r.env)).get(r.treatment) or ''"/>
+                                    <td t-out="', '.join(r.control_ids.mapped('code'))"/>
+                                    <td t-out="dict(r._fields['residual_level']._description_selection(r.env)).get(r.residual_level) or '—'"/>
+                                    <td t-out="r.owner_id.name or ''"/>
+                                </tr>
+                            </t>
+                        </tbody>
+                    </table>
+                </div>
+            </t>
+        </t>
+    </template>
+
+    <template id="report_asset_register">
+        <t t-call="web.html_container">
+            <t t-call="web.external_layout">
+                <t t-set="assets" t-value="docs.sorted('code')"/>
+                <div class="page" style="font-size: 9pt;">
+                    <h4>Мэдээллийн хөрөнгийн бүртгэл (Asset Register) — ISO/IEC 27001:2022 A.5.9, A.5.12</h4>
+                    <table class="table table-sm table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Код</th><th>Asset</th><th>Төрөл</th><th>Owner</th><th>Classification</th>
+                                <th>Location</th><th>C</th><th>I</th><th>A</th><th>Хувийн мэдээлэл</th><th>Risk (Low/Med/High)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-foreach="assets" t-as="a">
+                                <tr>
+                                    <td t-out="a.code"/>
+                                    <td t-out="a.name"/>
+                                    <td t-out="dict(a._fields['asset_type']._description_selection(a.env)).get(a.asset_type)"/>
+                                    <td t-out="a.owner_id.name or ''"/>
+                                    <td t-out="dict(a._fields['classification']._description_selection(a.env)).get(a.classification)"/>
+                                    <td t-out="a.location or ''"/>
+                                    <td t-out="a.confidentiality"/>
+                                    <td t-out="a.integrity"/>
+                                    <td t-out="a.availability"/>
+                                    <td t-out="'Тийм' if a.personal_data else 'Үгүй'"/>
+                                    <td t-att-style="'background-color: %s;' % {'high': '#f8b4b4', 'medium': '#fde68a', 'low': '#bbf7d0'}.get(a.risk_level, '#fff')"
+                                        t-out="dict(a._fields['risk_level']._description_selection(a.env)).get(a.risk_level)"/>
+                                </tr>
+                            </t>
+                        </tbody>
+                    </table>
+                </div>
+            </t>
+        </t>
+    </template>
+
+    <record id="action_server_print_soa" model="ir.actions.server">
+        <field name="name">SoA PDF (бүх 93 хяналт)</field>
+        <field name="model_id" ref="model_isms_control"/>
+        <field name="state">code</field>
+        <field name="code">action = env.ref('university_isms.action_report_soa').report_action(model.search([]))</field>
+    </record>
+    <record id="action_server_print_risks" model="ir.actions.server">
+        <field name="name">Эрсдэлийн бүртгэл PDF</field>
+        <field name="model_id" ref="model_isms_risk"/>
+        <field name="state">code</field>
+        <field name="code">action = env.ref('university_isms.action_report_risk_register').report_action(model.search([]))</field>
+    </record>
+    <record id="action_server_print_assets" model="ir.actions.server">
+        <field name="name">Хөрөнгийн бүртгэл PDF</field>
+        <field name="model_id" ref="model_isms_asset"/>
+        <field name="state">code</field>
+        <field name="code">action = env.ref('university_isms.action_report_asset_register').report_action(model.search([]))</field>
+    </record>
+</odoo>

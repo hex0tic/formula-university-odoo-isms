@@ -1,0 +1,150 @@
+{
+  "result": "PASS",
+  "count": 16,
+  "records": [
+    {
+      "asset": "AST-001",
+      "product_id": 2,
+      "type": "service",
+      "representative_demo_serial": false,
+      "owner": "badral",
+      "classification": "confidential",
+      "location": "Серверийн өрөө I-204 / PostgreSQL кластер"
+    },
+    {
+      "asset": "AST-002",
+      "product_id": 3,
+      "type": "service",
+      "representative_demo_serial": false,
+      "owner": "badral",
+      "classification": "confidential",
+      "location": "Серверийн өрөө I-204 / Odoo campus_university DB"
+    },
+    {
+      "asset": "AST-003",
+      "product_id": 4,
+      "type": "service",
+      "representative_demo_serial": false,
+      "owner": "batdemberel",
+      "classification": "restricted",
+      "location": "Серверийн өрөө I-204 (isms-odoo / isms-db контейнер)"
+    },
+    {
+      "asset": "AST-004",
+      "product_id": 5,
+      "type": "service",
+      "representative_demo_serial": false,
+      "owner": "lecturer_cs",
+      "classification": "internal",
+      "location": "Серверийн өрөө I-204 / VM-LMS-01"
+    },
+    {
+      "asset": "AST-005",
+      "product_id": 6,
+      "type": "service",
+      "representative_demo_serial": false,
+      "owner": "badral",
+      "classification": "restricted",
+      "location": "DMZ сегмент / VM-ADM-01"
+    },
+    {
+      "asset": "AST-006",
+      "product_id": 7,
+      "type": "service",
+      "representative_demo_serial": false,
+      "owner": "badral",
+      "classification": "confidential",
+      "location": "Сургалтын албаны шифрлэгдсэн сан / II-201 сейф"
+    },
+    {
+      "asset": "AST-007",
+      "product_id": 8,
+      "type": "service",
+      "representative_demo_serial": false,
+      "owner": "badral",
+      "classification": "confidential",
+      "location": "Сургалтын нэгдсэн алба II-201 / Архивын сан"
+    },
+    {
+      "asset": "AST-008",
+      "product_id": 9,
+      "type": "service",
+      "representative_demo_serial": false,
+      "owner": "lab_head",
+      "classification": "confidential",
+      "location": "II байр 305 тоот / Дотоод GitLab & SAN"
+    },
+    {
+      "asset": "AST-009",
+      "product_id": 10,
+      "type": "consu",
+      "representative_demo_serial": "DEMO-AST-009-001",
+      "owner": "lab_head",
+      "classification": "restricted",
+      "location": "II байр 305 тоот лаборатори (VLAN 40)"
+    },
+    {
+      "asset": "AST-010",
+      "product_id": 11,
+      "type": "consu",
+      "representative_demo_serial": "DEMO-AST-010-001",
+      "owner": "batdemberel",
+      "classification": "restricted",
+      "location": "Төв серверийн өрөө I-204, Зогсуур R1"
+    },
+    {
+      "asset": "AST-011",
+      "product_id": 12,
+      "type": "consu",
+      "representative_demo_serial": "DEMO-AST-011-001",
+      "owner": "batdemberel",
+      "classification": "confidential",
+      "location": "Хичээлийн II байр 108 тоот нөөц өрөө (Backup VLAN 90)"
+    },
+    {
+      "asset": "AST-012",
+      "product_id": 13,
+      "type": "service",
+      "representative_demo_serial": false,
+      "owner": "batdemberel",
+      "classification": "restricted",
+      "location": "Хичээлийн I байр, 2 давхар, 204 тоот"
+    },
+    {
+      "asset": "AST-013",
+      "product_id": 14,
+      "type": "consu",
+      "representative_demo_serial": "DEMO-AST-013-001",
+      "owner": "batdemberel",
+      "classification": "restricted",
+      "location": "Төв серверийн өрөө I-204, Зогсуур R2"
+    },
+    {
+      "asset": "AST-014",
+      "product_id": 15,
+      "type": "consu",
+      "representative_demo_serial": "DEMO-AST-014-001",
+      "owner": "badral",
+      "classification": "restricted",
+      "location": "Хичээлийн I, II байр — Сургалтын алба II-201"
+    },
+    {
+      "asset": "AST-015",
+      "product_id": 16,
+      "type": "service",
+      "representative_demo_serial": false,
+      "owner": "batdemberel",
+      "classification": "internal",
+      "location": "Серверийн өрөө I-204 / Hybrid Cloud"
+    },
+    {
+      "asset": "AST-016",
+      "product_id": 17,
+      "type": "service",
+      "representative_demo_serial": false,
+      "owner": "batdemberel",
+      "classification": "public",
+      "location": "DMZ сегмент / VM-WEB-01"
+    }
+  ]
+}

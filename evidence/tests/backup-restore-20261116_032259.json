@@ -1,0 +1,44 @@
+{
+  "started_at": "2026-11-16T03:22:59.927103+00:00",
+  "primary_database": "orgil_isms",
+  "verification_database": "orgil_restore_20261116_032259",
+  "scope": "Local database and filestore restore rehearsal",
+  "original_counts": {
+    "campus_student": 3,
+    "campus_enrollment": 3,
+    "campus_grade_change": 1,
+    "isms_asset": 16,
+    "isms_risk": 14,
+    "isms_control": 93,
+    "isms_incident": 6,
+    "isms_policy": 4,
+    "isms_audit_log": 333,
+    "helpdesk_ticket": 0
+  },
+  "restored_counts": {
+    "campus_student": 3,
+    "campus_enrollment": 3,
+    "campus_grade_change": 1,
+    "isms_asset": 16,
+    "isms_risk": 14,
+    "isms_control": 93,
+    "isms_incident": 6,
+    "isms_policy": 4,
+    "isms_audit_log": 333,
+    "helpdesk_ticket": 0
+  },
+  "attachments_verified": 190,
+  "restore_seconds": 48.414,
+  "backup_sizes_bytes": {
+    "database.dump": 4509226,
+    "filestore.tar.gz": 2307315
+  },
+  "backup_sha256": {
+    "database.dump": "bb7c8be821433ca7a59ec7b7d0dc475182d5da09a659af667c4074468c2c1515",
+    "filestore.tar.gz": "8d481f42260d7a4fc7b8c118990ff3989910fd2451130250ccec4d27765142e0"
+  },
+  "result": "PASS",
+  "elapsed_seconds": 55.974,
+  "finished_at": "2026-11-16T03:23:55.775570+00:00",
+  "verification_database_removed": true
+}

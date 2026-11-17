@@ -1,0 +1,290 @@
+<div class="o_isms_policy_doc">
+<h2>МЭДЭЭЛЛИЙН АЮУЛГҮЙ БАЙДЛЫН ЭРСДЭЛИЙГ БУУРУУЛАХ ТӨЛӨВЛӨГӨӨ (RISK TREATMENT PLAN — RTP)</h2>
+<table class="table table-bordered table-sm"><thead><tr>
+<th>Баримт бичгийн код</th>
+<th><code>POL-03</code></th>
+<th>Ангилал</th>
+<th>Хязгаарлагдмал (<code>restricted</code>)</th>
+</tr></thead><tbody>
+<tr>
+<td><strong>Баримт бичгийн төрөл</strong></td>
+<td>Төлөвлөгөө (<code>plan</code>)</td>
+<td><strong>Хувилбар</strong></td>
+<td><code>v1.2</code></td>
+</tr>
+<tr>
+<td><strong>Байгууллага</strong></td>
+<td>Formula University (сургалтын зохиомол кейс)</td>
+<td><strong>Төлөв</strong></td>
+<td>Батлагдсан (<code>approved</code>)</td>
+</tr>
+<tr>
+<td><strong>Боловсруулсан (Owner)</strong></td>
+<td>Мэдээллийн аюулгүй байдлын менежер (CISO) — <code>dorjsembe</code></td>
+<td><strong>Батлагдсан огноо</strong></td>
+<td><code>2026-11-16</code></td>
+</tr>
+<tr>
+<td><strong>Батлагч (Approver)</strong></td>
+<td>Formula University-ийн Ректор — <code>dorjsembe</code></td>
+<td><strong>Дахин хянах огноо</strong></td>
+<td><code>2027-02-16</code> (Улирал тутам)</td>
+</tr>
+<tr>
+<td><strong>Холбогдох стандарт</strong></td>
+<td>MNS ISO/IEC 27001:2023 Clause 6.1.2, 6.1.3, 8.2, 8.3; ISO/IEC 27005:2022</td>
+<td></td>
+<td></td>
+</tr>
+</tbody></table>
+<hr/>
+<h3>1. Зорилго ба эрсдэлийн үнэлгээний арга зүй (Clause 6.1.2)</h3>
+<p>Энэхүү Эрсдэлийг бууруулах төлөвлөгөө (Risk Treatment Plan, RTP) нь «Formula University» (Formula University)-ийн ISMS хамрах хүрээнд бүртгэгдсэн <strong>16 мэдээллийн хөрөнгө (<code>AST-001</code>–<code>AST-016</code>)</strong>-д хамаарах <strong>14 эрсдэл (<code>RSK-01</code>–<code>RSK-14</code>)</strong>-ийг үнэлж, хүлээн зөвшөөрөгдөх түвшинд хүртэл бууруулах хяналтын арга хэмжээ, хариуцагч, дуусах хугацаа болон үлдэгдэл эрсдэлийг тогтооход оршино.</p>
+<h4>1.1 Үнэлгээний шалгуур ба 5×5 матриц — `RM-01 v1.0` (Лекц 8–9 Слайд 18–19, Шийдвэр D04)</h4>
+<ul>
+<li><strong>Хөрөнгийн CIA үнэ цэнэ:</strong> Нууцлал (<code>C</code>), Бүрэн бүтэн байдал (<code>I</code>), Хүртээмж (<code>A</code>) тус бүрийг <code>1–3</code> оноогоор үнэлж, хөрөнгийн үнэ цэнийг <code>max(C, I, A)</code> буюу <code>3 = Өндөр</code>, <code>2 = Дунд</code>, <code>1 = Бага</code> гэж тогтооно (CIA нийлбэр <code>C+I+A</code>-г тусдаа үзүүлэлтээр бүртгэнэ).</li>
+<li><strong>Тохиолдох магадлал (<code>Likelihood</code>, 1–5):</strong> <code>1</code> Маш ховор (жилд 1), <code>2</code> Ховор (улиралд 1), <code>3</code> Заримдаа (сард 1), <code>4</code> Ихэвчлэн (7 хоногт 1), <code>5</code> Тогтмол (өдөр бүр).</li>
+<li><strong>Нөлөөлөл (<code>Impact</code>, 1–5):</strong> <code>1</code> Маш бага, <code>2</code> Бага (≤300 мян.₮), <code>3</code> Дунд (≤10 сая ₮, олон хичээл саатах), <code>4</code> Өндөр (≤50 сая ₮, олон хүний PII эсвэл улирлын дүн/судалгаа өртөх), <code>5</code> Маш өндөр (&gt;50 сая ₮, магадлан итгэмжлэл ба хуулийн хариуцлага).</li>
+<li><strong>Эрсдэлийн түвшин (<code>RM-01 v1.0</code> lookup) ба Хүлцэх босго:</strong> Тоон оноог <code>Оноо = Магадлал × Нөлөөлөл</code>-өөр тооцох ба эрсдэлийн түвшинг (<code>low</code>/<code>medium</code>/<code>high</code>) Лекц 8–9 Слайд 19-ийн 5×5 матрицын хүснэгтээр тогтооно (жишээ нь <code>(1,5), (5,1), (2,3), (3,2)</code> нүднүүд <code>Дунд / medium</code> ангилалд хамаарна):</li>
+</ul>
+<table class="table table-bordered table-sm"><thead><tr>
+<th>Магадлал ↓ \ Нөлөөлөл →</th>
+<th>1 (Маш бага)</th>
+<th>2 (Бага)</th>
+<th>3 (Дунд)</th>
+<th>4 (Өндөр)</th>
+<th>5 (Маш өндөр)</th>
+</tr></thead><tbody>
+<tr>
+<td><strong>1 (Маш ховор)</strong></td>
+<td>Бага (<code>low</code>)</td>
+<td>Бага (<code>low</code>)</td>
+<td>Бага (<code>low</code>)</td>
+<td>Бага (<code>low</code>)</td>
+<td>Дунд (<code>medium</code>)</td>
+</tr>
+<tr>
+<td><strong>2 (Ховор)</strong></td>
+<td>Бага (<code>low</code>)</td>
+<td>Бага (<code>low</code>)</td>
+<td>Дунд (<code>medium</code>)</td>
+<td>Дунд (<code>medium</code>)</td>
+<td>Дунд (<code>medium</code>)</td>
+</tr>
+<tr>
+<td><strong>3 (Заримдаа)</strong></td>
+<td>Бага (<code>low</code>)</td>
+<td>Дунд (<code>medium</code>)</td>
+<td>Дунд (<code>medium</code>)</td>
+<td>Дунд (<code>medium</code>)</td>
+<td>Өндөр (<code>high</code>)</td>
+</tr>
+<tr>
+<td><strong>4 (Ихэвчлэн)</strong></td>
+<td>Бага (<code>low</code>)</td>
+<td>Дунд (<code>medium</code>)</td>
+<td>Дунд (<code>medium</code>)</td>
+<td>Өндөр (<code>high</code>)</td>
+<td>Өндөр (<code>high</code>)</td>
+</tr>
+<tr>
+<td><strong>5 (Тогтмол)</strong></td>
+<td>Дунд (<code>medium</code>)</td>
+<td>Дунд (<code>medium</code>)</td>
+<td>Өндөр (<code>high</code>)</td>
+<td>Өндөр (<code>high</code>)</td>
+<td>Өндөр (<code>high</code>)</td>
+</tr>
+</tbody></table>
+<p>Formula University нь <strong>Өндөр (<code>high</code>)</strong> болон <strong>Дунд (<code>medium</code>)</strong> эрсдэлийг хүлээн зөвшөөрөхгүй бөгөөд заавал бууруулах (Mitigate), шилжүүлэх (Transfer) эсвэл зайлсхийх (Avoid) арга хэмжээ авна. Зөвхөн үлдэгдэл түвшин <strong>Бага (<code>low</code>)</strong> болсон үед эрсдэл эзэмшигч болон CISO албан ёсоор хүлээн зөвшөөрнө (Clause 6.1.3 f).</p>
+<hr/>
+<h3>2. Эрсдэлийг бууруулах үйл ажиллагааны нэгдсэн төлөвлөгөө (Clause 6.1.3)</h3>
+<p>Бүх арга хэмжээг Odoo-ийн <code>isms.risk</code> болон <code>project.task</code> (Risk Treatment Project) дээр даалгавар болгон үүсгэж хянана:</p>
+<table class="table table-bordered table-sm"><thead><tr>
+<th>Эрсдэл код</th>
+<th>Холбогдох хөрөнгө</th>
+<th>Эрсдэлийн товч утга</th>
+<th>Анхны (М×Н=Оноо, Түвшин)</th>
+<th>Стратеги</th>
+<th>Хэрэгжүүлэх арга хэмжээ ба Odoo шийдэл</th>
+<th>ISO Annex A Хяналт</th>
+<th>Хариуцагч</th>
+<th>Хугацаа</th>
+<th>Үлдэгдэл (М×Н=Оноо, Түвшин)</th>
+</tr></thead><tbody>
+<tr>
+<td><code>RSK-01</code></td>
+<td><code>AST-002</code>, <code>AST-003</code></td>
+<td>Фишингээр эрх алдагдаж семестрийн дүнг зөвшөөрөлгүй өөрчлөх</td>
+<td><code>4×5=20</code> (<strong>Өндөр</strong>)</td>
+<td>Бууруулах</td>
+<td>TOTP MFA (<code>auth_totp</code>) 100% идэвхжүүлэх; <code>campus.grade.change</code> 2 шатлалт батлалт (<code>requester != approver</code>)</td>
+<td><code>5.3</code>, <code>5.15</code>, <code>8.5</code>, <code>8.15</code></td>
+<td><code>batdemberel</code></td>
+<td><code>2026-11-25</code></td>
+<td><code>1×4=4</code> (Бага)</td>
+</tr>
+<tr>
+<td><code>RSK-02</code></td>
+<td><code>AST-001</code>, <code>AST-003</code>, <code>AST-010</code></td>
+<td>Сургалтын ба ERP серверт Ransomware халдаж үйлчилгээ зогсох</td>
+<td><code>3×5=15</code> (<strong>Өндөр</strong>)</td>
+<td>Бууруулах</td>
+<td>Immutable NAS нөөцлөлт (<code>AST-011</code>) сүлжээнээс тусгаарлах, улирал бүр restore тест хийх, EDR/patch</td>
+<td><code>8.7</code>, <code>8.8</code>, <code>8.13</code>, <code>5.30</code></td>
+<td><code>batdemberel</code></td>
+<td><code>2026-12-05</code></td>
+<td><code>1×4=4</code> (Бага)</td>
+</tr>
+<tr>
+<td><code>RSK-03</code></td>
+<td><code>AST-002</code>, <code>AST-003</code>, <code>AST-007</code></td>
+<td>Аудит логгүй эсвэл лог устгагдсанаас дүн/дипломын засварыг мөрдөж чадахгүй байх</td>
+<td><code>5×3=15</code> (<strong>Өндөр</strong>)</td>
+<td>Бууруулах</td>
+<td>Засах/устгах боломжгүй <code>isms.audit.log</code> (<code>isms.audit.mixin</code>) нэвтрүүлж бүх write/state/login бичих</td>
+<td><code>8.15</code>, <code>8.16</code>, <code>5.28</code>, <code>5.33</code></td>
+<td><code>batdemberel</code></td>
+<td><code>2026-11-20</code></td>
+<td><code>1×3=3</code> (Бага)</td>
+</tr>
+<tr>
+<td><code>RSK-04</code></td>
+<td><code>AST-001</code>, <code>AST-005</code></td>
+<td>Элсэгч ба оюутны хувийн мэдээлэл (PII) зөвшөөрөлгүй экспортлогдох, задрах</td>
+<td><code>4×4=16</code> (<strong>Өндөр</strong>)</td>
+<td>Бууруулах</td>
+<td>RBAC 6 түвшин, оюутны эмзэг талбарын record rule хязгаарлалт, экспортын лог, ХХМХТХ сургалт</td>
+<td><code>5.12</code>, <code>5.15</code>, <code>5.34</code>, <code>8.12</code></td>
+<td><code>badral</code></td>
+<td><code>2026-11-30</code></td>
+<td><code>1×4=4</code> (Бага)</td>
+</tr>
+<tr>
+<td><code>RSK-05</code></td>
+<td><code>AST-008</code>, <code>AST-009</code>, <code>AST-013</code></td>
+<td>Кибер-Физик лабораторийн гэрээт нийлүүлэгчийн байнгын VPN-ээр халдах</td>
+<td><code>3×5=15</code> (<strong>Өндөр</strong>)</td>
+<td>Бууруулах</td>
+<td>Байнгын VPN хаах, Just-in-Time (≤8 цаг) MFA хандалт, нийлүүлэгчийн NDA/SLA гэрээ шинэчлэх</td>
+<td><code>5.19</code>, <code>5.20</code>, <code>5.21</code>, <code>8.5</code></td>
+<td><code>erkhembayar</code></td>
+<td><code>2026-12-01</code></td>
+<td><code>1×4=4</code> (Бага)</td>
+</tr>
+<tr>
+<td><code>RSK-06</code></td>
+<td><code>AST-003</code>, <code>AST-015</code></td>
+<td>Ажлаас гарсан багш, туслах ажилтны идэвхтэй дансаар хандах (JML цоорхой)</td>
+<td><code>3×4=12</code> (Дунд)</td>
+<td>Бууруулах</td>
+<td>HR чөлөөлөх тушаал гармагц 4 цагийн дотор эрх хаах журам, улирлын эрхийн аудит</td>
+<td><code>5.16</code>, <code>5.18</code>, <code>6.5</code></td>
+<td><code>telmuun</code></td>
+<td><code>2026-11-28</code></td>
+<td><code>1×3=3</code> (Бага)</td>
+</tr>
+<tr>
+<td><code>RSK-07</code></td>
+<td><code>AST-006</code>, <code>AST-004</code></td>
+<td>Улирлын шалгалтын тестийн сан хувийн флаш/имэйлээр урьдчилан задрах</td>
+<td><code>3×4=12</code> (Дунд)</td>
+<td>Бууруулах</td>
+<td>Нууц ангиллын санд зөвхөн эрх бүхий комисс хандах, шифрлэлт ба дамжуулалтын журам</td>
+<td><code>5.10</code>, <code>5.12</code>, <code>5.14</code>, <code>8.24</code></td>
+<td><code>badral</code></td>
+<td><code>2026-12-10</code></td>
+<td><code>1×3=3</code> (Бага)</td>
+</tr>
+<tr>
+<td><code>RSK-08</code></td>
+<td><code>AST-008</code>, <code>AST-004</code></td>
+<td>Веб хайлт ба судалгааны порталд SQLi / XSS эмзэг байдал ашиглагдах</td>
+<td><code>2×4=8</code> (Дунд)</td>
+<td>Бууруулах</td>
+<td>Odoo ORM параметрчилсэн query, оролтын шалгалт, өөрчлөлтийн өмнөх SAST/DAST тест</td>
+<td><code>8.8</code>, <code>8.26</code>, <code>8.28</code>, <code>8.29</code></td>
+<td><code>batdemberel</code></td>
+<td><code>2026-12-12</code></td>
+<td><code>1×3=3</code> (Бага)</td>
+</tr>
+<tr>
+<td><code>RSK-09</code></td>
+<td><code>AST-007</code>, <code>AST-002</code></td>
+<td>Дотоод ажилтан хувийн ашиг сонирхлоор дипломын дугаар, дүн хуурамчаар үйлдэх</td>
+<td><code>2×5=10</code> (Дунд)</td>
+<td>Бууруулах</td>
+<td>Үүрэг салгалт (A.5.3), дипломын QR/хэш тулгалт, Дотоод аудиторын улирлын шалгалт</td>
+<td><code>5.3</code>, <code>5.33</code>, <code>8.3</code>, <code>8.15</code></td>
+<td><code>telmuun</code></td>
+<td><code>2026-12-05</code></td>
+<td><code>1×4=4</code> (Бага)</td>
+</tr>
+<tr>
+<td><code>RSK-10</code></td>
+<td><code>AST-014</code></td>
+<td>Сургалтын албаны зөөврийн компьютер алдагдаж доторх оюутны файл задрах</td>
+<td><code>3×3=9</code> (Дунд)</td>
+<td>Бууруулах</td>
+<td>Бүтэн дискний шифрлэлт (LUKS/BitLocker), дэлгэц автоматаар түгжих, локал PII хадгалахыг хориглох</td>
+<td><code>6.7</code>, <code>7.7</code>, <code>8.1</code>, <code>8.24</code></td>
+<td><code>erkhembayar</code></td>
+<td><code>2026-12-08</code></td>
+<td><code>1×3=3</code> (Бага)</td>
+</tr>
+<tr>
+<td><code>RSK-11</code></td>
+<td><code>AST-010</code>, <code>AST-012</code></td>
+<td>Серверийн өрөөнд (I-204) зөвшөөрөлгүй хүн нэвтрэх эсвэл цахилгаан/хөргөлт тасрах</td>
+<td><code>2×4=8</code> (Дунд)</td>
+<td>Бууруулах</td>
+<td>Карттай нэвтрэлт + CCTV, зочны бүртгэл, хос UPS ба температур мэдрэгчийн дохиолол</td>
+<td><code>7.1</code>, <code>7.2</code>, <code>7.4</code>, <code>7.13</code></td>
+<td><code>erkhembayar</code></td>
+<td><code>2026-12-15</code></td>
+<td><code>1×3=3</code> (Бага)</td>
+</tr>
+<tr>
+<td><code>RSK-12</code></td>
+<td><code>AST-009</code></td>
+<td>Лабораторийн PLC/симулятор шинэчлэлтийн алдаанаас сургалт, туршилт тасалдах</td>
+<td><code>3×3=9</code> (Дунд)</td>
+<td>Бууруулах</td>
+<td>Production шинэчлэхийн өмнө тусгаарласан staging орчинд турших, snapshot авах</td>
+<td><code>8.13</code>, <code>8.31</code>, <code>8.32</code></td>
+<td><code>batdemberel</code></td>
+<td><code>2026-12-10</code></td>
+<td><code>1×2=2</code> (Бага)</td>
+</tr>
+<tr>
+<td><code>RSK-13</code></td>
+<td><code>AST-005</code>, <code>AST-016</code></td>
+<td>Элсэлтийн болон хичээл сонголтын оргил ачааллын үед DDoS/ачааллаас портал унах</td>
+<td><code>3×3=9</code> (Дунд)</td>
+<td>Шилжүүлэх</td>
+<td>Reverse proxy rate-limiting ба гэрээт CDN/DDoS хамгаалалтын үйлчилгээ ашиглах</td>
+<td><code>8.6</code>, <code>8.20</code>, <code>5.30</code></td>
+<td><code>batdemberel</code></td>
+<td><code>2026-12-18</code></td>
+<td><code>1×3=3</code> (Бага)</td>
+</tr>
+<tr>
+<td><code>RSK-14</code></td>
+<td><code>AST-015</code>, <code>AST-003</code></td>
+<td>Нийт багш, оюутны МАБ-ын мэдлэг сул байснаас зөрчлийг оройтож мэдээлэх</td>
+<td><code>2×2=4</code> (Бага)</td>
+<td>Хүлээн зөвшөөрөх</td>
+<td>Жилийн SETA сургалт, <code>isms.incident</code> мэдээлэх суваг ба <code>isms.policy.ack</code> хэвшүүлэн хянах</td>
+<td><code>6.3</code>, <code>6.8</code>, <code>5.24</code></td>
+<td><code>dorjsembe</code></td>
+<td><code>2026-11-30</code></td>
+<td><code>1×2=2</code> (Бага)</td>
+</tr>
+</tbody></table>
+<hr/>
+<h3>3. Хяналт-шинжилгээ ба Үлдэгдэл эрсдэлийн баталгаажуулалт (Clause 6.1.3 f, 9.1)</h3>
+<ul>
+<li>Эрсдэлийг бууруулах даалгавар (<code>project.task</code>) хэрэгжиж дууссаны дараа Эрсдэлийн шинжээч болон CISO нар хяналтын нотолгоог шалгаж, <code>residual_likelihood</code> ба <code>residual_impact</code> оноог дахин үнэлнэ.</li>
+<li>Үлдэгдэл эрсдэлийн түвшин «Бага (<code>low</code>)» болсон тохиолдолд CISO систем дээр <code>accepted_by_id</code> болон <code>accepted_date</code> талбарыг баталгаажуулж, улирлын тайланг Ректорт танилцуулна.</li>
+</ul>
+</div>

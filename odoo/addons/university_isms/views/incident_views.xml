@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="isms_incident_view_list" model="ir.ui.view">
+        <field name="name">isms.incident.list</field>
+        <field name="model">isms.incident</field>
+        <field name="arch" type="xml">
+            <list decoration-danger="severity == 'critical'" decoration-warning="severity == 'high'"
+                  decoration-muted="state == 'close'">
+                <field name="code"/>
+                <field name="name"/>
+                <field name="category"/>
+                <field name="severity" widget="badge"
+                       decoration-danger="severity in ('high', 'critical')"
+                       decoration-warning="severity == 'medium'"/>
+                <field name="reporter_id" widget="many2one_avatar_user" optional="show"/>
+                <field name="assignee_id" widget="many2one_avatar_user" optional="show"/>
+                <field name="detected_at"/>
+                <field name="sla_deadline" optional="show"/>
+                <field name="sla_status" widget="badge" optional="show"
+                       decoration-danger="sla_status == 'breached'"
+                       decoration-success="sla_status == 'met'"/>
+                <field name="personal_data_breach" optional="show"/>
+                <field name="state" widget="badge"
+                       decoration-info="state in ('incident', 'report')"
+                       decoration-warning="state == 'investigate'"
+                       decoration-success="state in ('resolve', 'close')"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="isms_incident_view_form" model="ir.ui.view">
+        <field name="name">isms.incident.form</field>
+        <field name="model">isms.incident</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_report" type="object" string="Report — бүртгэх" class="btn-primary"
+                            invisible="state != 'incident'"/>
+                    <button name="action_investigate" type="object" string="Investigate — шалгаж эхлэх" class="btn-primary"
+                            invisible="state != 'report'" groups="university_isms.group_isms_analyst"/>
+                    <button name="action_resolve" type="object" string="Resolve — шийдвэрлэсэн" class="btn-primary"
+                            invisible="state != 'investigate'" groups="university_isms.group_isms_analyst"/>
+                    <button name="action_close" type="object" string="Close — хаах" class="btn-primary"
+                            invisible="state != 'resolve'" groups="university_isms.group_isms_manager"/>
+                    <button name="action_reopen" type="object" string="Дахин нээх"
+                            invisible="state not in ('resolve', 'close')" groups="university_isms.group_isms_manager"/>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <div class="alert alert-warning" role="alert" invisible="not personal_data_breach">
+                        <strong>Хувийн мэдээллийн зөрчил.</strong> Хүний хувийн мэдээлэл хамгаалах тухай хуулийн дагуу
+                        мэдээллийн эзэн болон эрх бүхий байгууллагад мэдэгдэх эсэхийг хуулийн зөвлөхтэй шийдвэрлэж
+                        «Мэдэгдлийн тэмдэглэл»-д бүртгэнэ.
+                    </div>
+                    <div class="oe_title">
+                        <div class="text-muted"><field name="code" readonly="1"/></div>
+                        <h1><field name="name" placeholder="жишээ: Сургалтын албаны ажилтны данснаас дүн өөрчлөгдсөн" readonly="state == 'close'"/></h1>
+                    </div>
+                    <group>
+                        <group string="Incident — илэрсэн">
+                            <field name="category" readonly="state == 'close'"/>
+                            <field name="severity" readonly="state == 'close'"/>
+                            <field name="detected_at" readonly="state != 'incident'"/>
+                            <field name="reporter_id" widget="many2one_avatar_user" readonly="1"/>
+                            <field name="reporter_type" readonly="state != 'incident'"/>
+                        </group>
+                        <group string="Хугацаа (SLA)">
+                            <field name="reported_at"/>
+                            <field name="investigation_at"/>
+                            <field name="resolved_at"/>
+                            <field name="closed_at"/>
+                            <field name="sla_deadline"/>
+                            <field name="sla_status" widget="badge"
+                                   decoration-danger="sla_status == 'breached'"
+                                   decoration-success="sla_status == 'met'"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group string="Нөлөөлөл">
+                            <field name="asset_ids" widget="many2many_tags" readonly="state == 'close'"/>
+                            <field name="impact_c" readonly="state == 'close'"/>
+                            <field name="impact_i" readonly="state == 'close'"/>
+                            <field name="impact_a" readonly="state == 'close'"/>
+                            <field name="personal_data_breach" readonly="state == 'close'"/>
+                            <field name="data_subjects_count" invisible="not personal_data_breach" readonly="state == 'close'"/>
+                        </group>
+                        <group string="Шалгалт" groups="university_isms.group_isms_analyst,university_isms.group_isms_auditor">
+                            <field name="assignee_id" widget="many2one_avatar_user" readonly="state == 'close'"/>
+                            <field name="risk_ids" widget="many2many_tags" readonly="state == 'close'"/>
+                            <field name="control_ids" widget="many2many_tags" readonly="state == 'close'"/>
+                            <field name="notification_done" invisible="not personal_data_breach" readonly="state == 'close'"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Тайлбар" name="description">
+                            <field name="description" placeholder="Юу, хэзээ, хаана, хэрхэн илэрсэн бэ? Ямар систем, хэдэн хэрэглэгч өртсөн бэ?"
+                                   readonly="state == 'close'"/>
+                        </page>
+                        <page string="Investigate — шалгалт" name="investigation"
+                              groups="university_isms.group_isms_analyst,university_isms.group_isms_auditor">
+                            <group>
+                                <field name="containment" readonly="state == 'close'"/>
+                                <field name="root_cause" readonly="state == 'close'"/>
+                            </group>
+                        </page>
+                        <page string="Resolve / Close" name="resolution"
+                              groups="university_isms.group_isms_analyst,university_isms.group_isms_auditor">
+                            <group>
+                                <field name="resolution" readonly="state == 'close'"/>
+                                <field name="lessons_learned" readonly="state == 'close'"/>
+                                <field name="notification_note" invisible="not personal_data_breach" readonly="state == 'close'"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="isms_incident_view_kanban" model="ir.ui.view">
+        <field name="name">isms.incident.kanban</field>
+        <field name="model">isms.incident</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="state" quick_create="0" group_create="0" group_delete="0" group_edit="0">
+                <field name="severity"/>
+                <templates>
+                    <t t-name="card">
+                        <div class="d-flex">
+                            <field name="code" class="text-muted small"/>
+                            <field name="severity" widget="badge" class="ms-auto"
+                                   decoration-danger="severity in ('high', 'critical')"
+                                   decoration-warning="severity == 'medium'"/>
+                        </div>
+                        <field name="name" class="fw-bold"/>
+                        <field name="category" class="small text-muted"/>
+                        <div class="d-flex mt-1">
+                            <field name="sla_status" widget="badge"
+                                   decoration-danger="sla_status == 'breached'"
+                                   decoration-success="sla_status == 'met'"/>
+                            <field name="assignee_id" widget="many2one_avatar_user" class="ms-auto"/>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="isms_incident_view_search" model="ir.ui.view">
+        <field name="name">isms.incident.search</field>
+        <field name="model">isms.incident</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name" filter_domain="['|', ('name', 'ilike', self), ('code', 'ilike', self)]"/>
+                <field name="reporter_id"/>
+                <field name="assignee_id"/>
+                <field name="asset_ids"/>
+                <filter name="f_mine" string="Миний мэдээлсэн" domain="[('reporter_id', '=', uid)]"/>
+                <filter name="f_assigned" string="Надад оноосон" domain="[('assignee_id', '=', uid)]"/>
+                <filter name="f_open" string="Нээлттэй" domain="[('state', '!=', 'close')]"/>
+                <filter name="f_critical" string="Өндөр / Ноцтой" domain="[('severity', 'in', ('high', 'critical'))]"/>
+                <filter name="f_pii" string="Хувийн мэдээллийн зөрчил" domain="[('personal_data_breach', '=', True)]"/>
+                <filter name="f_detected" string="Илэрсэн огноо" date="detected_at"/>
+                <group>
+                    <filter name="g_state" string="Үе шат" context="{'group_by': 'state'}"/>
+                    <filter name="g_category" string="Ангилал" context="{'group_by': 'category'}"/>
+                    <filter name="g_severity" string="Ноцтой байдал" context="{'group_by': 'severity'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="isms_incident_view_graph" model="ir.ui.view">
+        <field name="name">isms.incident.graph</field>
+        <field name="model">isms.incident</field>
+        <field name="arch" type="xml">
+            <graph string="Инцидент" type="bar" stacked="1">
+                <field name="category"/>
+                <field name="severity"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="action_isms_incident" model="ir.actions.act_window">
+        <field name="name">Инцидент</field>
+        <field name="res_model">isms.incident</field>
+        <field name="view_mode">kanban,list,form,graph</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Инцидент мэдээлэх</p>
+            <p>Incident → Report → Investigate → Resolve → Close. Сэжигтэй и-мэйл, данс, дүнгийн өөрчлөлт, алдагдсан төхөөрөмжийг даруй мэдээлнэ үү (A.6.8).</p>
+        </field>
+    </record>
+    <record id="action_isms_incident_mine" model="ir.actions.act_window">
+        <field name="name">Миний мэдээлсэн инцидент</field>
+        <field name="res_model">isms.incident</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('reporter_id', '=', uid)]</field>
+    </record>
+    <record id="action_isms_incident_new" model="ir.actions.act_window">
+        <field name="name">Инцидент мэдээлэх</field>
+        <field name="res_model">isms.incident</field>
+        <field name="view_mode">form</field>
+        <field name="target">current</field>
+    </record>
+</odoo>

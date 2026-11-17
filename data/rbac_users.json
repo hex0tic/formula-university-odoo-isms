@@ -1,0 +1,145 @@
+{
+  "departments": [
+    {
+      "name": "Ректорын ажлын алба",
+      "parent": "",
+      "manager_login": "rector"
+    },
+    {
+      "name": "Мэдээллийн аюулгүй байдлын алба",
+      "parent": "Ректорын ажлын алба",
+      "manager_login": "dorjsembe"
+    },
+    {
+      "name": "Мэдээллийн технологи ба цахим засаглалын алба",
+      "parent": "Ректорын ажлын алба",
+      "manager_login": "batdemberel"
+    },
+    {
+      "name": "Сургалтын нэгдсэн алба",
+      "parent": "Ректорын ажлын алба",
+      "manager_login": "badral"
+    },
+    {
+      "name": "Дотоод аудит ба чанарын алба",
+      "parent": "Ректорын ажлын алба",
+      "manager_login": "telmuun"
+    },
+    {
+      "name": "Захиргаа, хүний нөөцийн алба",
+      "parent": "Ректорын ажлын алба",
+      "manager_login": "hr_officer"
+    },
+    {
+      "name": "МТ ба кибер аюулгүй байдлын сургууль",
+      "parent": "Ректорын ажлын алба",
+      "manager_login": "lecturer_cs"
+    },
+    {
+      "name": "Кибер-Физик судалгааны лаборатори",
+      "parent": "МТ ба кибер аюулгүй байдлын сургууль",
+      "manager_login": "lab_head"
+    }
+  ],
+  "users": [
+    {
+      "login": "dorjsembe",
+      "name": "Э. Доржсэмбэ",
+      "student_code": "B241870023",
+      "is_team_member": true,
+      "job_title": "Мэдээллийн аюулгүй байдлын менежер (CISO)",
+      "department": "Мэдээллийн аюулгүй байдлын алба",
+      "isms_role": "manager"
+    },
+    {
+      "login": "batdemberel",
+      "name": "Б. Батдэмбэрэл",
+      "student_code": "B241870018",
+      "is_team_member": true,
+      "job_title": "МТЦЗА-ны дарга / Системийн ерөнхий админ (CIO)",
+      "department": "Мэдээллийн технологи ба цахим засаглалын алба",
+      "isms_role": "admin"
+    },
+    {
+      "login": "badral",
+      "name": "Б. Бадрал",
+      "student_code": "B241870051",
+      "is_team_member": true,
+      "job_title": "Сургалтын нэгдсэн албаны дарга (Хөрөнгө ба эрсдэл эзэмшигч)",
+      "department": "Сургалтын нэгдсэн алба",
+      "isms_role": "asset_owner"
+    },
+    {
+      "login": "erkhembayar",
+      "name": "А. Эрхэмбаяр",
+      "student_code": "B241870055",
+      "is_team_member": true,
+      "job_title": "МАБ ба инцидент хариуцсан ахлах шинжээч (SOC Analyst)",
+      "department": "Мэдээллийн аюулгүй байдлын алба",
+      "isms_role": "analyst"
+    },
+    {
+      "login": "telmuun",
+      "name": "Б. Тэлмүүн",
+      "student_code": "B241870042",
+      "is_team_member": true,
+      "job_title": "Дотоод аудитор ба чанарын хяналтын мэргэжилтэн",
+      "department": "Дотоод аудит ба чанарын алба",
+      "isms_role": "auditor"
+    },
+    {
+      "login": "rector",
+      "name": "Д. Алтансүх (Зохиомол)",
+      "student_code": "",
+      "is_team_member": false,
+      "job_title": "Formula University-ийн Ректор",
+      "department": "Ректорын ажлын алба",
+      "isms_role": "manager"
+    },
+    {
+      "login": "registrar_approver",
+      "name": "Г. Сарантуяа (Зохиомол)",
+      "student_code": "",
+      "is_team_member": false,
+      "job_title": "Сургалтын албаны ахлах мэргэжилтэн (Дүн батлагч)",
+      "department": "Сургалтын нэгдсэн алба",
+      "isms_role": "asset_owner"
+    },
+    {
+      "login": "lecturer_cs",
+      "name": "Ц. Түвшинбаяр (Зохиомол)",
+      "student_code": "",
+      "is_team_member": false,
+      "job_title": "МТ ба кибер аюулгүй байдлын сургуулийн ахлах багш",
+      "department": "МТ ба кибер аюулгүй байдлын сургууль",
+      "isms_role": "reporter"
+    },
+    {
+      "login": "lab_head",
+      "name": "О. Ганзориг (Зохиомол)",
+      "student_code": "",
+      "is_team_member": false,
+      "job_title": "Кибер-Физик судалгааны лабораторийн эрхлэгч",
+      "department": "Кибер-Физик судалгааны лаборатори",
+      "isms_role": "asset_owner"
+    },
+    {
+      "login": "hr_officer",
+      "name": "Н. Энхжаргал (Зохиомол)",
+      "student_code": "",
+      "is_team_member": false,
+      "job_title": "Хүний нөөцийн ахлах мэргэжилтэн",
+      "department": "Захиргаа, хүний нөөцийн алба",
+      "isms_role": "reporter"
+    },
+    {
+      "login": "student_demo",
+      "name": "Б. Тэмүүлэн (Зохиомол оюутан)",
+      "student_code": "OTU24001",
+      "is_team_member": false,
+      "job_title": "Бакалаврын оюутан",
+      "department": "МТ ба кибер аюулгүй байдлын сургууль",
+      "isms_role": "reporter"
+    }
+  ]
+}

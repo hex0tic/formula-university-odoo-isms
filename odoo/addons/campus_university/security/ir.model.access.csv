@@ -1,0 +1,21 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_program_reader,program reader,model_campus_program,group_campus_user,1,0,0,0
+access_program_registrar,program registrar,model_campus_program,group_campus_registrar,1,1,1,0
+access_course_reader,course reader,model_campus_course,group_campus_user,1,0,0,0
+access_course_registrar,course registrar,model_campus_course,group_campus_registrar,1,1,1,0
+access_student_student,student self,model_campus_student,group_campus_student,1,0,0,0
+access_student_lecturer,student lecturer,model_campus_student,group_campus_lecturer,1,0,0,0
+access_student_registrar,student registrar,model_campus_student,group_campus_registrar,1,1,1,0
+access_student_auditor,student auditor,model_campus_student,group_campus_auditor,1,0,0,0
+access_offering_student,offering student,model_campus_offering,group_campus_student,1,0,0,0
+access_offering_lecturer,offering lecturer,model_campus_offering,group_campus_lecturer,1,0,0,0
+access_offering_registrar,offering registrar,model_campus_offering,group_campus_registrar,1,1,1,0
+access_offering_auditor,offering auditor,model_campus_offering,group_campus_auditor,1,0,0,0
+access_enrollment_student,enrollment student,model_campus_enrollment,group_campus_student,1,0,0,0
+access_enrollment_lecturer,enrollment lecturer,model_campus_enrollment,group_campus_lecturer,1,0,0,0
+access_enrollment_registrar,enrollment registrar,model_campus_enrollment,group_campus_registrar,1,1,1,0
+access_enrollment_auditor,enrollment auditor,model_campus_enrollment,group_campus_auditor,1,0,0,0
+access_change_student,change student,model_campus_grade_change,group_campus_student,1,0,0,0
+access_change_lecturer,change lecturer,model_campus_grade_change,group_campus_lecturer,1,1,1,1
+access_change_registrar,change registrar,model_campus_grade_change,group_campus_registrar,1,1,1,1
+access_change_auditor,change auditor,model_campus_grade_change,group_campus_auditor,1,0,0,0

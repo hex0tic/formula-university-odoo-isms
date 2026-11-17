@@ -1,0 +1,17 @@
+<odoo>
+    <record id="university_isms.group_isms_analyst" model="res.groups">
+        <field name="implied_ids" eval="[(4, ref('helpdesk_mgmt.group_helpdesk_user'))]"/>
+    </record>
+    <record id="rule_isms_ticket_visibility" model="ir.rule">
+        <field name="name">ISMS tickets retain incident confidentiality</field>
+        <field name="model_id" ref="helpdesk_mgmt.model_helpdesk_ticket"/>
+        <field name="domain_force">[(1, '=', 1)] if user.has_group('university_isms.group_isms_analyst') or user.has_group('university_isms.group_isms_auditor') else ['|', ('isms_incident_id', '=', False), ('isms_incident_id.reporter_id', '=', user.id)]</field>
+    </record>
+    <record id="rule_isms_auditor_tickets" model="ir.rule">
+        <field name="name">Auditor reads ISMS service tickets</field>
+        <field name="model_id" ref="helpdesk_mgmt.model_helpdesk_ticket"/>
+        <field name="groups" eval="[(4, ref('university_isms.group_isms_auditor'))]"/>
+        <field name="domain_force">[('isms_incident_id', '!=', False)]</field>
+        <field name="perm_write" eval="False"/><field name="perm_create" eval="False"/><field name="perm_unlink" eval="False"/>
+    </record>
+</odoo>

@@ -1,0 +1,45 @@
+# Formula University — ISMS платформ (Odoo 18.0 Community)
+# Эзэмшигч: Claude Code. Ажиллуулах: scripts/setup.sh -> docker compose up -d -> scripts/init-db.sh
+name: isms
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: isms-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: odoo
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?run scripts/setup.sh first}
+    volumes:
+      - ${ISMS_DATA_ROOT:-/data/sembee/odoo-isms}/pgdata:/var/lib/postgresql/data
+    networks: [isms]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U odoo -d postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  odoo:
+    image: odoo:18.0
+    container_name: isms-odoo
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      HOST: db
+      USER: odoo
+      PASSWORD: ${POSTGRES_PASSWORD:?run scripts/setup.sh first}
+    ports:
+      - "127.0.0.1:8069:8069"   # зөвхөн localhost (A.8.20 сүлжээний хамгаалалт)
+    volumes:
+      - ./config/odoo.conf:/etc/odoo/odoo.conf:ro
+      - ./addons:/mnt/extra-addons:ro
+      - ${ISMS_DATA_ROOT:-/data/sembee/odoo-isms}/filestore:/var/lib/odoo
+      - ./logs:/var/log/odoo
+    networks: [isms]
+
+networks:
+  isms:
+    name: isms-net

@@ -1,0 +1,42 @@
+{
+  "result": "PASS",
+  "inventory_count": 16,
+  "selected_controls": 25,
+  "status_counts": {
+    "yes": 15,
+    "partial": 10,
+    "no": 0
+  },
+  "policies": [
+    {
+      "code": "POL-01",
+      "state": "approved",
+      "approver": "dorjsembe",
+      "date": "2026-11-16",
+      "acks": 1
+    },
+    {
+      "code": "POL-02",
+      "state": "approved",
+      "approver": "dorjsembe",
+      "date": "2026-11-16",
+      "acks": 1
+    },
+    {
+      "code": "POL-03",
+      "state": "approved",
+      "approver": "dorjsembe",
+      "date": "2026-11-16",
+      "acks": 1
+    },
+    {
+      "code": "POL-04",
+      "state": "approved",
+      "approver": "rector",
+      "date": "2026-11-08",
+      "acks": 0
+    }
+  ],
+  "users": 19,
+  "audit_count": 392
+}

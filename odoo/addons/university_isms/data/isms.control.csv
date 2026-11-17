@@ -1,0 +1,94 @@
+id,code,sequence,name,name_mn,theme,is_new_2022
+control_5_1,5.1,501,Policies for information security,Мэдээллийн аюулгүй байдлын бодлого,organizational,False
+control_5_2,5.2,502,Information security roles and responsibilities,"Мэдээллийн аюулгүй байдлын үүрэг, хариуцлага",organizational,False
+control_5_3,5.3,503,Segregation of duties,Үүрэг салгах,organizational,False
+control_5_4,5.4,504,Management responsibilities,Удирдлагын хариуцлага,organizational,False
+control_5_5,5.5,505,Contact with authorities,Эрх бүхий байгууллагатай харилцах,organizational,False
+control_5_6,5.6,506,Contact with special interest groups,Мэргэжлийн сонирхлын бүлгүүдтэй харилцах,organizational,False
+control_5_7,5.7,507,Threat intelligence,Аюул заналын тагнуул (Threat intelligence),organizational,True
+control_5_8,5.8,508,Information security in project management,Төслийн удирдлага дахь мэдээллийн аюулгүй байдал,organizational,False
+control_5_9,5.9,509,Inventory of information and other associated assets,Мэдээлэл болон холбогдох хөрөнгийн бүртгэл,organizational,False
+control_5_10,5.10,510,Acceptable use of information and other associated assets,"Мэдээлэл, хөрөнгийг зохистой ашиглах",organizational,False
+control_5_11,5.11,511,Return of assets,Хөрөнгийг буцаан хүлээлгэн өгөх,organizational,False
+control_5_12,5.12,512,Classification of information,Мэдээллийн ангилал,organizational,False
+control_5_13,5.13,513,Labelling of information,Мэдээллийн шошголол,organizational,False
+control_5_14,5.14,514,Information transfer,Мэдээлэл дамжуулах,organizational,False
+control_5_15,5.15,515,Access control,Хандалтын хяналт,organizational,False
+control_5_16,5.16,516,Identity management,Хэрэглэгчийн таних тэмдгийн удирдлага,organizational,False
+control_5_17,5.17,517,Authentication information,Баталгаажуулалтын мэдээлэл,organizational,False
+control_5_18,5.18,518,Access rights,Хандах эрх,organizational,False
+control_5_19,5.19,519,Information security in supplier relationships,Нийлүүлэгчтэй харилцах дахь мэдээллийн аюулгүй байдал,organizational,False
+control_5_20,5.20,520,Addressing information security within supplier agreements,Нийлүүлэгчийн гэрээнд мэдээллийн аюулгүй байдлыг тусгах,organizational,False
+control_5_21,5.21,521,Managing information security in the ICT supply chain,МХХТ-ийн нийлүүлэлтийн сүлжээний мэдээллийн аюулгүй байдал,organizational,False
+control_5_22,5.22,522,"Monitoring, review and change management of supplier services","Нийлүүлэгчийн үйлчилгээний хяналт, өөрчлөлтийн удирдлага",organizational,False
+control_5_23,5.23,523,Information security for use of cloud services,Үүлэн үйлчилгээ ашиглах үеийн мэдээллийн аюулгүй байдал,organizational,True
+control_5_24,5.24,524,Information security incident management planning and preparation,"Зөрчлийн удирдлагын төлөвлөлт, бэлтгэл",organizational,False
+control_5_25,5.25,525,Assessment and decision on information security events,"МАБ-ын үйл явдлыг үнэлэх, шийдвэр гаргах",organizational,False
+control_5_26,5.26,526,Response to information security incidents,МАБ-ын зөрчилд хариу арга хэмжээ авах,organizational,False
+control_5_27,5.27,527,Learning from information security incidents,МАБ-ын зөрчлөөс суралцах,organizational,False
+control_5_28,5.28,528,Collection of evidence,Нотлох баримт цуглуулах,organizational,False
+control_5_29,5.29,529,Information security during disruption,Тасалдлын үеийн мэдээллийн аюулгүй байдал,organizational,False
+control_5_30,5.30,530,ICT readiness for business continuity,Тасралтгүй ажиллагаанд МХХТ-ийн бэлэн байдал,organizational,True
+control_5_31,5.31,531,"Legal, statutory, regulatory and contractual requirements","Хууль, зохицуулалт, гэрээний шаардлага",organizational,False
+control_5_32,5.32,532,Intellectual property rights,Оюуны өмчийн эрх,organizational,False
+control_5_33,5.33,533,Protection of records,"Бүртгэл, баримтын хамгаалалт",organizational,False
+control_5_34,5.34,534,Privacy and protection of PII,Хувийн нууцлал ба хувийн мэдээллийн хамгаалалт,organizational,False
+control_5_35,5.35,535,Independent review of information security,Мэдээллийн аюулгүй байдлын хараат бус хяналт,organizational,False
+control_5_36,5.36,536,"Compliance with policies, rules and standards for information security","МАБ-ын бодлого, дүрэм, стандартын нийцэл",organizational,False
+control_5_37,5.37,537,Documented operating procedures,Баримтжуулсан үйл ажиллагааны журам,organizational,False
+control_6_1,6.1,601,Screening,Ажилтны урьдчилсан шалгалт,people,False
+control_6_2,6.2,602,Terms and conditions of employment,Хөдөлмөр эрхлэлтийн нөхцөл,people,False
+control_6_3,6.3,603,"Information security awareness, education and training","МАБ-ын мэдлэгжүүлэлт, боловсрол, сургалт",people,False
+control_6_4,6.4,604,Disciplinary process,Сахилгын арга хэмжээ,people,False
+control_6_5,6.5,605,Responsibilities after termination or change of employment,"Ажлаас гарах, шилжих үеийн хариуцлага",people,False
+control_6_6,6.6,606,Confidentiality or non-disclosure agreements,Нууцлал хадгалах гэрээ (NDA),people,False
+control_6_7,6.7,607,Remote working,Зайнаас ажиллах,people,False
+control_6_8,6.8,608,Information security event reporting,МАБ-ын үйл явдлыг мэдээлэх,people,False
+control_7_1,7.1,701,Physical security perimeters,Физик аюулгүй байдлын периметр,physical,False
+control_7_2,7.2,702,Physical entry,Физик нэвтрэлт,physical,False
+control_7_3,7.3,703,"Securing offices, rooms and facilities","Оффис, өрөө, байгууламжийн хамгаалалт",physical,False
+control_7_4,7.4,704,Physical security monitoring,Физик аюулгүй байдлын мониторинг,physical,True
+control_7_5,7.5,705,Protecting against physical and environmental threats,Физик болон байгаль орчны аюулаас хамгаалах,physical,False
+control_7_6,7.6,706,Working in secure areas,Хамгаалалттай бүсэд ажиллах,physical,False
+control_7_7,7.7,707,Clear desk and clear screen,"Цэвэр ширээ, цэвэр дэлгэц",physical,False
+control_7_8,7.8,708,Equipment siting and protection,"Тоног төхөөрөмжийн байршил, хамгаалалт",physical,False
+control_7_9,7.9,709,Security of assets off-premises,Байгууллагаас гадуурх хөрөнгийн аюулгүй байдал,physical,False
+control_7_10,7.10,710,Storage media,Хадгалах зөөвөрлөгч,physical,False
+control_7_11,7.11,711,Supporting utilities,"Дэмжих хангамж (цахилгаан, хөргөлт)",physical,False
+control_7_12,7.12,712,Cabling security,Кабелийн аюулгүй байдал,physical,False
+control_7_13,7.13,713,Equipment maintenance,Тоног төхөөрөмжийн засвар үйлчилгээ,physical,False
+control_7_14,7.14,714,Secure disposal or re-use of equipment,"Тоног төхөөрөмжийг аюулгүй устгах, дахин ашиглах",physical,False
+control_8_1,8.1,801,User endpoint devices,Хэрэглэгчийн төгсгөлийн төхөөрөмж,technological,False
+control_8_2,8.2,802,Privileged access rights,Давуу эрхийн хандалт,technological,False
+control_8_3,8.3,803,Information access restriction,Мэдээлэлд хандах хязгаарлалт,technological,False
+control_8_4,8.4,804,Access to source code,Эх кодонд хандах,technological,False
+control_8_5,8.5,805,Secure authentication,Аюулгүй баталгаажуулалт,technological,False
+control_8_6,8.6,806,Capacity management,Хүчин чадлын удирдлага,technological,False
+control_8_7,8.7,807,Protection against malware,Хортой кодоос хамгаалах,technological,False
+control_8_8,8.8,808,Management of technical vulnerabilities,Техникийн эмзэг байдлын удирдлага,technological,False
+control_8_9,8.9,809,Configuration management,Тохиргооны удирдлага,technological,True
+control_8_10,8.10,810,Information deletion,Мэдээлэл устгах,technological,True
+control_8_11,8.11,811,Data masking,Өгөгдөл далдлах (Data masking),technological,True
+control_8_12,8.12,812,Data leakage prevention,Мэдээлэл алдагдахаас сэргийлэх (DLP),technological,True
+control_8_13,8.13,813,Information backup,Мэдээллийн нөөцлөлт,technological,False
+control_8_14,8.14,814,Redundancy of information processing facilities,Мэдээлэл боловсруулах байгууламжийн нөөцлөл,technological,False
+control_8_15,8.15,815,Logging,Лог бүртгэл,technological,False
+control_8_16,8.16,816,Monitoring activities,"Хяналт, мониторинг",technological,True
+control_8_17,8.17,817,Clock synchronization,Цагийн синхрончлол,technological,False
+control_8_18,8.18,818,Use of privileged utility programs,Давуу эрхтэй туслах программын хэрэглээ,technological,False
+control_8_19,8.19,819,Installation of software on operational systems,Ашиглалтын системд программ суулгах,technological,False
+control_8_20,8.20,820,Networks security,Сүлжээний аюулгүй байдал,technological,False
+control_8_21,8.21,821,Security of network services,Сүлжээний үйлчилгээний аюулгүй байдал,technological,False
+control_8_22,8.22,822,Segregation of networks,Сүлжээг тусгаарлах,technological,False
+control_8_23,8.23,823,Web filtering,Вэб шүүлтүүр,technological,True
+control_8_24,8.24,824,Use of cryptography,Криптограф ашиглах,technological,False
+control_8_25,8.25,825,Secure development life cycle,Аюулгүй хөгжүүлэлтийн амьдралын мөчлөг,technological,False
+control_8_26,8.26,826,Application security requirements,Аппликейшний аюулгүй байдлын шаардлага,technological,False
+control_8_27,8.27,827,Secure system architecture and engineering principles,"Аюулгүй системийн архитектур, инженерчлэлийн зарчим",technological,False
+control_8_28,8.28,828,Secure coding,Аюулгүй кодчилол,technological,True
+control_8_29,8.29,829,Security testing in development and acceptance,"Хөгжүүлэлт, хүлээн авалтын аюулгүй байдлын тест",technological,False
+control_8_30,8.30,830,Outsourced development,Гэрээт гүйцэтгэгчийн хөгжүүлэлт,technological,False
+control_8_31,8.31,831,"Separation of development, test and production environments","Хөгжүүлэлт, тест, ашиглалтын орчныг тусгаарлах",technological,False
+control_8_32,8.32,832,Change management,Өөрчлөлтийн удирдлага,technological,False
+control_8_33,8.33,833,Test information,Тестийн мэдээлэл,technological,False
+control_8_34,8.34,834,Protection of information systems during audit testing,Аудитын тестийн үеийн мэдээллийн системийн хамгаалалт,technological,False

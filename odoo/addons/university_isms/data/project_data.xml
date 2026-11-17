@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <record id="project_risk_treatment" model="project.project">
+        <field name="name">МАБ-ын эрсдэлийг бууруулах төлөвлөгөө (Risk Treatment Plan)</field>
+        <field name="description">ISO/IEC 27001:2022 Clause 6.1.3 e), 8.3 — эрсдэлийн хариу арга хэмжээний даалгаврыг хянах төсөл.</field>
+        <field name="privacy_visibility">employees</field>
+    </record>
+    <record id="task_stage_todo" model="project.task.type">
+        <field name="name">Төлөвлөсөн</field>
+        <field name="sequence">1</field>
+        <field name="project_ids" eval="[(4, ref('project_risk_treatment'))]"/>
+    </record>
+    <record id="task_stage_doing" model="project.task.type">
+        <field name="name">Хэрэгжүүлж буй</field>
+        <field name="sequence">2</field>
+        <field name="project_ids" eval="[(4, ref('project_risk_treatment'))]"/>
+    </record>
+    <record id="task_stage_verify" model="project.task.type">
+        <field name="name">Үр нөлөөг шалгах</field>
+        <field name="sequence">3</field>
+        <field name="project_ids" eval="[(4, ref('project_risk_treatment'))]"/>
+    </record>
+    <record id="task_stage_done" model="project.task.type">
+        <field name="name">Дууссан</field>
+        <field name="sequence">4</field>
+        <field name="fold" eval="True"/>
+        <field name="project_ids" eval="[(4, ref('project_risk_treatment'))]"/>
+    </record>
+</odoo>

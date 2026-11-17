@@ -1,0 +1,58 @@
+{
+  "result": "PASS",
+  "exercise_incident_code": "INC-2026-0021",
+  "exercise_incident_id": 34,
+  "helpdesk_ticket_id": 17,
+  "incident_state": "close",
+  "helpdesk_state": "Close",
+  "live_transition_trace": [
+    {
+      "state": "report",
+      "actor": "student_demo",
+      "helpdesk_stage": "Report"
+    },
+    {
+      "state": "investigate",
+      "actor": "erkhembayar",
+      "helpdesk_stage": "Investigate"
+    },
+    {
+      "state": "resolve",
+      "actor": "erkhembayar",
+      "helpdesk_stage": "Resolve"
+    },
+    {
+      "state": "close",
+      "actor": "dorjsembe",
+      "helpdesk_stage": "Close"
+    }
+  ],
+  "detected_at": "2026-11-16 03:28:42",
+  "reported_at": "2026-11-16 03:28:42",
+  "investigation_at": "2026-11-16 03:28:42",
+  "resolved_at": "2026-11-16 03:28:42",
+  "closed_at": "2026-11-16 03:28:42",
+  "grade_request_id": 39,
+  "grade_request_name": "GCR/2026/00039",
+  "grade_requester": "campus.lecturer@orgil.example",
+  "grade_approver": "campus.reviewer@orgil.example",
+  "grade_before": 72.0,
+  "grade_after": 85.0,
+  "grade_revision": 1,
+  "grade_audit_actor": "campus.reviewer@orgil.example",
+  "grade_audit_changes": "Баталгаат дүн: 72.0 → 85.0\nGrade Revision: 0 → 1",
+  "counts": {
+    "isms.asset": 16,
+    "isms.risk": 14,
+    "isms.control": 93,
+    "isms.incident": 7,
+    "isms.policy": 4,
+    "isms.audit.log": 353,
+    "helpdesk.ticket": 7,
+    "campus.student": 3,
+    "campus.enrollment": 3,
+    "campus.grade.change": 1
+  },
+  "selected_controls": 25,
+  "scope": "AI-assisted software exercise with fictional data and actual role checks; not human participation evidence"
+}

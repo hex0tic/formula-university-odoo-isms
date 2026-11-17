@@ -1,0 +1,8 @@
+<odoo noupdate="1">
+    <record id="seq_grade_change" model="ir.sequence">
+        <field name="name">Grade Correction Request</field>
+        <field name="code">campus.grade.change</field>
+        <field name="prefix">GCR/%(year)s/</field>
+        <field name="padding">5</field>
+    </record>
+</odoo>

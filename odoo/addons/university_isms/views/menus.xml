@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_isms_treatment_tasks" model="ir.actions.act_window">
+        <field name="name">Эрсдэлийг бууруулах даалгавар</field>
+        <field name="res_model">project.task</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="domain">[('project_id', '=', ref('university_isms.project_risk_treatment'))]</field>
+        <field name="context">{'default_project_id': ref('university_isms.project_risk_treatment')}</field>
+    </record>
+
+    <menuitem id="menu_isms_root" name="ISMS" sequence="5"
+              web_icon="university_isms,static/description/icon.png"
+              action="action_isms_incident"
+              groups="group_isms_reporter"/>
+
+    <menuitem id="menu_isms_incident_top" name="Инцидент" parent="menu_isms_root" sequence="10"/>
+    <menuitem id="menu_isms_incident_new" name="Инцидент мэдээлэх" parent="menu_isms_incident_top"
+              action="action_isms_incident_new" sequence="1"/>
+    <menuitem id="menu_isms_incident_mine" name="Миний мэдээлсэн" parent="menu_isms_incident_top"
+              action="action_isms_incident_mine" sequence="2"/>
+    <menuitem id="menu_isms_incident_all" name="Бүх инцидент" parent="menu_isms_incident_top"
+              action="action_isms_incident" sequence="3"
+              groups="group_isms_analyst,group_isms_auditor"/>
+
+    <menuitem id="menu_isms_assets" name="Хөрөнгө" parent="menu_isms_root" sequence="20"
+              action="action_isms_asset" groups="group_isms_asset_owner,group_isms_auditor"/>
+
+    <menuitem id="menu_isms_risk_top" name="Эрсдэл" parent="menu_isms_root" sequence="30"
+              groups="group_isms_asset_owner,group_isms_auditor"/>
+    <menuitem id="menu_isms_risk" name="Эрсдэлийн бүртгэл" parent="menu_isms_risk_top"
+              action="action_isms_risk" sequence="1"/>
+    <menuitem id="menu_isms_risk_matrix" name="Эрсдэлийн матриц 5×5" parent="menu_isms_risk_top"
+              action="action_isms_risk_matrix" sequence="2"/>
+    <menuitem id="menu_isms_treatment_tasks" name="Эрсдэлийг бууруулах даалгавар" parent="menu_isms_risk_top"
+              action="action_isms_treatment_tasks" sequence="3" groups="group_isms_analyst"/>
+    <menuitem id="menu_isms_threat" name="Аюул занал" parent="menu_isms_risk_top"
+              action="action_isms_threat" sequence="10" groups="group_isms_analyst,group_isms_auditor"/>
+    <menuitem id="menu_isms_vulnerability" name="Эмзэг байдал" parent="menu_isms_risk_top"
+              action="action_isms_vulnerability" sequence="11" groups="group_isms_analyst,group_isms_auditor"/>
+
+    <menuitem id="menu_isms_control_top" name="Хяналт ба SoA" parent="menu_isms_root" sequence="40"
+              groups="group_isms_asset_owner,group_isms_auditor"/>
+    <menuitem id="menu_isms_control_mapping" name="Controls Mapping" parent="menu_isms_control_top"
+              action="action_isms_control_mapping" sequence="1"/>
+    <menuitem id="menu_isms_soa" name="Statement of Applicability" parent="menu_isms_control_top"
+              action="action_isms_soa" sequence="2"/>
+    <menuitem id="menu_isms_control_all" name="Annex A (93 хяналт)" parent="menu_isms_control_top"
+              action="action_isms_control" sequence="3"/>
+
+    <menuitem id="menu_isms_policy" name="Бодлого" parent="menu_isms_root" sequence="50"
+              action="action_isms_policy"/>
+
+    <menuitem id="menu_isms_report_top" name="Тайлан" parent="menu_isms_root" sequence="60"
+              groups="group_isms_analyst,group_isms_auditor"/>
+    <menuitem id="menu_isms_report_soa" name="SoA PDF" parent="menu_isms_report_top"
+              action="action_server_print_soa" sequence="1"/>
+    <menuitem id="menu_isms_report_risks" name="Эрсдэлийн бүртгэл PDF" parent="menu_isms_report_top"
+              action="action_server_print_risks" sequence="2"/>
+    <menuitem id="menu_isms_report_assets" name="Хөрөнгийн бүртгэл PDF" parent="menu_isms_report_top"
+              action="action_server_print_assets" sequence="3"/>
+
+    <menuitem id="menu_isms_audit_log" name="Аудит лог" parent="menu_isms_root" sequence="70"
+              action="action_isms_audit_log" groups="group_isms_auditor,base.group_system"/>
+</odoo>

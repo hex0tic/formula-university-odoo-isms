@@ -1,0 +1,7 @@
+<odoo noupdate="1">
+    <!-- Fictional teaching data. Login credentials are provisioned separately. -->
+    <record id="demo_program_security" model="campus.program"><field name="code">SEC</field><field name="name">Мэдээллийн аюулгүй байдал</field><field name="department">Инженер, тоон технологийн сургууль</field><field name="owner_id" ref="base.user_admin"/></record>
+    <record id="demo_course_governance" model="campus.course"><field name="code">ORG-338</field><field name="name">Мэдээллийн аюулгүй байдлын засаглал</field><field name="credits">3</field><field name="program_id" ref="demo_program_security"/></record>
+    <record id="demo_student_anar" model="campus.student"><field name="student_code">DEMO-26001</field><field name="name">Демо Анар</field><field name="program_id" ref="demo_program_security"/><field name="institutional_email">demo.anar@orgil.example</field></record>
+    <record id="demo_student_nomin" model="campus.student"><field name="student_code">DEMO-26002</field><field name="name">Демо Номин</field><field name="program_id" ref="demo_program_security"/><field name="institutional_email">demo.nomin@orgil.example</field></record>
+</odoo>
