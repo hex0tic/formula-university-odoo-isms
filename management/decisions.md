@@ -1,16 +1,16 @@
 # Шийдвэрийн бүртгэл
 
 ## D01 — 2026-11-16: Нэг орчин, тусдаа эзэмшил
-Claude deployment ба university_isms; Codex campus_university ба интеграц; OpenCode canonical data ба policies. Бусдын write scope-д тохиролцолгүй бичихгүй.
+Deployment агент deployment ба university_isms; Codex campus_university ба интеграц; OpenCode canonical data ба policies. Бусдын write scope-д тохиролцолгүй бичихгүй.
 
 ## D02 — 2026-11-16: Кейсийн нэр, хэмжээ
 Агентууд «Оргил Технологийн Их Сургууль» нэрийг хүлээн авсан. Суурь хэмжээ: 3,600 оюутан, 280 ажилтан, 3 бүрэлдэхүүн сургууль, төв кампусын 2 байр. Эдгээр нь зохиомол кейсийн параметр; бодит сургуулийн статистик биш.
 
 ## D03 — 2026-11-16: Хэрэгжүүлэх Odoo хувилбар
-Odoo 18.0 Community + PostgreSQL 16. Version-ийг “хамгийн шинэ” гэж нэрлэхгүй; OCA branch support, тухайн суулгалтын тогтвортой хувилбараар сонгов. Actual deployed build/диск/контейнер evidence-г Claude deployment log-д хадгална.
+Odoo 18.0 Community + PostgreSQL 16. Version-ийг “хамгийн шинэ” гэж нэрлэхгүй; OCA branch support, тухайн суулгалтын тогтвортой хувилбараар сонгов. Actual deployed build/диск/контейнер evidence-г Deployment агент deployment log-д хадгална.
 
 ## D04 — 2026-11-16: Эрсдэлийн аргачлал RM-01 v1.0
-**Лекц 8–9 слайд19-ийн 5×5 lookup матрицыг** үндсэн ангилал болгоно (Claude schema §2). Тоон score = likelihood×impact, харин level-ийг доорх lookup-аар тогтооно.
+**Лекц 8–9 слайд19-ийн 5×5 lookup матрицыг** үндсэн ангилал болгоно (Deployment агент schema §2). Тоон score = likelihood×impact, харин level-ийг доорх lookup-аар тогтооно.
 
 | Магадлал / Нөлөөлөл | 1 | 2 | 3 | 4 | 5 |
 |---|---|---|---|---|---|

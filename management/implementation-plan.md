@@ -11,7 +11,7 @@ biydaalt/
   odoo/
     docker-compose.yml, config/, scripts/
     addons/campus_university/            академик үйлчилгээ (Codex)
-    addons/university_isms/              ISMS domain (Claude)
+    addons/university_isms/              ISMS domain (Deployment агент)
     addons/campus_isms_bridge/           audit/asset/incident интеграц
   data/                                 CSV/JSON canonical synthetic data
   policies/                             3 үндсэн ISMS бодлого (+ optional AUP)
@@ -24,12 +24,12 @@ biydaalt/
 | Үе | Ажил | Эзэн | Дууссан гэж үзэх нөхцөл |
 |---|---|---|---|
 | P0 | Заавар, өмнөх хичээл, team, VM inventory унших | Codex/Sophia/Infra | requirements, course-review, glossary, team, environment-audit |
-| P1 | 3 агентын proposal-ийг нэгтгэх, case ба аргачлал тогтоох | Codex + Claude/OpenCode | case, architecture, D01–D07; бүх тал ижил нэр/тоо/матриц ашиглах |
-| P2 | Existing runtime reuse; Odoo/DB суулгах | Claude | ажилладаг login, version/digest, loopback, isolated data, commands |
+| P1 | 3 агентын proposal-ийг нэгтгэх, case ба аргачлал тогтоох | Codex + Deployment агент/OpenCode | case, architecture, D01–D07; бүх тал ижил нэр/тоо/матриц ашиглах |
+| P2 | Existing runtime reuse; Odoo/DB суулгах | Deployment агент | ажилладаг login, version/digest, loopback, isolated data, commands |
 | P3a | Academic module: 6 model, views, rules, approval | Codex | install, security/workflow tests, demo flow |
-| P3b | ISMS models, Inventory/Project/Helpdesk, RBAC, audit | Claude | ≥5 role, immutable UI audit, incident 5 stages, core integration |
+| P3b | ISMS models, Inventory/Project/Helpdesk, RBAC, audit | Deployment агент | ≥5 role, immutable UI audit, incident 5 stages, core integration |
 | P3c | Assets, risks, controls/SoA, policy dataset | OpenCode | schema нийцсэн UTF-8 CSV/JSON, stable codes, ≥15/12/25 |
-| P4 | Нэг dataset импортлох, campus ба audit bridge холбоно | Claude/Codex | idempotent import, no duplicate codes, actual actor/change traces |
+| P4 | Нэг dataset импортлох, campus ба audit bridge холбоно | Deployment агент/Codex | idempotent import, no duplicate codes, actual actor/change traces |
 | P5 | Allow/deny, incident transitions, matrix25, backup/restore шалгах | Codex + бүгд | бодит test logs, screenshot, evidence manifest |
 | P6 | Report 20–30p, slides8–12, demo10–15min | Баг | бүх зураг бодит, нэр/тоо/claim таарсан, эх сурвалж ба AI disclosure |
 

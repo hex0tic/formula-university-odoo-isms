@@ -1,6 +1,6 @@
 # Schema contract — `university_isms` (Odoo 18.0 Community)
 
-Эзэмшигч: **Claude Code**. Өөрчлөх санал бол `messages.md`-д бичнэ үү. Хувилбар: v1.1 (2026-11-18, модуль 18.0.1.1.0).
+Эзэмшигч: **Deployment агент**. Өөрчлөх санал бол `messages.md`-д бичнэ үү. Хувилбар: v1.1 (2026-11-18, модуль 18.0.1.1.0).
 
 - Модулийн зам: `biydaalt/odoo/addons/university_isms/`
 - Хамаарал: `base`, `mail`, `hr`, `project`
@@ -122,7 +122,7 @@
 | `university_isms.group_isms_manager` | МАБ менежер (CISO) | analyst, auditor |
 | `base.group_system` | Odoo админ | — |
 
-## 4. Импортын CSV формат (OpenCode `data/` → Claude XML)
+## 4. Импортын CSV формат (OpenCode `data/` → Deployment агент XML)
 Олон утгыг `;`-ээр тусгаарлана. Хэрэглэгчийг `login`-оор, холбоосыг `code`-оор заана. UTF-8.
 - `users.csv`: `login,name,job_title,department,isms_role` (`reporter|asset_owner|auditor|analyst|manager|admin`)
 - `departments.csv`: `name,parent,manager_login`

@@ -6,7 +6,7 @@
 - VM бодлогыг уншиж lab-vms refresh ажиллуулав (11 бүртгэл, нийт 58 илрүүлэлт).
 - Бие даалтын PDF 6 хуудас, текст давхаргагүй тул хуудас бүрийг зургаар унших шаардлагатай.
 
-## 2026-11-16 10:39 — Claude Code
+## 2026-11-16 10:39 — Deployment агент
 - Даалгаврын PDF-ийн 6 хуудсыг 200dpi зураг болгон бүрэн уншив (Даалгавар 1–8, тайлангийн 11 бүтэц, үнэлгээ 10 оноо, ёс зүй).
 - Орчин шалгав: Docker 29.9.3 / Compose 5.7.1 идэвхтэй; /var 13G сул; 8069/8072/5432 сул; postgres:16-alpine локалд байгаа; Odoo контейнер байхгүй.
 - `lab-vms refresh` + `find --role odoo/erp` → тохирох бүртгэл байхгүй. Docker сонголт A-г санал болгов.
@@ -14,7 +14,7 @@
 
 ## 2026-11-16 10:41 — OpenCode (Gemini 4 Argon)
 - Бие даалтын заавар PDF (6 хуудас) болон `Sem1/Семинар_1_formula5.pdf`-ийг уншиж, багийн 5 гишүүний нэр, оюутны кодыг (`Formula 5`: Э. Доржсэмбэ B241870023, Б. Батдэмбэрэл B241870018, Б. Бадрал B241870051, А. Эрхэмбаяр B241870055, Б. Тэлмүүн B241870042) баталгаажуулав.
-- `messages.md`-д багийн 5 гишүүний мэдээлэл, үүргийн хуваарилалт болон Claude Code / Coordinator-той давхцахгүй ажиллах саналаа бичив.
+- `messages.md`-д багийн 5 гишүүний мэдээлэл, үүргийн хуваарилалт болон Deployment агент / Coordinator-той давхцахгүй ажиллах саналаа бичив.
 
 ## 2026-11-16T10:43:12+08:00 — Sophia: эх сурвалж ба багийн бүрэлдэхүүн
 - Хичээлийн эх файлуудыг read-only бүртгэж, лекцийн 6 Markdown-ийг (нийт 4 694 мөр) бүрэн уншив.
@@ -26,7 +26,7 @@
 - Зааврын 6 хуудсыг бүгдийг render хийж нүдээр уншив.
 - 21 албан шаардлага + 8 хэрэглэгчийн нэмэлт бүхий requirements.md үүсгэв.
 - 4/5 гишүүний зөрүү, 8–10/20–25 control-ын зөрүүг хэрэглэгч ба дэлгэрэнгүй зааврын дагуу шийдэв.
-- OpenCode, Claude хоёр messages.md-д нэгдэж, нийтлэг файлын харилцаа ажиллаж байгааг батлав.
+- OpenCode, Deployment агент хоёр messages.md-д нэгдэж, нийтлэг файлын харилцаа ажиллаж байгааг батлав.
 
 ## 2026-11-16T10:48:47+08:00 — Infrastructure analyst: read-only орчны аудит дуусав
 - `shared-lab-vms` skill, POLICY.md, багийн management болон applicable AGENTS зааврыг уншив; Coordinator-ийн 10:37:13+08 refresh-ийг ашиглав. Дахин refresh/reserve хийгээгүй.
@@ -37,7 +37,7 @@
 - `management/environment-audit.md` бичив; UTF-8/code-fence/evidence-reference consistency шалгав. Official Odoo 18/PostgreSQL Docker docs-оор хувилбарын шаардлагыг тулгав. Санал: existing Docker runtime + шинэ тусдаа Odoo Community/PG16 stack, cached image layer reuse, шинэ data/filestore; суулгалт/тест deployment эзэнд.
 - Нийт mutation: өөрийн report болон messages.md/worklog.md-д fcntl.flock append. Provision/install/pull/service start-stop/prune/group reserve/registry өөрчлөлт хийгээгүй.
 
-## 2026-11-16 10:49 — Claude Code: Odoo суулгалт
+## 2026-11-16 10:49 — Deployment агент: Odoo суулгалт
 - `docker pull odoo:18.0` → Odoo Server 18.0-20261112, Python 3.12.3, wkhtmltopdf 0.12.6.1 (PDF тайланд).
 - Community addons шалгав: helpdesk/documents/knowledge **байхгүй** (Enterprise) — баталгаажсан.
 - `biydaalt/odoo/`: docker-compose.yml (project `isms`, 127.0.0.1:8069), config/odoo.conf.template (list_db=False, without_demo=all, logfile), scripts/setup.sh, init-db.sh, odoo-cli.sh, .gitignore (.env, odoo.conf, logs).
@@ -48,7 +48,7 @@
 ## 2026-11-16T10:59:19.572561+08:00 — Codex → баг: campus суусан, 10/10 тест өнгөрлөө
 `campus_university` Odoo18 DB-д бодитоор install хийж native TransactionCase 10 тест ажиллуулав: 0 failed, 0 errors. Independent approval, self-approval deny, student/lecturer isolation, auditor read-only, forged-context/direct-state deny, stale-revision reject, freeze/reject reason, forged-create actor ба score range шалгав. Log `evidence/tests/campus-install-test-20261116.log`. `runtime.lock` чөлөөлөгдсөн. `management/case.md`, implementation-plan.md, decisions.md бэлэн, 3,600/280/3 сургууль/2 байр тогтсон. Одоо synthetic academic seed, дараа нь audit bridge хийнэ.
 
-## 2026-11-16 11:04 — Claude Code: university_isms хөгжүүлэлт ба шалгалт
+## 2026-11-16 11:04 — Deployment агент: university_isms хөгжүүлэлт ба шалгалт
 - `odoo/addons/university_isms/`: 9 модел файл, security (5 бүлэг + 13 record rule, 30 ACL), 93 Annex A CSV (37/8/14/34, 2022 шинэ 11), 12 аюул занал/14 эмзэг байдлын каталог, Risk Treatment Project, 9 view файл, 3 QWeb PDF, цэс, icon.
 - `-i university_isms` → exit 0. `-u university_isms --test-enable --test-tags /university_isms` → 13 тест, 0 failed/0 error (`evidence/tests/university_isms-tests-20261116-110343.log`). Эхний оролдлогод password policy (≥10) тестийн хэрэглэгчийг хориглосон → тестийн нууц үгийг уртасгав.
 - `scripts/bootstrap.py`: компанийн нэр/улс/MNT, admin нууц үг .env-ээс (hash pbkdf2 баталгаажсан), minlength=10.
@@ -62,11 +62,11 @@
 ## 2026-11-16T11:15:52.586939+08:00 — Codex → баг: Helpdesk ба Academic audit bridge installed, 18/18 pass
 `campus_university`, `campus_isms_bridge`, `helpdesk_mgmt` (OCA pinned18), `university_isms_helpdesk` суусан. Native18 tests:10 academic +3 audit bridge +5 Helpdesk;0failed0errors. Audit pre/post grade ба approving actor зөв; `isms_audit_skip=True` campus audit-ыг алгасахгүй; 5stage transition Helpdesk-ээс ажиллана, skipping/analyst-close хориг; reporter isolation/auditor read-only/link-delete/tamper deny шалгасан. Log `evidence/tests/campus-helpdesk-integration-20261116.log`.
 
-Claude: шинэ ISMS incident бүр bridge ticket автоматаар үүсгэнэ. Одоо байсан6 imported incident-д `env['isms.incident'].search([])._sync_helpdesk_tickets()` нэг удаа ажиллуулна. Таны CSV import энэ bridge-ийн дараа ажиллавал автоматаар mirror болно. Incident resolve/close нь direct write routed тул importer `_isms_internal`/sudo замаа шалгана уу. Helpdesk stage XML IDs: `university_isms_helpdesk.stage_incident/report/investigate/resolve/close`. Team XML ID team_security.
+Deployment агент: шинэ ISMS incident бүр bridge ticket автоматаар үүсгэнэ. Одоо байсан6 imported incident-д `env['isms.incident'].search([])._sync_helpdesk_tickets()` нэг удаа ажиллуулна. Таны CSV import энэ bridge-ийн дараа ажиллавал автоматаар mirror болно. Incident resolve/close нь direct write routed тул importer `_isms_internal`/sudo замаа шалгана уу. Helpdesk stage XML IDs: `university_isms_helpdesk.stage_incident/report/investigate/resolve/close`. Team XML ID team_security.
 
-`management/glossary.md` болон course-review.md дууссан. Sophia/reviewer туслахууд application network permission revoked болж тасалдсан; эхний source review файл нь бэлэн, glossary-г Coordinator course-review эхийн дагуу өөрөө гүйцээв. External OpenCode/Claude shared-file channel үргэлжилж байна.
+`management/glossary.md` болон course-review.md дууссан. Sophia/reviewer туслахууд application network permission revoked болж тасалдсан; эхний source review файл нь бэлэн, glossary-г Coordinator course-review эхийн дагуу өөрөө гүйцээв. External OpenCode/Deployment агент shared-file channel үргэлжилж байна.
 
-## 2026-11-16 11:18 — Claude Code: аюулгүй байдлын засвар, импорт, баталгаажуулалт
+## 2026-11-16 11:18 — Deployment агент: аюулгүй байдлын засвар, импорт, баталгаажуулалт
 - Codex review: context-оор audit алгасах, RPC/kanban-аар workflow алгасах, acceptance/approval хуурах — сервер талын token-оор хаав; шинэ 5 тест. Нийт 18/18 (`evidence/tests/university_isms-tests-20261116-111048.log`). (Засвар: өмнөх бичлэгт «13 record rule» гэсэн нь буруу — 11 record rule, 30 ACL.)
 - `university_isms_stock` (isms.asset ↔ product/stock.lot/location) суулгаж тест 1/1.
 - `scripts/import_case_data.py`: schema §4 CSV → idempotent upsert, dry-run горим; OpenCode data-г бодитоор импортлов (16 хөрөнгө, 14 эрсдэл, 25/93 SoA, 6 инцидент, 4 бодлого, 11 хэрэглэгч).
@@ -94,7 +94,7 @@ D08 нэрийн өөрчлөлтийг company/menu/canonical data/policies/rep
 ## 2026-11-17 — Codex: GitHub push амжилттай
 `https://github.com/hex0tic/formula-university-odoo-isms` private репозитор үүсгэж `main` branch руу push хийв. Анхны commit `9db325e16a4bc256f9174bf4f30c7f89ccc73720` локал болон GitHub дээр таарсан; remote tree 282 файлтай, нууц зам/тохиргоо агуулаагүй. Тайлангийн DOCX/PDF, PPTX GitHub дээр байгааг шалгав. Локал Git хуулбар ба цааш өөрчлөх зааврыг `management/github.md`-д хадгалав.
 
-## 2026-11-18 07:37 — Claude Code: төслийн аудит, алдаа засвар, нэмэлт (university_isms 18.0.1.1.0)
+## 2026-11-18 07:37 — Deployment агент: төслийн аудит, алдаа засвар, нэмэлт (university_isms 18.0.1.1.0)
 **Эхний төлөв:** Odoo 18.0-20261112 + PG16 ажиллаж байсан, 14 custom/CE модуль, 16 хөрөнгө, 14 эрсдэл, 25 сонгосон хяналт, 7 инцидент/7 тасалбар, 516 аудит бичлэг; 39/39 тест (ашиглалтын DB дээр). Runtime лог дахь cron алдаа нь backup үеийн DB restart (benign).
 **Олдсон алдаа/дутуу ба засвар:**
 1. RSK-14 «Хүлээн зөвшөөрөх» CISO-гийн батлалтгүй 6-р үе шатанд — импорт workflow-г тойрсон → `_isms_repair_workflow_consistency` + migration (эрсдэл хариуцагч нь CISO тул батлалтыг бүртгэв, chatter-т тэмдэглэв); импорт цаашид өөрөө тулгана.
@@ -112,13 +112,19 @@ D08 нэрийн өөрчлөлтийг company/menu/canonical data/policies/rep
 **Нэмэлт боломж:** brute-force нэвтрэлтийн автомат инцидент (A.8.16), өдөр тутмын мониторинг cron (бодлогын хяналт, хугацаа хэтэрсэн эрсдэл, SLA), Clause 9.3 удирдлагын дүн шинжилгээний PDF, «Хугацаа хэтэрсэн», «SLA хэтэрсэн», «Автомат илрүүлэлт» шүүлтүүр.
 **Шалгалт:** `run-tests.sh` → 47/47 PASS (`evidence/tests/regression-20261118.json`). Бодит HTTP: brute-force → INC-2026-0070 (Report, Helpdesk тасалбартай); аудитор SoA/удирдлагын PDF хэвлэнэ, мониторинг хориотой; CISO бүгд; багш бүх хязгаарлагдмал бүртгэлээс татгалзагдсан (`evidence/tests/live-audit-20261118.json`). PDF: `evidence/reports/2026-11-18/`; 11-16-ны түүхэн PDF-ийг санамсаргүй дарж бичсэнээ git хуулбараас сэргээв.
 
-## 2026-11-18 07:39 — Claude Code: GitHub push
-- `hex0tic/formula-university-odoo-isms` → branch `claude/audit-fixes-20261118`, commit `7a43fe0805b40237a309ac1fb9fcadf8ca1baf3a` (48 файл, +1007/−70). Remote SHA таарсан. Push хийхээс өмнө өөрчлөгдсөн 47 файлыг `odoo/.env` ба `evidence/private/`-ийн 22 нууц утгатай тулгаж шалгав — нууц үг ороогүй. `main` руу merge хийх эсэхийг хэрэглэгч шийднэ.
+## 2026-11-18 07:39 — Deployment агент: GitHub push
+- `hex0tic/formula-university-odoo-isms` → branch `audit-fixes-20261118`, commit `7a43fe0805b40237a309ac1fb9fcadf8ca1baf3a` (48 файл, +1007/−70). Remote SHA таарсан. Push хийхээс өмнө өөрчлөгдсөн 47 файлыг `odoo/.env` ба `evidence/private/`-ийн 22 нууц утгатай тулгаж шалгав — нууц үг ороогүй. `main` руу merge хийх эсэхийг хэрэглэгч шийднэ.
 
-## 2026-11-18 07:54 — Claude Code: өнөөдрийн ажлын нэгтгэл ба merge
+## 2026-11-18 07:54 — Deployment агент: өнөөдрийн ажлын нэгтгэл ба merge
 1. **Аудит:** ажиллаж буй Odoo-гийн төлөв (Odoo 18, 14 модуль, 39 тест), runtime лог, DB-ийн өгөгдлийн чанар, бүх custom модулийн код, бодит HTTP-ийн үүргийн allow/deny-г шалгав.
 2. **Засвар:** 11 олдвор (импортын workflow зөрчил ×2, Project ашиглагдаагүй, 6.1.3 f) дутуу, Reporter-ийн мэдээлэл задрал, campus мэдээлэх эрхгүй, admin=CISO, аудитор хэвлэж чадахгүй, тест ашиглалтын DB дээр, PG segfault, token context урсах, хуучин нэр).
 3. **Нэмэлт:** brute-force илрүүлэлт, мониторинг cron, Clause 9.3 тайлан, шүүлтүүр; `university_isms` 18.0.1.1.0 + migration.
 4. **Баталгаа:** 47/47 тест тусдаа DB дээр; бодит HTTP-ээр аудитор/CISO/багшийн эрх; INC-2026-0070 автомат инцидент.
 5. **Баримт:** `management/audit-20261118.md` — засвар бүрийн «яагаад» үндэслэл ба ISO заалт; `odoo-guide.md`, `schema-university_isms.md` v1.1, `operations.md`, `README.md` шинэчилсэн.
-6. **GitHub:** branch `claude/audit-fixes-20261118` (commit 7a43fe0, a5ad1d3) → үндэслэл бүхий merge commit-оор `main` руу.
+6. **GitHub:** branch `audit-fixes-20261118` (commit 7a43fe0, a5ad1d3) → үндэслэл бүхий merge commit-оор `main` руу.
+
+## 2026-11-18 07:55 — Deployment агент: `main` руу merge хийгдлээ
+`hex0tic/formula-university-odoo-isms` `main` = merge commit `1e7b6f4` (`--no-ff`, branch `audit-fixes-20261118`: 7a43fe0, a5ad1d3, 208659d). Merge commit-ийн мессежид засвар бүрийн шалтгаан (ISO заалттай) бичигдсэн; дэлгэрэнгүй `management/audit-20261118.md`. Remote SHA шалгаж таарсан. Энэ бичлэг дараагийн синкээр GitHub-д орно.
+
+## 2026-11-18 — Codex → Deployment агент/OpenCode/баг: GitHub өөрчлөлтийн review
+Хэрэглэгчийн хүсэлтээр main `da14a7f` (эхлээд шалгасан `1e7b6f4`-тэй ижил tree)-г суурь `4aeb926`-той харьцуулав: 50 файл. 47/47 PASS runtime логийг бие даан баталгаажуулсан. Review: `management/github-review-20261118-codex.md`. F1(P1): repair helper бодит owner/CISO action-гүй батлагч/өнөөдрийн огноо нөхдөг; F2(P2): treatment/asset өөрчлөгдөхөд residual approval хуучнаараа; F3(P2): stage.fold=True нь In Progress даалгаврыг дууссанд тооцдог. Яг source method-уудын нөхцөлт логикийг ORM stub-тай тусгаарлан давтав. Monitoring давхар review: архивлагдсан хариуцагчийн сануулга алга болох, KPI archive-user numerator/active-user denominator зөрөх, cron upgrade локал тохиргоог дарах. Нэгдсэн DOCX/PDF/PPTX хуучин 39 тестийн snapshot хэвээр. Код/runtime/GitHub-д засвар/push хийгээгүй; review болон worklog/messages-ийг үндсэн biydaalt management-д хадгалсан.

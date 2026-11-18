@@ -78,4 +78,4 @@ Formula University-ийн төв кампусын I, II байр дахь оюу
 
 ## 10. Эх ба нэгтгэл
 
-Албан бие даалтын зааврын Д1–Д8; Sophia course-review/glossary; Claude-ийн `proposals/claude-case-and-plan.md` (дүнгийн integrity ба үүрэг тусгаарлалт); OpenCode-ийн `proposals/opencode-case-and-plan.md` (хамтарсан лаборатори, core module mapping); өмнөх Sem10-ын сургалтын risk аргачлал. Эрсдэлийн зөрүүг decisions.md D04-өөр шийдсэн. Хуулийн хүчин төгөлдөр редакц, байгууллагын бодит статистик гэдгийг энэ кейсийн зохиомол өгөгдлөөс дүгнэхгүй.
+Албан бие даалтын зааврын Д1–Д8; Sophia course-review/glossary; Deployment агентын `proposals/deployment-case-and-plan.md` (дүнгийн integrity ба үүрэг тусгаарлалт); OpenCode-ийн `proposals/opencode-case-and-plan.md` (хамтарсан лаборатори, core module mapping); өмнөх Sem10-ын сургалтын risk аргачлал. Эрсдэлийн зөрүүг decisions.md D04-өөр шийдсэн. Хуулийн хүчин төгөлдөр редакц, байгууллагын бодит статистик гэдгийг энэ кейсийн зохиомол өгөгдлөөс дүгнэхгүй.

@@ -21,7 +21,7 @@ flowchart LR
 ## Хуваах зарчим
 
 - `campus_university` (Codex): `base`, `mail`-д тулгуурлана. Сургалтын мэдээллийн домэйн.
-- `university_isms` (Claude): asset/risk/control/policy/incident домэйн; Community Helpdesk, Inventory, audit-тай холбох.
+- `university_isms` (Deployment агент): asset/risk/control/policy/incident домэйн; Community Helpdesk, Inventory, audit-тай холбох.
 - Хоорондын dependency cycle үүсгэхгүй. ISMS module нь шаардлагатай үед `campus_university`-г depend хийнэ эсвэл bridge extension ашиглана.
 - OpenCode dataset нь эхлээд JSON/CSV; XML ID нь тогтвортой, import нь idempotent байна.
 
@@ -55,7 +55,7 @@ flowchart LR
 
 ## Runtime
 
-Одоо байгаа Docker runtime ба cached PostgreSQL image-ийг ашиглах саналтай. Odoo service зөвхөн loopback publish; DB-г host руу publish хийхгүй. DB ба filestore-г хамтад нь backup/restore хийнэ. Deployment-ийн эцсийн version/commit/image digest-г Claude environment note-д тогтооно.
+Одоо байгаа Docker runtime ба cached PostgreSQL image-ийг ашиглах саналтай. Odoo service зөвхөн loopback publish; DB-г host руу publish хийхгүй. DB ба filestore-г хамтад нь backup/restore хийнэ. Deployment-ийн эцсийн version/commit/image digest-г Deployment агент environment note-д тогтооно.
 
 ## Бодитоор суусан интеграц (2026-11-16)
 

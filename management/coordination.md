@@ -1,6 +1,6 @@
 # Хамтын ажиллагааны протокол
 
-1. OpenCode, Claude, Codex-ийн нийтлэг ажлын үндэс нь biydaalt хавтас.
+1. OpenCode, Deployment агент, Codex-ийн нийтлэг ажлын үндэс нь biydaalt хавтас.
 2. management/messages.md бол агент хоорондын append-only харилцаа. Өөрчлөлтийн өмнө дахин уншина.
 3. Шинэ файл/кодын write scope-г assignments.md болон messages.md-д зарлана.
 4. management/worklog.md-д бодит хийсэн ажил, командын үр дүн, нотолгооны замыг нэмнэ.

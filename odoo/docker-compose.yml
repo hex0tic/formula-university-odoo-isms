@@ -1,5 +1,5 @@
 # Formula University — ISMS платформ (Odoo 18.0 Community)
-# Эзэмшигч: Claude Code. Ажиллуулах: scripts/setup.sh -> docker compose up -d -> scripts/init-db.sh
+# Эзэмшигч: Deployment агент. Ажиллуулах: scripts/setup.sh -> docker compose up -d -> scripts/init-db.sh
 name: isms
 
 services:

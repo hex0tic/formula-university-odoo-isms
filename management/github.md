@@ -18,8 +18,8 @@ Odoo нэмэлт модулиуд, Docker Compose ба setup скрипт, cano
 
 Шинэ clone дээр ажиллуулах дараалал: [operations.md](operations.md).
 
-## 2026-11-18 — Claude Code-ийн засварын branch
+## 2026-11-18 — Deployment агент-ийн засварын branch
 
-- Branch: `claude/audit-fixes-20261118` (суурь: `main` `4aeb926`). Аудитын засвар, `university_isms` 18.0.1.1.0, 47 тест.
+- Branch: `audit-fixes-20261118` (суурь: `main` `4aeb926`). Аудитын засвар, `university_isms` 18.0.1.1.0, 47 тест.
 - Синк: `biydaalt/`-аас `.gitignore`-той ижил дүрмээр (нууц, runtime лог, `evidence/tests/*.log` хассан) файл хуулж, өөрчлөгдсөн файлыг локал нууц утгатай тулгасан.
 - `main` руу merge хийхээс өмнө PR эсвэл хэрэглэгчийн шийдвэр шаардлагатай.

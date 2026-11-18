@@ -8,18 +8,18 @@ Odoo Community Edition дээр их сургуулийн бодит нөхцө�
 
 | ID | Шаардлага | Эх | Хүлээн авах нотолгоо | Эзэн |
 |---|---|---|---|---|
-| R01 | Odoo Community Edition; локал Docker эсвэл source deployment | х.1–2 §3 | version, compose/image/source ID, login screenshot | Claude |
+| R01 | Odoo Community Edition; локал Docker эсвэл source deployment | х.1–2 §3 | version, compose/image/source ID, login screenshot | Deployment агент |
 | R02 | Байгууллагын кейс: үйл ажиллагаа, өгөгдлийн төрөл, гол эрсдэл, Clause 4 | х.3 Д1 | case.md, context/stakeholders/scope, тайлангийн танилцуулга | Codex |
-| R03 | Odoo модуль сонголт, control бүртэй холбоо, сонгосон үндэслэл | х.3 Д2 | module–control–implementation хүснэгт | Codex/Claude |
-| R04 | Хөрөнгийн бүртгэл ≥10; Asset, Owner, Classification, Location, Risk | х.4 Д3 | canonical register + Odoo Inventory/Documents дахь бодит бүртгэл ба screenshot | OpenCode/Claude |
+| R03 | Odoo модуль сонголт, control бүртэй холбоо, сонгосон үндэслэл | х.3 Д2 | module–control–implementation хүснэгт | Codex/Deployment агент |
+| R04 | Хөрөнгийн бүртгэл ≥10; Asset, Owner, Classification, Location, Risk | х.4 Д3 | canonical register + Odoo Inventory/Documents дахь бодит бүртгэл ба screenshot | OpenCode/Deployment агент |
 | R05 | Эрсдэлийн бүртгэл ≥10; Threat, Vulnerability, Likelihood, Impact, Risk Level | х.4 Д4 | эрсдэлийн аргачлал, 5×5 матриц, ≥10 мөр; оноо тооцоолол | OpenCode |
-| R06 | Annex A 20–25 хяналт сонгож Odoo implementation-тэй холбох | х.4 Д5 | 25 хяналтын mapping; asset→risk→treatment→control→evidence холбоо | OpenCode/Claude |
-| R07 | Incident → Report → Investigate → Resolve → Close таван шат | х.4 Д6 | workflow диаграм, Community Helpdesk дахь тасалбарын бодит шилжилт | Claude |
+| R06 | Annex A 20–25 хяналт сонгож Odoo implementation-тэй холбох | х.4 Д5 | 25 хяналтын mapping; asset→risk→treatment→control→evidence холбоо | OpenCode/Deployment агент |
+| R07 | Incident → Report → Investigate → Resolve → Close таван шат | х.4 Д6 | workflow диаграм, Community Helpdesk дахь тасалбарын бодит шилжилт | Deployment агент |
 | R08 | Information Security Policy, Access Control Policy, Risk Treatment Plan зэрэг 2–3 бодлого, тус бүр 1–2 хуудас | х.4 Д7 | 3 бодлого, эзэн/батлах үүрэг/хянан үзэх давтамж/хэрэгжилт | OpenCode |
-| R09 | ≥5 өөр эрхийн түвшин (RBAC) | х.5 Д8 | бүлэг ба ACL/record rule матриц; 5+ хэрэглэгч; allow/deny шалгалт; screenshot | Claude/Codex |
-| R10 | Хэрэглэгчид үүсгэх | х.5 Д8 | users screenshot, role membership, synthetic demo accounts | Claude |
-| R11 | Хэрэглэгчийн үйлдлийг audit log-д бодитоор бүртгэх | х.5 Д8 | өөр хэрэглэгчийн create/write/approval/read test шаардлагын дагуу; actor/time/model/action | Claude/Codex |
-| R12 | Сонгосон Annex A бүрийн SoA: Тийм/Үгүй/Хэсэгчилсэн, тайлбар/үндэслэл | х.5 Д8 | 25 control-ын SoA, applicability ба implementation тусдаа талбар | OpenCode/Claude |
+| R09 | ≥5 өөр эрхийн түвшин (RBAC) | х.5 Д8 | бүлэг ба ACL/record rule матриц; 5+ хэрэглэгч; allow/deny шалгалт; screenshot | Deployment агент/Codex |
+| R10 | Хэрэглэгчид үүсгэх | х.5 Д8 | users screenshot, role membership, synthetic demo accounts | Deployment агент |
+| R11 | Хэрэглэгчийн үйлдлийг audit log-д бодитоор бүртгэх | х.5 Д8 | өөр хэрэглэгчийн create/write/approval/read test шаардлагын дагуу; actor/time/model/action | Deployment агент/Codex |
+| R12 | Сонгосон Annex A бүрийн SoA: Тийм/Үгүй/Хэсэгчилсэн, тайлбар/үндэслэл | х.5 Д8 | 25 control-ын SoA, applicability ба implementation тусдаа талбар | OpenCode/Deployment агент |
 | R13 | Нэг нэгдсэн Word эсвэл PDF тайлан, ойролцоогоор 20–30 хуудас | х.5 §6 | бүрэн render/структур/эх сурвалжийн QA | Баг |
 | R14 | Нүүр: байгууллага, багийн гишүүд, огноо | х.5 §6.1 | Formula 5-ын баталгаатай 5 нэр, курс, зөв огноо | Баг |
 | R15 | Тайлангийн дараалал: удиртгал; модуль/ISO; asset; risk; mapping; incident; policies; RBAC/audit/SoA; дүгнэлт; хавсралт/эх сурвалж | х.5 §6 | бүтэцтэй TOC, бүх хэсэг, зураг/хүснэгтийн тайлбар | Баг |
@@ -30,13 +30,13 @@ Odoo Community Edition дээр их сургуулийн бодит нөхцө�
 | R20 | Бүтээл өөрийнх; шууд хуулбарлахгүй; AI хэрэглээг төгсгөлд товч дурдана | х.6 §9 | эх сурвалж, AI assistance disclosure, бодит орчны нотолгоо | Бүгд |
 | R21 | Монгол хэл; техникийн нэр ба Odoo module нэрийг англиар үлдээж болно | х.1 | glossary-д нийцсэн Монгол бичвэр | Бүгд |
 | U01 | Үндсэн biydaalt/management дотор агент хоорондын messages.md, worklog.md, төлөвлөгөө зэрэг файлууд | хэрэглэгч | append-only бүртгэл, ажлын хуваарилалт | Codex |
-| U02 | OpenCode, Claude, Codex хамтран ярилцаж давхцалгүй ажиллах | хэрэглэгч | messages.md, эзэмших замууд, шийдвэрийн мөр | Бүгд |
+| U02 | OpenCode, Deployment агент, Codex хамтран ярилцаж давхцалгүй ажиллах | хэрэглэгч | messages.md, эзэмших замууд, шийдвэрийн мөр | Бүгд |
 | U03 | Шинэ, их сургуультай холбоотой, бодит нөхцөлд ойр кейс | хэрэглэгч | өмнөх семинарын кейсийг хуулбарлаагүй шинэ урсгал | Codex |
 | U04 | Өмнөх лекц, семинарын засаглал/менежментийн ойлголтыг судлах | хэрэглэгч | course-review.md, glossary.md, кейсийн уялдаа | Sophia |
-| U05 | Odoo татаж суулгах, зориулалт, ажиллуулах арга, бүтцийг тайлбарлах | хэрэглэгч | ажиллагаатай service, operations guide, архитектур | Claude/Codex |
-| U06 | Өөрсдийн их сургуулийн систем хөгжүүлэх | хэрэглэгч | campus_university custom module + ISMS integration + функционал/эрхийн шалгалт | Codex/Claude |
+| U05 | Odoo татаж суулгах, зориулалт, ажиллуулах арга, бүтцийг тайлбарлах | хэрэглэгч | ажиллагаатай service, operations guide, архитектур | Deployment агент/Codex |
+| U06 | Өөрсдийн их сургуулийн систем хөгжүүлэх | хэрэглэгч | campus_university custom module + ISMS integration + функционал/эрхийн шалгалт | Codex/Deployment агент |
 | U07 | Баг 5 гишүүнтэй; нэрс өмнөх тайлангаас | хэрэглэгч | team.md ба эх тайлангийн мөр | Sophia |
-| U08 | VM/server reuse policy, registry refresh/search ба reservation | AGENTS.md | environment-audit.md, deployment lease/registry | Claude |
+| U08 | VM/server reuse policy, registry refresh/search ба reservation | AGENTS.md | environment-audit.md, deployment lease/registry | Deployment агент |
 
 ## Зөрүүг шийдсэн тайлбар
 

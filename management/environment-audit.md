@@ -197,11 +197,11 @@ Reclaimable гэдэг нь устгах зөвшөөрөл биш. Нэг ч pr
 | 8080 | `0.0.0.0:8080`, `[::]:8080` LISTEN | Existing `nyoom_local-edge-1`; Odoo энэ портыг булаахгүй |
 | 80, 443 | Listener харагдаагүй | HTTPS/reverse proxy суулгаж туршаагүй |
 
-Listener байхгүй нь порт reserve хийгдсэн гэсэн үг биш. OpenCode/Claude бие даан ажиллаж байгаа тул deployment эзэн ажиллуулахын яг өмнө дахин шалгана. Шинэ stack-ийн network/subnet үүсгээгүй, firewall/NAT тохиргоо өөрчлөөгүй.
+Listener байхгүй нь порт reserve хийгдсэн гэсэн үг биш. OpenCode/Deployment агент бие даан ажиллаж байгаа тул deployment эзэн ажиллуулахын яг өмнө дахин шалгана. Шинэ stack-ийн network/subnet үүсгээгүй, firewall/NAT тохиргоо өөрчлөөгүй.
 
 ## 8. Coordinator ба deployment эзэнд өгөх бодит төлөвлөгөө
 
-1. `management/assignments.md`, `messages.md`-ээр нэг deployment эзнийг эцэслэж, shared state өөрчлөхийн өмнө POLICY-ийн дагуу тохирох шинэ төслийн group reservation-ийг Coordinator зохицуулна. Audit ямар ч group reserve хийгээгүй. Аудитын явцад ownership солигдсон: 10:42:40-ийн assignments snapshot-д deployment нь Claude Code, OpenCode нь dataset/policies гэж бичигдсэн; эцсийн зохицуулалтыг багийн одоогийн заавар шийднэ.
+1. `management/assignments.md`, `messages.md`-ээр нэг deployment эзнийг эцэслэж, shared state өөрчлөхийн өмнө POLICY-ийн дагуу тохирох шинэ төслийн group reservation-ийг Coordinator зохицуулна. Audit ямар ч group reserve хийгээгүй. Аудитын явцад ownership солигдсон: 10:42:40-ийн assignments snapshot-д deployment нь Deployment агент, OpenCode нь dataset/policies гэж бичигдсэн; эцсийн зохицуулалтыг багийн одоогийн заавар шийднэ.
 2. Existing Docker/Compose-ийг ашиглана. Ubuntu VM/ISO/container-ийг дахин татаж эхлэх шаардлага одоогоор байхгүй; standalone Odoo official image дотроо application dependencies-тэй [S1].
 3. Тусдаа Compose project name, шинэ network, шинэ PostgreSQL data, шинэ Odoo filestore ашиглана. 29 existing volume болон Cygnus/Beebee/Lab7 evidence-ийг холбохгүй. Код, compose, README нь бие даалтын `odoo/` дотор байрлана; mutable data-д `/data/sembee/` дотор шинэ assignment-owned directory сонгоно. Эдгээр замыг аудит үүсгээгүй.
 4. Odoo 18 Community хувилбар нь боломжит суурь. Local PostgreSQL 16 image-ийг эхлээд reuse candidate гэж үзнэ; deploy хийхдээ origin/digest/update болон Odoo/OCA module compatibility-г баталгаажуулна. Official Odoo 18 image local-д байхгүй тул зөвхөн сонгосон application image-ийн download/build шаардлага үлдэнэ. Энэ аудит download хийгээгүй.
