@@ -31,6 +31,10 @@
                             <field name="channel_summary" readonly="1" force_save="1"/>
                         </group>
                     </group>
+                    <div class="alert alert-warning" role="alert" invisible="not sod_warnings">
+                        <strong>Үүргийн тусгаарлалтын зөрчил:</strong>
+                        <field name="sod_warnings" readonly="1" force_save="1" nolabel="1"/>
+                    </div>
                     <div class="alert alert-info" role="status" invisible="not user_id">
                         Эрхийг тухайн хэрэглэгчийн нэрээр бодитоор тооцоолсон: эрхийн бүлэг, хандах эрх,
                         бичлэгийн дүрэм бүгд орсон. Энэ хуудсыг зөвхөн эрх өөрчлөх эрхтэй ажилтан харна.
@@ -51,6 +55,7 @@
                                     <field name="visible_count" force_save="1"/>
                                     <field name="writable_count" force_save="1"/>
                                     <field name="total_count" force_save="1"/>
+                                    <field name="granted_by" optional="show" force_save="1"/>
                                 </list>
                             </field>
                         </page>

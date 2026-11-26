@@ -75,3 +75,56 @@ class TestAccessReview(TransactionCase):
         review = self.Review.create({'user_id': self.admin_mgr.id})
         with self.assertRaises(UserError):
             review.action_apply_groups()
+
+
+@tagged('post_install', '-at_install', 'university_access_review')
+class TestAccessGovernance(TransactionCase):
+    """GOV-05 давуу эрх, GOV-02 үүргийн тусгаарлалт, WF-06 эрхийн эх сурвалж."""
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        env = cls.env
+        cls.rights_mgr = new_test_user(env, 't_gov_rights', password=PASS,
+                                       groups='base.group_user,base.group_erp_manager')
+        cls.sysadmin = new_test_user(env, 't_gov_sys', password=PASS,
+                                     groups='base.group_user,base.group_system')
+        cls.target = new_test_user(env, 't_gov_target', password=PASS,
+                                   groups='university_isms.group_isms_auditor')
+        cls.ciso = new_test_user(env, 't_gov_ciso', password=PASS,
+                                 groups='university_isms.group_isms_manager')
+
+    def _review(self, as_user, user):
+        return self.env['access.review'].with_user(as_user).create({'user_id': user.id})
+
+    def _grant(self, review, xmlid, value=True):
+        group = self.env.ref(xmlid)
+        review.group_line_ids.filtered(lambda l: l.group_id == group).granted = value
+
+    def test_privileged_grant_requires_system_admin(self):
+        review = self._review(self.rights_mgr, self.target)
+        self._grant(review, 'base.group_erp_manager')
+        with self.assertRaises(AccessError):
+            review.action_apply_groups()
+        self.assertFalse(self.target.has_group('base.group_erp_manager'))
+        review = self._review(self.sysadmin, self.target)
+        self._grant(review, 'base.group_erp_manager')
+        review.action_apply_groups()
+        self.assertTrue(self.target.has_group('base.group_erp_manager'))
+
+    def test_sod_conflict_blocked(self):
+        review = self._review(self.rights_mgr, self.target)
+        self._grant(review, 'university_isms.group_isms_analyst')
+        with self.assertRaises(UserError):
+            review.action_apply_groups()
+        self.assertFalse(self.target.has_group('university_isms.group_isms_analyst'))
+
+    def test_ciso_is_not_flagged(self):
+        review = self._review(self.rights_mgr, self.ciso)
+        self.assertFalse(review.sod_warnings)
+
+    def test_acl_source_is_explained(self):
+        review = self._review(self.rights_mgr, self.target)
+        line = review.model_line_ids.filtered(lambda l: l.model == 'isms.audit.log')
+        self.assertTrue(line.can_read)
+        self.assertIn(self.env.ref('university_isms.group_isms_auditor').name, line.granted_by)

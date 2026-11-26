@@ -1,0 +1,341 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <t t-name="formula_control_explorer.Explorer">
+        <Layout display="{ controlPanel: {} }" className="'o_formula_control_explorer'">
+            <div class="fce">
+                <header class="fce-header">
+                    <div class="fce-title">
+                        <h1 class="fce-h1">ISO Control Explorer</h1>
+                        <p class="fce-sub">Annex A 93 хяналт: сонгосон байдал, хэрэгжилт, холбоос, тооцсон шалгалт.</p>
+                    </div>
+                    <div class="fce-toolbar">
+                        <button type="button" class="fce-btn" t-att-disabled="state.loading"
+                                t-on-click="() => this.load()">Шинэчлэх</button>
+                    </div>
+                </header>
+
+                <!-- Filter bar -->
+                <section class="fce-filters" role="search" aria-label="Хяналтын шүүлтүүр">
+                    <div class="fce-field fce-field-search">
+                        <label class="fce-label" for="fce-search">Хайх (код, нэр)</label>
+                        <input id="fce-search" type="search" class="fce-input" autocomplete="off"
+                               placeholder="Жишээ: 5.15 эсвэл нэвтрэлт"
+                               t-att-value="state.filters.search"
+                               t-on-input="(ev) => this.onSearchInput(ev)" t-on-keydown="(ev) => this.onSearchKeydown(ev)"/>
+                    </div>
+                    <div class="fce-field">
+                        <label class="fce-label" for="fce-selected">Controls Mapping</label>
+                        <select id="fce-selected" class="fce-select" t-on-change="(ev) => this.onFilterChange('selected', ev)">
+                            <t t-foreach="selectedOptions" t-as="opt" t-key="opt.value">
+                                <option t-att-value="opt.value" t-att-selected="opt.value === state.filters.selected"><t t-esc="opt.label"/></option>
+                            </t>
+                        </select>
+                    </div>
+                    <div class="fce-field">
+                        <label class="fce-label" for="fce-applicable">Хамаарал</label>
+                        <select id="fce-applicable" class="fce-select" t-on-change="(ev) => this.onFilterChange('applicable', ev)">
+                            <t t-foreach="applicableOptions" t-as="opt" t-key="opt.value">
+                                <option t-att-value="opt.value" t-att-selected="opt.value === state.filters.applicable"><t t-esc="opt.label"/></option>
+                            </t>
+                        </select>
+                    </div>
+                    <div class="fce-field">
+                        <label class="fce-label" for="fce-impl">Хэрэгжилт</label>
+                        <select id="fce-impl" class="fce-select" t-on-change="(ev) => this.onFilterChange('implementation', ev)">
+                            <t t-foreach="implementationOptions" t-as="opt" t-key="opt.value">
+                                <option t-att-value="opt.value" t-att-selected="opt.value === state.filters.implementation"><t t-esc="opt.label"/></option>
+                            </t>
+                        </select>
+                    </div>
+                    <div class="fce-field">
+                        <label class="fce-label" for="fce-owner">Хариуцагч</label>
+                        <select id="fce-owner" class="fce-select" t-on-change="(ev) => this.onFilterChange('owner_id', ev)">
+                            <option value="0" t-att-selected="!state.filters.owner_id">Бүгд</option>
+                            <t t-foreach="options.owners" t-as="owner" t-key="owner.id">
+                                <option t-att-value="owner.id" t-att-selected="owner.id === state.filters.owner_id"><t t-esc="owner.name"/></option>
+                            </t>
+                        </select>
+                    </div>
+                    <div class="fce-filter-actions">
+                        <label class="fce-check">
+                            <input type="checkbox" t-att-checked="state.filters.new_2022" t-on-change="(ev) => this.onNewToggle(ev)"/>
+                            <span>2022 оны шинэ</span>
+                        </label>
+                        <button type="button" class="fce-btn fce-btn-ghost" t-att-disabled="!hasFilters or state.loading"
+                                t-on-click="() => this.resetFilters()">Шүүлтүүр цэвэрлэх</button>
+                    </div>
+                </section>
+
+                <!-- Theme chips -->
+                <div class="fce-chips" role="group" aria-label="Сэдвээр шүүх" t-if="summary">
+                    <button type="button" t-att-aria-pressed="state.filters.theme === '' ? 'true' : 'false'"
+                            t-att-class="state.filters.theme === '' ? 'fce-chip is-active' : 'fce-chip'"
+                            t-on-click="() => this.selectTheme('')">
+                        <span>Бүгд</span> <span class="fce-chip-count" t-esc="summary.theme_all"/>
+                    </button>
+                    <t t-foreach="summary.by_theme" t-as="theme" t-key="theme.key">
+                        <button type="button"
+                                t-att-class="state.filters.theme === theme.key ? 'fce-chip is-active' : 'fce-chip'"
+                                t-att-aria-pressed="state.filters.theme === theme.key ? 'true' : 'false'"
+                                t-on-click="() => this.selectTheme(theme.key)">
+                            <span t-esc="theme.label"/> <span class="fce-chip-count" t-esc="theme.count"/>
+                        </button>
+                    </t>
+                </div>
+
+                <!-- Summary -->
+                <section class="fce-summary" t-if="summary" aria-label="Хураангуй">
+                    <div class="fce-stat">
+                        <span class="fce-stat-label">Каталог</span>
+                        <span class="fce-stat-value" t-esc="summary.catalog"/>
+                    </div>
+                    <div class="fce-stat">
+                        <span class="fce-stat-label">Шүүлтүүрт таарсан</span>
+                        <span class="fce-stat-value" t-esc="summary.matching"/>
+                    </div>
+                    <div class="fce-stat">
+                        <span class="fce-stat-label">Сонгосон</span>
+                        <span class="fce-stat-value" t-esc="summary.selected"/>
+                    </div>
+                    <div class="fce-stat">
+                        <span class="fce-stat-label">Хэрэгжсэн</span>
+                        <span class="fce-stat-value fce-tone-text-success" t-esc="implementedCount"/>
+                    </div>
+                </section>
+
+                <div class="fce-body">
+                    <div class="fce-list">
+                        <!-- Loading skeleton (first load) -->
+                        <div t-if="state.loading and !state.data" class="fce-skeleton" role="status"
+                             aria-live="polite" aria-busy="true" aria-label="Ачаалж байна">
+                            <div class="fce-skel-row"></div>
+                            <div class="fce-skel-row"></div>
+                            <div class="fce-skel-row"></div>
+                            <div class="fce-skel-row"></div>
+                        </div>
+
+                        <!-- Catalog error -->
+                        <div t-if="state.error" class="fce-state fce-state-error" role="alert">
+                            <p class="fce-state-title">Хяналтын жагсаалтыг ачаалж чадсангүй.</p>
+                            <p class="fce-muted">Сүлжээ эсвэл эрхээ шалгаад дахин оролдоно уу.</p>
+                            <button type="button" class="fce-btn" t-on-click="() => this.load()">Дахин оролдох</button>
+                        </div>
+
+                        <!-- Unavailable (no read access) -->
+                        <div t-if="state.data and !state.data.available" class="fce-state" role="status">
+                            <p class="fce-state-title" t-esc="state.data.reason"/>
+                        </div>
+
+                        <t t-if="state.data and state.data.available and !state.error">
+                            <div class="fce-table-wrap" t-att-aria-busy="state.loading ? 'true' : 'false'">
+                                <p class="fce-hint" t-if="items.length">
+                                    Сум товчоор мөр солих, Enter дээр дэлгэрэнгүй нээх.
+                                    <span class="fce-muted">Олдсон: <t t-esc="state.data.total"/></span>
+                                </p>
+                                <table class="fce-table" aria-label="ISO хяналтын жагсаалт" t-if="items.length">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">Annex A</th>
+                                            <th scope="col">Хяналт</th>
+                                            <th scope="col">Сонгосон</th>
+                                            <th scope="col">Хэрэгжилт</th>
+                                            <th scope="col">Хариуцагч</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody t-ref="tbody">
+                                        <t t-foreach="items" t-as="item" t-key="item.id">
+                                            <tr data-row="1" role="row"
+                                                t-att-class="state.selectedId === item.id ? 'fce-row is-open' : 'fce-row'"
+                                                t-att-tabindex="item_index === state.activeIndex ? 0 : -1"
+                                                t-att-aria-selected="state.selectedId === item.id ? 'true' : 'false'"
+                                                t-on-click="(ev) => this.openDetail(item, ev.currentTarget)"
+                                                t-on-keydown="(ev) => this.onRowKeydown(ev, item_index)"
+                                                t-on-focus="() => this.onRowFocus(item_index)">
+                                                <td data-label="Annex A">
+                                                    <span class="fce-code">A.<t t-esc="item.code"/></span>
+                                                </td>
+                                                <td data-label="Хяналт">
+                                                    <div class="fce-ctrl-name" t-esc="item.name_mn || item.name"/>
+                                                    <div class="fce-muted fce-ctrl-en" t-if="item.name_mn" t-esc="item.name"/>
+                                                    <div class="fce-tags">
+                                                        <span class="fce-tag" t-esc="item.theme_label"/>
+                                                        <span t-if="item.is_new_2022" class="fce-tag">2022 шинэ</span>
+                                                        <span t-if="!item.applicable" class="fce-tag fce-tag-muted">Хамааралгүй</span>
+                                                        <span t-if="item.gap_implementation" class="fce-tag fce-tag-danger">Саад</span>
+                                                    </div>
+                                                </td>
+                                                <td data-label="Сонгосон">
+                                                    <span t-att-class="item.selected ? 'fce-badge fce-tone-success' : 'fce-badge fce-tone-neutral'"
+                                                          t-esc="item.selected ? 'Тийм' : 'Үгүй'"/>
+                                                </td>
+                                                <td data-label="Хэрэгжилт">
+                                                    <span t-att-class="'fce-badge fce-tone-' + implementationTone(item.implementation, item.selected)"
+                                                          t-esc="item.implementation_label"/>
+                                                </td>
+                                                <td data-label="Хариуцагч">
+                                                    <span t-if="item.owner" t-esc="item.owner.name"/>
+                                                    <span t-else="" class="fce-muted">Оноогоогүй</span>
+                                                </td>
+                                            </tr>
+                                        </t>
+                                    </tbody>
+                                </table>
+
+                                <div t-if="!items.length and !state.loading" class="fce-state" role="status">
+                                    <p class="fce-state-title">Тохирох хяналт олдсонгүй.</p>
+                                    <p class="fce-muted">Хайлтын үгээ өөрчилж эсвэл шүүлтүүрээ цэвэрлэж үзнэ үү.</p>
+                                    <button type="button" class="fce-btn fce-btn-ghost" t-att-disabled="!hasFilters"
+                                            t-on-click="() => this.resetFilters()">Шүүлтүүр цэвэрлэх</button>
+                                </div>
+                                <div t-if="state.loading and state.data" class="fce-inline-loading" role="status">Ачаалж байна...</div>
+                            </div>
+                        </t>
+                    </div>
+
+                    <!-- Detail drawer -->
+                    <aside t-if="state.drawerOpen" class="fce-drawer" role="dialog" aria-modal="false"
+                           aria-labelledby="fce-drawer-title" tabindex="-1" t-ref="drawer"
+                           t-on-keydown="(ev) => this.onDrawerKeydown(ev)">
+                        <header class="fce-drawer-head">
+                            <div class="fce-drawer-titles">
+                                <p class="fce-eyebrow" t-if="detailAvailable">A.<t t-esc="detail.control.code"/> · <t t-esc="detail.control.theme_label"/></p>
+                                <h2 id="fce-drawer-title" class="fce-h2" t-if="detailAvailable"><t t-esc="detail.control.name_mn || detail.control.name"/></h2>
+                                <h2 id="fce-drawer-title" class="fce-h2" t-else="">Хяналтын дэлгэрэнгүй</h2>
+                            </div>
+                            <button type="button" class="fce-icon-btn" aria-label="Хаах" t-on-click="() => this.closeDetail()">&#215;</button>
+                        </header>
+
+                        <div t-if="state.detailLoading and !detail" class="fce-skeleton" role="status" aria-busy="true" aria-label="Ачаалж байна">
+                            <div class="fce-skel-row"></div>
+                            <div class="fce-skel-row"></div>
+                            <div class="fce-skel-row"></div>
+                        </div>
+
+                        <div t-if="state.detailError" class="fce-state fce-state-error" role="alert">
+                            <p class="fce-state-title">Дэлгэрэнгүйг ачаалж чадсангүй.</p>
+                            <button type="button" class="fce-btn" t-on-click="() => this.retryDetail()">Дахин оролдох</button>
+                        </div>
+
+                        <div t-if="detail and !detailAvailable" class="fce-state" role="status">
+                            <p class="fce-state-title" t-esc="detail.reason"/>
+                        </div>
+
+                        <t t-if="detailAvailable">
+                            <div class="fce-tabs" role="tablist" aria-label="Дэлгэрэнгүйн хэсэг" t-ref="tablist">
+                                <t t-foreach="tabList" t-as="tab" t-key="tab.key">
+                                    <button type="button" role="tab" class="fce-tab"
+                                            t-att-data-tab="tab.key"
+                                            t-att-id="'fce-tab-' + tab.key"
+                                            t-att-aria-selected="state.tab === tab.key ? 'true' : 'false'"
+                                            t-att-aria-controls="'fce-panel-' + tab.key"
+                                            t-att-tabindex="state.tab === tab.key ? 0 : -1"
+                                            t-att-class="state.tab === tab.key ? 'fce-tab is-active' : 'fce-tab'"
+                                            t-on-click="() => this.selectTab(tab.key)"
+                                            t-on-keydown="(ev) => this.onTabKeydown(ev, tab_index)">
+                                        <t t-esc="tab.label"/>
+                                    </button>
+                                </t>
+                            </div>
+
+                            <!-- SoA -->
+                            <section t-if="state.tab === 'soa'" class="fce-panel" role="tabpanel" id="fce-panel-soa" aria-labelledby="fce-tab-soa" tabindex="0">
+                                <dl class="fce-dl">
+                                    <div><dt>Controls Mapping-д сонгосон</dt>
+                                        <dd><span t-att-class="detail.control.selected ? 'fce-badge fce-tone-success' : 'fce-badge fce-tone-neutral'" t-esc="detail.control.selected ? 'Тийм' : 'Үгүй'"/></dd></div>
+                                    <div><dt>Хамааралтай</dt>
+                                        <dd t-esc="detail.control.applicable ? 'Тийм' : 'Үгүй'"/></div>
+                                    <div><dt>Хэрэгжилт</dt>
+                                        <dd><span t-att-class="'fce-badge fce-tone-' + implementationTone(detail.control.implementation, detail.control.selected)" t-esc="detail.control.implementation_label"/></dd></div>
+                                    <div><dt>Хариуцагч</dt>
+                                        <dd><t t-if="detail.control.owner"><t t-esc="detail.control.owner.name"/></t><t t-else=""><span class="fce-muted">Оноогоогүй</span></t></dd></div>
+                                    <div><dt>2022 оны шинэ</dt>
+                                        <dd t-esc="detail.control.is_new_2022 ? 'Тийм' : 'Үгүй'"/></div>
+                                </dl>
+                                <h3 class="fce-h3">Үндэслэл / тайлбар</h3>
+                                <p t-if="detail.justification.readable" class="fce-text" t-esc="detail.justification.value || 'Бичигдээгүй.'"/>
+                                <p t-else="" class="fce-restricted">Энэ мэдээллийг таны эрх харах боломжгүй.</p>
+                            </section>
+
+                            <!-- Links -->
+                            <section t-if="state.tab === 'links'" class="fce-panel" role="tabpanel" id="fce-panel-links" aria-labelledby="fce-tab-links" tabindex="0">
+                                <t t-foreach="linkSections" t-as="section" t-key="section.key">
+                                    <div class="fce-link-section">
+                                        <div class="fce-link-head">
+                                            <h3 class="fce-h3"><t t-esc="section.label"/> <span class="fce-count" t-esc="section.count"/></h3>
+                                            <button type="button" class="fce-btn fce-btn-sm" t-if="section.available and section.count"
+                                                    t-on-click="() => this.openSectionList(section)">Бүгдийг харах</button>
+                                        </div>
+                                        <p t-if="!section.available" class="fce-restricted" t-esc="section.reason"/>
+                                        <p t-elif="!section.count" class="fce-muted">Холбоотой бичлэг алга.</p>
+                                        <ul t-else="" class="fce-ref-list">
+                                            <t t-foreach="section.records" t-as="ref" t-key="ref.id">
+                                                <li>
+                                                    <button type="button" class="fce-ref" t-on-click="() => this.openRecord(ref)">
+                                                        <span class="fce-ref-code" t-esc="ref.code"/>
+                                                        <span class="fce-ref-name" t-esc="ref.name"/>
+                                                        <span t-if="ref.state_label" class="fce-tag" t-esc="ref.state_label"/>
+                                                        <span t-if="ref.level_label" class="fce-tag" t-esc="ref.level_label"/>
+                                                        <span t-if="ref.severity_label" class="fce-tag" t-esc="ref.severity_label"/>
+                                                        <span t-if="ref.review_overdue" class="fce-tag fce-tag-danger">Хугацаа хэтэрсэн</span>
+                                                    </button>
+                                                </li>
+                                            </t>
+                                        </ul>
+                                    </div>
+                                </t>
+                            </section>
+
+                            <!-- Evidence -->
+                            <section t-if="state.tab === 'evidence'" class="fce-panel" role="tabpanel" id="fce-panel-evidence" aria-labelledby="fce-tab-evidence" tabindex="0">
+                                <h3 class="fce-h3">Нотолгоо</h3>
+                                <p t-if="detail.evidence.readable" class="fce-text" t-esc="detail.evidence.value || 'Нотолгоо бичигдээгүй.'"/>
+                                <p t-else="" class="fce-restricted">Энэ мэдээллийг таны эрх харах боломжгүй.</p>
+
+                                <h3 class="fce-h3">Odoo дахь хэрэгжилт</h3>
+                                <p t-if="detail.odoo_implementation.readable" class="fce-text" t-esc="detail.odoo_implementation.value || 'Бичигдээгүй.'"/>
+                                <p t-else="" class="fce-restricted">Энэ мэдээллийг таны эрх харах боломжгүй.</p>
+
+                                <h3 class="fce-h3">Дахин хянах огноо</h3>
+                                <p class="fce-text" t-esc="detail.next_review.reason"/>
+                                <p t-if="detail.next_review.earliest" class="fce-text">
+                                    Холбоотой бодлогын хамгийн ойрын огноо: <strong t-esc="formatDateValue(detail.next_review.earliest)"/>
+                                </p>
+                            </section>
+
+                            <!-- Findings -->
+                            <section t-if="state.tab === 'findings'" class="fce-panel" role="tabpanel" id="fce-panel-findings" aria-labelledby="fce-tab-findings" tabindex="0">
+                                <p class="fce-disclaimer" t-esc="detail.disclaimer"/>
+                                <div class="fce-finding-counts">
+                                    <span class="fce-badge fce-tone-danger">Саад: <t t-esc="findingsSummary.gap or 0"/></span>
+                                    <span class="fce-badge fce-tone-success">Зөв: <t t-esc="findingsSummary.ok or 0"/></span>
+                                    <span class="fce-badge fce-tone-neutral">Хамаарахгүй: <t t-esc="findingsSummary.na or 0"/></span>
+                                    <span class="fce-badge fce-tone-muted">Шалгах боломжгүй: <t t-esc="findingsSummary.not_evaluated or 0"/></span>
+                                </div>
+                                <ul class="fce-finding-list">
+                                    <t t-foreach="detail.findings" t-as="finding" t-key="finding.key">
+                                        <li t-att-class="'fce-finding fce-tone-border-' + findingTone(finding.status)">
+                                            <div class="fce-finding-head">
+                                                <span class="fce-finding-label" t-esc="finding.label"/>
+                                                <span t-att-class="'fce-badge fce-tone-' + findingTone(finding.status)" t-esc="findingLabel(finding.status)"/>
+                                            </div>
+                                            <p class="fce-muted fce-finding-detail" t-esc="finding.detail"/>
+                                        </li>
+                                    </t>
+                                </ul>
+                            </section>
+
+                            <footer class="fce-drawer-foot">
+                                <p class="fce-muted">Засвар зөвхөн стандарт маягтаар хийгдэнэ.</p>
+                                <button type="button" class="fce-btn fce-btn-primary" t-on-click="() => this.openForm()">Стандарт маягтаар нээх</button>
+                            </footer>
+                        </t>
+
+                        <div t-if="state.detailLoading and detail" class="fce-inline-loading" role="status">Ачаалж байна...</div>
+                    </aside>
+                </div>
+            </div>
+        </Layout>
+    </t>
+
+</templates>

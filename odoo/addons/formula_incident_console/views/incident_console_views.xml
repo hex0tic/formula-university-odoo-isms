@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Консол нь ISMS-ийн бүх эрхийн түвшинд нээгдэнэ (menu_isms_root нь group_isms_reporter-ээр хязгаарлагдана).
+         Жагсаалт, дэлгэрэнгүй, шилжилт бүр серверийн ORM эрхээр шүүгдэнэ. -->
+    <record id="action_formula_incident_console" model="ir.actions.client">
+        <field name="name">Incident Console</field>
+        <field name="tag">formula_incident_console</field>
+    </record>
+
+    <menuitem id="menu_formula_incident_console" name="Incident Console"
+              parent="university_isms.menu_isms_root" sequence="8"
+              action="action_formula_incident_console"
+              groups="university_isms.group_isms_reporter"/>
+</odoo>
