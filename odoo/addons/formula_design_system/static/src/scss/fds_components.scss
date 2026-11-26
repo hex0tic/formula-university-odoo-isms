@@ -224,4 +224,35 @@
     .o_notification {
         border-radius: var(--fds-radius-md, 10px);
     }
+
+    // Odoo's bootstrap success badge (white on #28A745, 3.1:1) falls below WCAG AA for small text.
+    .text-bg-success {
+        background-color: var(--fds-success-fill, #0F766E) !important;
+    }
+
+    // Odoo's btn-success (white on #28A745, 3.1:1) gets the same accessible success fill as the badge.
+    .btn-success {
+        background-color: var(--fds-success-fill, #0F766E) !important;
+        border-color: var(--fds-success-fill, #0F766E) !important;
+    }
+
+    // Odoo's translucent arrow-button labels (4.3:1) get the text-muted token.
+    .o_statusbar_status .btn.o_arrow_button {
+        color: var(--fds-text-muted, #475569) !important;
+    }
+
+    // Form labels: Odoo's default grey (#8F8F8F) is 3.2:1 on white.
+    .o_form_label {
+        color: var(--fds-text-muted, #475569) !important;
+    }
+
+    // Chatter tracking values use Bootstrap's info tone (4.3:1 on the chatter background).
+    .text-info {
+        color: #075E79 !important;
+    }
+
+    // Odoo's text-muted is a translucent grey (4.3:1 on white); use the token that meets 4.5:1.
+    .text-muted {
+        color: var(--fds-text-muted, #475569) !important;
+    }
 }

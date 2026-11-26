@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ISMS туслах: client action. Бүх хэрэглэгч (reporter+) өөрийн харах эрхээр. -->
+    <record id="action_formula_isms_copilot" model="ir.actions.client">
+        <field name="name">ISMS туслах</field>
+        <field name="tag">formula_isms_copilot</field>
+    </record>
+
+    <menuitem id="menu_formula_isms_copilot" name="ISMS туслах"
+              parent="university_isms.menu_isms_root" sequence="9"
+              action="action_formula_isms_copilot"
+              groups="university_isms.group_isms_reporter"/>
+
+    <!-- Аудитын лог: зөвхөн аудитор / CISO -->
+    <record id="view_formula_copilot_query_log_list" model="ir.ui.view">
+        <field name="name">formula.copilot.query.log.list</field>
+        <field name="model">formula.copilot.query.log</field>
+        <field name="arch" type="xml">
+            <list string="ISMS туслахын асуултын лог" create="0" edit="0" delete="0">
+                <field name="queried_at"/>
+                <field name="login"/>
+                <field name="action_type"/>
+                <field name="question_excerpt"/>
+                <field name="scope_keys"/>
+                <field name="engine"/>
+                <field name="record_count"/>
+                <field name="refused"/>
+                <field name="fallback_reason" optional="hide"/>
+                <field name="question_hash" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_formula_copilot_query_log" model="ir.actions.act_window">
+        <field name="name">ISMS туслахын асуултын лог</field>
+        <field name="res_model">formula.copilot.query.log</field>
+        <field name="view_mode">list</field>
+    </record>
+
+    <menuitem id="menu_formula_copilot_query_log" name="ISMS туслахын лог"
+              parent="university_isms.menu_isms_root" sequence="75"
+              action="action_formula_copilot_query_log"
+              groups="university_isms.group_isms_auditor"/>
+
+    <!-- Admin тохиргоо: Settings > ISMS туслах (base.group_system) -->
+    <record id="res_config_settings_view_form_formula_isms_copilot" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.formula.isms.copilot</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form" position="inside">
+                <app data-string="ISMS туслах" string="ISMS туслах" name="formula_isms_copilot"
+                     groups="base.group_system">
+                    <block title="Гадаад LLM провайдер (анхдагчаар унтраалттай)" name="formula_isms_copilot_external">
+                        <setting id="formula_isms_copilot_external_enabled"
+                                 string="Гадаад провайдер"
+                                 help="Идэвхжүүлбэл зөвхөн хэрэглэгчийн харах эрхтэй, маскласан эх сурвалжийг илгээнэ. Алдаа гарвал дотоод хөдөлгүүр ашиглана.">
+                            <field name="formula_isms_copilot_external_enabled"/>
+                        </setting>
+                        <setting id="formula_isms_copilot_endpoint" string="Endpoint URL"
+                                 help="https:// -ээр эхлэх chat completions HTTP endpoint.">
+                            <field name="formula_isms_copilot_endpoint_url" placeholder="https://provider.example/v1/chat/completions"/>
+                        </setting>
+                        <setting id="formula_isms_copilot_model" string="Загварын нэр">
+                            <field name="formula_isms_copilot_model_name"/>
+                        </setting>
+                        <setting id="formula_isms_copilot_secret_ref" string="Нууцийн лавлагаа"
+                                 help="Нууцийн утгыг энд бүү оруулна. Орчны хувьсагчийн нэр эсвэл системийн параметрийн түлхүүр.">
+                            <field name="formula_isms_copilot_secret_ref" placeholder="ISMS_COPILOT_KEY"/>
+                        </setting>
+                        <setting id="formula_isms_copilot_policy_ack" string="Өгөгдлийн бодлого"
+                                 help="Гадаад провайдерт өгөгдөл илгээх бодлогыг батлах шаардлагатай.">
+                            <field name="formula_isms_copilot_data_policy_ack"/>
+                        </setting>
+                        <setting id="formula_isms_copilot_timeout" string="Хүлээх хугацаа (сек)">
+                            <field name="formula_isms_copilot_timeout_seconds"/>
+                        </setting>
+                        <setting id="formula_isms_copilot_retention" string="Логын хадгалах хугацаа (өдөр)">
+                            <field name="formula_isms_copilot_log_retention_days"/>
+                        </setting>
+                    </block>
+                </app>
+            </xpath>
+        </field>
+    </record>
+</odoo>

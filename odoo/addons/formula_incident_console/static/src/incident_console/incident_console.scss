@@ -300,9 +300,9 @@
         color: var(--fic-muted);
         font-variant-numeric: tabular-nums;
 
-        &.fic-tone-danger { color: var(--fic-danger); }
-        &.fic-tone-warning { color: var(--fic-warning); }
-        &.fic-tone-ok { color: var(--fic-success); }
+        &.fic-tone-danger { color: var(--fds-danger-text, #B91C1C); }
+        &.fic-tone-warning { color: var(--fds-warning-text, #92400E); }
+        &.fic-tone-ok { color: var(--fds-success-text, #0F766E); }
     }
 
     .fic-state {

@@ -16,6 +16,9 @@
         --fgs-primary-text: var(--fds-primary-text, #ffffff);
         --fgs-primary-soft: var(--fds-primary-soft, #e4eefb);
         --fgs-danger: var(--fds-danger, #b42318);
+        --fgs-danger-text: var(--fds-danger-text, #b42318);
+        --fgs-success-text: var(--fds-success-text, #1d7a46);
+        --fgs-warning-text: var(--fds-warning-text, #9a5b00);
         --fgs-danger-soft: var(--fds-danger-soft, #fdecea);
         --fgs-warning: var(--fds-warning, #9a5b00);
         --fgs-warning-soft: var(--fds-warning-soft, #fff4e0);
@@ -163,8 +166,8 @@
             background: var(--fgs-surface-raised);
 
             &.is-pending { background: var(--fgs-primary-soft); color: var(--fgs-text); }
-            &.is-ok { background: var(--fgs-success-soft); color: var(--fgs-success); }
-            &.is-warn { background: var(--fgs-warning-soft); color: var(--fgs-warning); }
+            &.is-ok { background: var(--fgs-success-soft); color: var(--fgs-success-text); }
+            &.is-warn { background: var(--fgs-warning-soft); color: var(--fgs-warning-text); }
             &.is-muted { color: var(--fgs-text-muted); }
         }
 
@@ -189,10 +192,10 @@
             &--primary {
                 background: var(--fgs-primary);
                 border-color: var(--fgs-primary);
-                color: var(--fgs-primary-text);
+                color: #FFFFFF;
             }
             &--danger {
-                color: var(--fgs-danger);
+                color: var(--fgs-danger-text);
                 border-color: var(--fgs-danger);
             }
         }
@@ -212,7 +215,7 @@
             padding: 16px 0;
             margin: 0;
         }
-        .fgs-error-text { color: var(--fgs-danger); margin: 6px 0 0; font-weight: 600; }
+        .fgs-error-text { color: var(--fgs-danger-text); margin: 6px 0 0; font-weight: 600; }
 
         .fgs-card { display: flex; flex-direction: column; gap: 16px; }
         .fgs-detail-head {
@@ -256,8 +259,8 @@
             font-size: 1.5rem;
             font-weight: 700;
             color: var(--fgs-text);
-            &.is-up { color: var(--fgs-success); }
-            &.is-down { color: var(--fgs-danger); }
+            &.is-up { color: var(--fgs-success-text); }
+            &.is-down { color: var(--fgs-danger-text); }
         }
 
         .fgs-meta {

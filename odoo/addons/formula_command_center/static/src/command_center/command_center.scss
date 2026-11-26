@@ -254,7 +254,7 @@
     .fcc-link {
         border: 0;
         background: none;
-        color: var(--fcc-primary);
+        color: var(--fds-primary-text, var(--fcc-primary)); // text-safe link tone (dark: 7.7:1)
         cursor: pointer;
         padding: 0;
         font-size: 13px;

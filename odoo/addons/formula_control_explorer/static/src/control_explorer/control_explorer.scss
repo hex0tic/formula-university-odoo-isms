@@ -10,19 +10,19 @@ $fce-bp-phone: 640px;
     --fce-primary-ink: #FFFFFF;
     --fce-bg: var(--fds-bg, #F8FAFC);
     --fce-surface: var(--fds-surface, #FFFFFF);
-    --fce-surface-alt: #F1F5F9;
+    --fce-surface-alt: var(--fds-bg-muted, #F1F5F9);
     --fce-text: var(--fds-text, #0F172A);
     --fce-muted: var(--fds-text-muted, #64748B);
     --fce-border: var(--fds-border, #E2E8F0);
     --fce-success: var(--fds-success, #0D9488);
-    --fce-success-bg: #CCFBF1;
-    --fce-success-ink: #115E59;
+    --fce-success-bg: var(--fds-success-soft, #CCFBF1);
+    --fce-success-ink: var(--fds-success-text, #115E59);
     --fce-warning: var(--fds-warning, #F59E0B);
-    --fce-warning-bg: #FEF3C7;
-    --fce-warning-ink: #92400E;
+    --fce-warning-bg: var(--fds-warning-soft, #FEF3C7);
+    --fce-warning-ink: var(--fds-warning-text, #92400E);
     --fce-danger: var(--fds-danger, #EF4444);
-    --fce-danger-bg: #FEE2E2;
-    --fce-danger-ink: #991B1B;
+    --fce-danger-bg: var(--fds-danger-soft, #FEE2E2);
+    --fce-danger-ink: var(--fds-danger-text, #991B1B);
     --fce-focus: var(--fds-focus, #635BFF);
     --fce-radius: var(--fds-radius, 12px);
     --fce-radius-sm: 8px;
@@ -318,7 +318,7 @@ $fce-bp-phone: 640px;
             color: var(--fce-primary-ink);
 
             .fce-chip-count {
-                background: rgba(255, 255, 255, 0.22);
+                background: rgba(0, 0, 0, 0.28);
                 color: var(--fce-primary-ink);
             }
         }
@@ -368,7 +368,7 @@ $fce-bp-phone: 640px;
     }
 
     .fce-tone-text-success {
-        color: var(--fce-success);
+        color: var(--fds-success-text, #0F766E);
     }
 
     // ---------------------------------------------------------- body layout
