@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="plan_audit_chain_integrity" model="isms.control.test.plan">
+            <field name="name">Аудит гинжийн бүрэн бүтэн байдал (hash chain)</field>
+            <field name="control_id" ref="university_isms.control_8_15"/>
+            <field name="method">automated</field>
+            <field name="check_key">audit_chain_integrity</field>
+            <field name="frequency">daily</field>
+            <field name="description">Аудит логийн гинжийг бүрэн шалгана. Зөвхөн унших. Эвдэрсэн бол эвдэрсэн seq-ийг дурдана.</field>
+        </record>
+    </data>
+</odoo>

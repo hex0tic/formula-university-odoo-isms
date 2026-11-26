@@ -177,6 +177,24 @@ def check_evidence_freshness(env):
     return (FAIL if expired else PASS, details, {'expired_evidence': expired})
 
 
+def check_audit_chain_integrity(env):
+    """Scope: university_isms_audit_chain суулгагдсан үед isms.audit.log-ийн hash гинжийг бүрэн
+    шалгана (seq дараалал, prev_hash холбоос, entry_hash, толгойн харьцуулалт). Зөвхөн унших.
+    Эвдрэлтэй бол эвдэрсэн seq ба шалтгааныг дурдана (хэш утга гаргахгүй). Аддон суулгаагүй бол
+    not_applicable; энэ модуль тэр аддоноос хамаардаггүй."""
+    if 'isms.audit.chain.head' not in env.registry or 'isms.audit.log' not in env.registry:
+        return (NOT_APPLICABLE, 'Аудит гинжийн аддон суулгагдаагүй.', {})
+    result = env['isms.audit.log'].sudo()._verify_chain()
+    checked = int(result.get('checked') or 0)
+    if result.get('ok'):
+        if not checked:
+            return (NOT_APPLICABLE, 'Гинжинд бичлэг байхгүй.', {'checked': 0})
+        return (PASS, 'Аудит гинж бүрэн: %d бичлэг.' % checked, {'checked': checked})
+    broken = int(result.get('broken_seq') or 0)
+    details = 'Аудит гинж эвдэрсэн: seq=%s. Шалтгаан: %s' % (broken or '-', result.get('reason') or '')
+    return (FAIL, details, {'checked': checked, 'broken_seq': broken})
+
+
 CHECKS = {spec.key: spec for spec in (
     CheckSpec('privileged_no_totp', 'Давуу эрхтэй хэрэглэгч TOTP-гүй', 'high', 'Annex A 8.5',
               'Давуу эрхтэй группийн идэвхтэй хэрэглэгчдээс TOTP идэвхгүйг тоолно (auth_totp байвал).',
@@ -199,6 +217,9 @@ CHECKS = {spec.key: spec for spec in (
     CheckSpec('evidence_freshness', 'Нотолгооны хугацаа дууссан', 'medium', 'Annex A 5.33',
               'isms.evidence байвал хугацаа дууссан батлагдсан нотолгоо. Байхгүй бол хамааралгүй.',
               check_evidence_freshness),
+    CheckSpec('audit_chain_integrity', 'Аудит гинжийн бүрэн бүтэн байдал', 'high', 'Annex A 8.15',
+              'university_isms_audit_chain суулгагдсан үед аудит логийн hash гинжийг бүтнээр шалгана. Суулгаагүй бол хамааралгүй.',
+              check_audit_chain_integrity),
 )}
 
 

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Хэрэглэгчийн өөрийн цэс: хүсэлт гаргах, хянах мөр -->
+    <menuitem id="menu_access_governance_root" name="Эрхийн хүсэлт ба тойм" sequence="95"
+              groups="base.group_user"/>
+    <menuitem id="menu_access_request_mine" name="Миний хүсэлтүүд" parent="menu_access_governance_root"
+              action="action_access_request_mine" sequence="10"/>
+    <menuitem id="menu_access_recert_mine" name="Миний хянах мөрүүд" parent="menu_access_governance_root"
+              action="action_access_recert_line_mine" sequence="20"/>
+    <menuitem id="menu_access_recert_campaign_ops" name="Кампанит ажлууд" parent="menu_access_governance_root"
+              action="action_access_recert_campaign" sequence="30"
+              groups="base.group_erp_manager,university_isms.group_isms_auditor,university_isms.group_isms_manager"/>
+    <menuitem id="menu_access_report_ops" name="Давуу эрхийн тайлан" parent="menu_access_governance_root"
+              action="action_access_gov_report" sequence="40"
+              groups="base.group_erp_manager,university_isms.group_isms_auditor,university_isms.group_isms_manager"/>
+
+    <!-- Админ: Тохиргоо > Хэрэглэгчид ба компаниуд -->
+    <menuitem id="menu_access_recert_settings" name="Эрхийн дахин баталгаажуулалт" parent="base.menu_users"
+              action="action_access_recert_campaign" sequence="40" groups="base.group_system"/>
+    <menuitem id="menu_access_recert_lines_settings" name="Бүх тойм мөр" parent="base.menu_users"
+              action="action_access_recert_line_all" sequence="41" groups="base.group_system"/>
+    <menuitem id="menu_access_request_settings" name="Түр / давуу эрхийн хүсэлт" parent="base.menu_users"
+              action="action_access_request_all" sequence="42" groups="base.group_system"/>
+    <menuitem id="menu_access_report_settings" name="Давуу эрхийн тайлан" parent="base.menu_users"
+              action="action_access_gov_report" sequence="43" groups="base.group_system"/>
+
+    <!-- ISMS аудитор / CISO (зөвхөн унших): Эрхийн засаглал -->
+    <menuitem id="menu_isms_access_governance" name="Эрхийн засаглал" parent="university_isms.menu_isms_root"
+              sequence="60" groups="university_isms.group_isms_auditor,university_isms.group_isms_manager"/>
+    <menuitem id="menu_isms_access_campaigns" name="Дахин баталгаажуулалт" parent="menu_isms_access_governance"
+              action="action_access_recert_campaign" sequence="10"/>
+    <menuitem id="menu_isms_access_requests" name="Түр / давуу эрхийн хүсэлт" parent="menu_isms_access_governance"
+              action="action_access_request_all" sequence="20"/>
+    <menuitem id="menu_isms_access_report" name="Давуу эрхийн тайлан" parent="menu_isms_access_governance"
+              action="action_access_gov_report" sequence="30"/>
+</odoo>

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <record id="ir_cron_access_recert_recurring" model="ir.cron">
+        <field name="name">Эрхийн тойм: дараагийн кампанитыг давтамжаар үүсгэх</field>
+        <field name="model_id" ref="model_access_recert_campaign"/>
+        <field name="state">code</field>
+        <field name="code">model._cron_create_recurring()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="user_id" ref="base.user_root"/>
+        <field name="active" eval="True"/>
+    </record>
+    <record id="ir_cron_access_recert_escalate" model="ir.cron">
+        <field name="name">Эрхийн тойм: хугацаа хэтэрсэн мөрийг эскалац хийх</field>
+        <field name="model_id" ref="model_access_recert_line"/>
+        <field name="state">code</field>
+        <field name="code">model._cron_escalate_overdue()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="user_id" ref="base.user_root"/>
+        <field name="active" eval="True"/>
+    </record>
+    <record id="ir_cron_access_request_grants" model="ir.cron">
+        <field name="name">Түр эрх: батлагдсаныг идэвхжүүлж, хугацаа дууссаныг хасах</field>
+        <field name="model_id" ref="model_access_request"/>
+        <field name="state">code</field>
+        <field name="code">model._cron_process_grants()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">hours</field>
+        <field name="user_id" ref="base.user_root"/>
+        <field name="active" eval="True"/>
+    </record>
+</odoo>

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <!-- Хоосон бол зөвхөн сануулна. YYYY-MM-DD огноо тавибал тэр өдрөөс step-up хориг идэвхжинэ. -->
+    <record id="param_enforce_date" model="ir.config_parameter">
+        <field name="key">university_mfa_policy.enforce_date</field>
+        <field name="value"></field>
+    </record>
+</odoo>

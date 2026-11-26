@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Record rules: нэг хэрэглэгч зөвхөн өөрийн мөр/хүсэлтийг харна (GOV-01, GOV-03, GOV-05).
+     Давхардсан дүрмүүд (бүлгүүдээр OR-лагдана): удирдлага бүгдийг, ажилтан зөвхөн өөрийнхөө. -->
+<odoo>
+    <record id="rule_recert_campaign_managers" model="ir.rule">
+        <field name="name">Кампанит ажил: удирдлага ба аудитор бүгдийг харна</field>
+        <field name="model_id" ref="model_access_recert_campaign"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('base.group_erp_manager')), (4, ref('university_isms.group_isms_auditor')), (4, ref('university_isms.group_isms_manager'))]"/>
+    </record>
+    <record id="rule_recert_campaign_reviewer" model="ir.rule">
+        <field name="name">Кампанит ажил: хянагч зөвхөн өөрийн мөртэй кампанитыг харна</field>
+        <field name="model_id" ref="model_access_recert_campaign"/>
+        <field name="domain_force">[('line_ids.reviewer_id', '=', user.id)]</field>
+        <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+    </record>
+
+    <record id="rule_recert_line_managers" model="ir.rule">
+        <field name="name">Тойм мөр: удирдлага ба аудитор бүгдийг харна</field>
+        <field name="model_id" ref="model_access_recert_line"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('base.group_erp_manager')), (4, ref('university_isms.group_isms_auditor')), (4, ref('university_isms.group_isms_manager'))]"/>
+    </record>
+    <record id="rule_recert_line_reviewer" model="ir.rule">
+        <field name="name">Тойм мөр: хянагч зөвхөн өөрт томилогдсон мөрийг харна</field>
+        <field name="model_id" ref="model_access_recert_line"/>
+        <field name="domain_force">[('reviewer_id', '=', user.id)]</field>
+        <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <record id="rule_access_request_managers" model="ir.rule">
+        <field name="name">Хүсэлт: удирдлага ба аудитор бүгдийг харна</field>
+        <field name="model_id" ref="model_access_request"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('base.group_erp_manager')), (4, ref('university_isms.group_isms_auditor')), (4, ref('university_isms.group_isms_manager'))]"/>
+    </record>
+    <record id="rule_access_request_requester" model="ir.rule">
+        <field name="name">Хүсэлт: хэрэглэгч зөвхөн өөрийн гаргасан хүсэлтийг харна</field>
+        <field name="model_id" ref="model_access_request"/>
+        <field name="domain_force">[('requester_id', '=', user.id)]</field>
+        <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+    </record>
+</odoo>
