@@ -1,0 +1,227 @@
+// Formula Design System - surgical restyling of Odoo 18 backend components.
+// Every selector is scoped to Odoo classes under body.o_web_client. Third-party
+// widgets are not targeted. Colors come from --fds-* tokens with light fallbacks.
+
+// ---------------------------------------------------------------------------
+// Top navbar
+// ---------------------------------------------------------------------------
+.o_web_client .o_main_navbar {
+    --NavBar-entry-color: var(--fds-navbar-text, #E2E8F0);
+    // Odoo paints app menu entries with the brand purple; keep them on the navbar surface.
+    --NavBar-entry-backgroundColor: transparent;
+    --NavBar-entry-backgroundColor--hover: rgba(255, 255, 255, 0.08);
+    --NavBar-entry-backgroundColor--focus: rgba(255, 255, 255, 0.12);
+    --NavBar-entry-backgroundColor--active: rgba(255, 255, 255, 0.14);
+    --NavBar-entry-color--hover: #FFFFFF;
+    --NavBar-entry-color--active: #FFFFFF;
+    background: var(--fds-navbar-bg, #0F172A);
+    color: var(--fds-navbar-text, #E2E8F0);
+}
+
+// ---------------------------------------------------------------------------
+// Buttons: primary, secondary, outline, danger, icon.
+// Each variant defines default, hover, active, focus-visible and disabled.
+// ---------------------------------------------------------------------------
+.o_web_client {
+    .btn-primary {
+        --fds-btn-bg: var(--fds-primary, #635BFF);
+        background-color: var(--fds-btn-bg);
+        border-color: var(--fds-btn-bg);
+        color: #FFFFFF;
+        transition: background-color var(--fds-duration-fast, 150ms) var(--fds-ease, ease),
+            border-color var(--fds-duration-fast, 150ms) var(--fds-ease, ease),
+            box-shadow var(--fds-duration-fast, 150ms) var(--fds-ease, ease);
+
+        &:hover {
+            background-color: var(--fds-primary-hover, #4C44D9);
+            border-color: var(--fds-primary-hover, #4C44D9);
+            color: #FFFFFF;
+        }
+
+        &:active,
+        &.active {
+            background-color: var(--fds-primary-active, #3F38B8);
+            border-color: var(--fds-primary-active, #3F38B8);
+        }
+
+        &:disabled,
+        &.disabled {
+            background-color: var(--fds-primary, #635BFF);
+            border-color: var(--fds-primary, #635BFF);
+            opacity: .55;
+            cursor: not-allowed;
+        }
+    }
+
+    .btn-secondary {
+        background-color: var(--fds-surface, #FFFFFF);
+        border: 1px solid var(--fds-border-strong, #CBD5E1);
+        color: var(--fds-text, #0F172A);
+        transition: background-color var(--fds-duration-fast, 150ms) var(--fds-ease, ease);
+
+        &:hover {
+            background-color: var(--fds-bg-muted, #F1F5F9);
+            color: var(--fds-text, #0F172A);
+        }
+
+        &:active,
+        &.active {
+            background-color: var(--fds-border, #E2E8F0);
+        }
+
+        &:disabled,
+        &.disabled {
+            opacity: .55;
+            cursor: not-allowed;
+        }
+    }
+
+    .btn-outline-primary {
+        background-color: transparent;
+        border: 1px solid var(--fds-primary, #635BFF);
+        color: var(--fds-primary-text, #4C44D9);
+        transition: background-color var(--fds-duration-fast, 150ms) var(--fds-ease, ease);
+
+        &:hover {
+            background-color: var(--fds-primary-soft, #EEF0FF);
+            color: var(--fds-primary-text, #4C44D9);
+        }
+
+        &:active,
+        &.active {
+            background-color: var(--fds-primary-soft, #EEF0FF);
+            border-color: var(--fds-primary-active, #3F38B8);
+        }
+
+        &:disabled,
+        &.disabled {
+            opacity: .55;
+            cursor: not-allowed;
+        }
+    }
+
+    .btn-danger {
+        --fds-btn-bg: var(--fds-danger-fill, #DC2626);
+        background-color: var(--fds-btn-bg);
+        border-color: var(--fds-btn-bg);
+        color: #FFFFFF;
+        transition: background-color var(--fds-duration-fast, 150ms) var(--fds-ease, ease);
+
+        &:hover {
+            background-color: var(--fds-danger-hover, #B91C1C);
+            border-color: var(--fds-danger-hover, #B91C1C);
+            color: #FFFFFF;
+        }
+
+        &:active,
+        &.active {
+            background-color: var(--fds-danger-active, #991B1B);
+            border-color: var(--fds-danger-active, #991B1B);
+        }
+
+        &:disabled,
+        &.disabled {
+            opacity: .55;
+            cursor: not-allowed;
+        }
+    }
+
+    // Icon-only button. Add class fds-icon-btn to a .btn element.
+    .btn.fds-icon-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 36px;
+        height: 36px;
+        padding: 0;
+        border-radius: var(--fds-radius-md, 10px);
+        background: transparent;
+        border: 1px solid transparent;
+        color: inherit;
+        transition: background-color var(--fds-duration-fast, 150ms) var(--fds-ease, ease);
+
+        &:hover {
+            background-color: var(--fds-bg-muted, #F1F5F9);
+        }
+
+        &:active {
+            background-color: var(--fds-border, #E2E8F0);
+        }
+
+        &:disabled {
+            opacity: .45;
+            cursor: not-allowed;
+        }
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Form sheet, cards, list header, kanban cards
+// ---------------------------------------------------------------------------
+.o_web_client {
+    .o_form_sheet_bg > .o_form_sheet {
+        border-radius: var(--fds-radius-lg, 12px);
+        box-shadow: var(--fds-shadow-card, 0 1px 2px rgba(15, 23, 42, .06));
+    }
+
+    .o_list_table > thead > tr > th {
+        background-color: var(--fds-bg-muted, #F1F5F9);
+        color: var(--fds-text-muted, #475569);
+        font-weight: 600;
+    }
+
+    .o_kanban_record:not(.o_legacy_kanban_record) {
+        border-radius: var(--fds-radius-md, 10px);
+        box-shadow: var(--fds-shadow-card, 0 1px 2px rgba(15, 23, 42, .06));
+        transition: box-shadow var(--fds-duration-base, 200ms) var(--fds-ease, ease);
+
+        &:hover {
+            box-shadow: var(--fds-shadow-hover, 0 4px 12px rgba(15, 23, 42, .10));
+        }
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Status badges. Use the semantic modifier classes on a .badge element:
+// fds-badge--success, fds-badge--warning, fds-badge--danger, fds-badge--primary.
+// ---------------------------------------------------------------------------
+.o_web_client .badge {
+    border-radius: var(--fds-radius-pill, 999px);
+    font-weight: 600;
+
+    &.fds-badge--success {
+        background-color: var(--fds-success-soft, #CCFBF1);
+        color: var(--fds-success-text, #0F766E);
+    }
+
+    &.fds-badge--warning {
+        background-color: var(--fds-warning-soft, #FEF3C7);
+        color: var(--fds-warning-text, #92400E);
+    }
+
+    &.fds-badge--danger {
+        background-color: var(--fds-danger-soft, #FEE2E2);
+        color: var(--fds-danger-text, #B91C1C);
+    }
+
+    &.fds-badge--primary {
+        background-color: var(--fds-primary-soft, #EEF0FF);
+        color: var(--fds-primary-text, #4C44D9);
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Dialogs and toasts
+// ---------------------------------------------------------------------------
+.o_web_client {
+    .o_dialog .modal-content {
+        border-radius: var(--fds-radius-lg, 12px);
+        box-shadow: var(--fds-shadow-overlay, 0 12px 32px rgba(15, 23, 42, .18));
+        background-color: var(--fds-surface, #FFFFFF);
+        color: var(--fds-text, #0F172A);
+    }
+
+    .o_notification {
+        border-radius: var(--fds-radius-md, 10px);
+    }
+}

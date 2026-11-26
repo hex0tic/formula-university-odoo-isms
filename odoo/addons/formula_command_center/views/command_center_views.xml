@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Dashboard нь ISMS-ийн бүх эрхийн түвшинд нээгдэнэ (menu_isms_root нь group_isms_reporter-ээр хязгаарлагдана).
+         Хэсэг бүр өөрийн ORM эрхээр шүүгдэнэ; эрхгүй хэсэг «Хандах эрхгүй» гэж харагдана. -->
+    <record id="action_formula_command_center" model="ir.actions.client">
+        <field name="name">Command Center</field>
+        <field name="tag">formula_command_center</field>
+    </record>
+
+    <menuitem id="menu_formula_command_center" name="Command Center" parent="university_isms.menu_isms_root"
+              sequence="5" action="action_formula_command_center" groups="university_isms.group_isms_reporter"/>
+</odoo>

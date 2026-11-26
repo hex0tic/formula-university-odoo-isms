@@ -1,0 +1,258 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <t t-name="formula_command_center.Dashboard">
+        <Layout display="{ controlPanel: {} }" className="'o_formula_command_center'">
+            <div class="fcc">
+                <header class="fcc-header">
+                    <div class="fcc-title">
+                        <h1 class="fcc-h1">ISMS Command Center</h1>
+                        <p class="fcc-sub">Таны эрхээр харагдах хөрөнгө, эрсдэл, хяналт, инцидентийн хураангуй.</p>
+                        <p class="fcc-meta" t-if="state.data">Шинэчлэгдсэн: <time t-esc="generatedAt"/></p>
+                    </div>
+                    <div class="fcc-toolbar">
+                        <label class="fcc-label" for="fcc-period">Инцидентийн хугацаа</label>
+                        <select id="fcc-period" class="fcc-select" t-on-change="onPeriodChange"
+                                t-att-disabled="state.loading">
+                            <t t-foreach="periodOptions" t-as="opt" t-key="opt.value">
+                                <option t-att-value="opt.value" t-att-selected="opt.value === state.incidentDays">
+                                    <t t-esc="opt.label"/>
+                                </option>
+                            </t>
+                        </select>
+                        <button type="button" class="fcc-btn" t-on-click="load" t-att-disabled="state.loading">
+                            Шинэчлэх
+                        </button>
+                    </div>
+                </header>
+
+                <!-- Loading skeleton -->
+                <div t-if="state.loading and !hasAnyData" class="fcc-skeleton" role="status" aria-live="polite"
+                     aria-label="Ачаалж байна" aria-busy="true">
+                    <div class="fcc-skel-grid">
+                        <t t-foreach="[1, 2, 3, 4, 5, 6]" t-as="n" t-key="n">
+                            <div class="fcc-skel-card"></div>
+                        </t>
+                    </div>
+                    <div class="fcc-skel-block"></div>
+                    <div class="fcc-skel-block"></div>
+                </div>
+
+                <!-- Error state -->
+                <div t-elif="state.error" class="fcc-state fcc-state-error" role="alert">
+                    <h2 class="fcc-h2">Мэдээлэл ачаалж чадсангүй</h2>
+                    <p>Сүлжээ эсвэл серверийн алдаа гарсан байж магадгүй. Дахин оролдоно уу.</p>
+                    <button type="button" class="fcc-btn fcc-btn-primary" t-on-click="load">Дахин оролдох</button>
+                </div>
+
+                <t t-else="">
+                    <div class="fcc-live" aria-live="polite">
+                        <span t-if="state.loading">Шинэчилж байна…</span>
+                    </div>
+
+                    <!-- KPI cards -->
+                    <section class="fcc-kpis" aria-label="Гол үзүүлэлтүүд">
+                        <t t-foreach="kpis" t-as="kpi" t-key="kpi.key">
+                            <button type="button" class="fcc-kpi"
+                                    t-attf-class="fcc-tone-{{kpi.tone}} {{kpi.available ? '' : 'is-denied'}}"
+                                    t-att-disabled="!kpi.drill"
+                                    t-att-aria-disabled="kpi.drill ? 'false' : 'true'"
+                                    t-att-aria-label="kpi.available ? kpi.label + ': ' + kpi.value : kpi.label + ': хандах эрхгүй'"
+                                    t-on-click="() => this.openDrill(kpi.drill)">
+                                <span class="fcc-kpi-label" t-esc="kpi.label"/>
+                                <span class="fcc-kpi-value" t-if="kpi.available" t-esc="kpi.value"/>
+                                <span class="fcc-kpi-value fcc-kpi-denied" t-else="">—</span>
+                                <span class="fcc-kpi-foot" t-if="kpi.available and kpi.of !== undefined">
+                                    Нийт каталог: <t t-esc="kpi.of"/>
+                                </span>
+                                <span class="fcc-kpi-foot" t-if="!kpi.available">Хандах эрхгүй</span>
+                            </button>
+                        </t>
+                    </section>
+
+                    <div class="fcc-grid">
+                        <!-- Heatmap -->
+                        <section class="fcc-panel fcc-panel-wide" aria-labelledby="fcc-heat-title">
+                            <div class="fcc-panel-head">
+                                <h2 id="fcc-heat-title" class="fcc-h2">Эрсдэлийн матриц 5×5</h2>
+                                <div class="fcc-seg" role="group" aria-label="Эрсдэлийн төрөл">
+                                    <button type="button" class="fcc-seg-btn"
+                                            t-attf-class="{{state.mode === 'residual' ? 'is-active' : ''}}"
+                                            t-att-aria-pressed="state.mode === 'residual' ? 'true' : 'false'"
+                                            t-on-click="() => this.setMode('residual')">Үлдэгдэл</button>
+                                    <button type="button" class="fcc-seg-btn"
+                                            t-attf-class="{{state.mode === 'inherent' ? 'is-active' : ''}}"
+                                            t-att-aria-pressed="state.mode === 'inherent' ? 'true' : 'false'"
+                                            t-on-click="() => this.setMode('inherent')">Анхдагч</button>
+                                </div>
+                            </div>
+
+                            <div t-if="!heatAvailable" class="fcc-state">
+                                <p><t t-esc="denied"/></p>
+                            </div>
+                            <div t-elif="heatTotal === 0" class="fcc-state">
+                                <p>Эрсдэл бүртгэгдээгүй байна. Эрсдэлийн бүртгэлээс эрсдэл нэмснээр матриц идэвхжинэ.</p>
+                            </div>
+                            <t t-else="">
+                                <p class="fcc-hint">Нүд дээр дарвал тухайн үнэлгээтэй эрсдэлүүд нээгдэнэ. Нийт: <t t-esc="heatTotal"/></p>
+                                <div class="fcc-matrix-wrap">
+                                    <div class="fcc-matrix" role="table" aria-label="Магадлал ба нөлөөллийн матриц">
+                                        <div class="fcc-matrix-row" role="row">
+                                            <span class="fcc-axis-corner" role="columnheader">М, Н</span>
+                                            <t t-foreach="['1','2','3','4','5']" t-as="imp" t-key="imp">
+                                                <span class="fcc-axis" role="columnheader">Н<t t-esc="imp"/></span>
+                                            </t>
+                                        </div>
+                                        <t t-foreach="heatRows" t-as="row" t-key="row.likelihood">
+                                            <div class="fcc-matrix-row" role="row">
+                                                <span class="fcc-axis" role="rowheader">М<t t-esc="row.likelihood"/></span>
+                                                <t t-foreach="row.cells" t-as="cell" t-key="cell.key">
+                                                    <button type="button" class="fcc-cell"
+                                                            t-attf-class="fcc-level-{{cell.level}} {{cell.count ? 'has-items' : ''}}"
+                                                            t-att-aria-label="cell.ariaLabel"
+                                                            t-on-click="() => this.openDrill(cell.drill)">
+                                                        <span aria-hidden="true" t-esc="cell.count"/>
+                                                    </button>
+                                                </t>
+                                            </div>
+                                        </t>
+                                    </div>
+                                </div>
+                                <ul class="fcc-legend" aria-label="Түвшний тайлбар">
+                                    <li><span class="fcc-chip fcc-level-low"></span>Бага</li>
+                                    <li><span class="fcc-chip fcc-level-medium"></span>Дунд</li>
+                                    <li><span class="fcc-chip fcc-level-high"></span>Өндөр</li>
+                                    <li class="fcc-legend-note">М = магадлал, Н = нөлөөлөл</li>
+                                </ul>
+                            </t>
+                        </section>
+
+                        <!-- Incident SLA -->
+                        <section class="fcc-panel" aria-labelledby="fcc-inc-title">
+                            <h2 id="fcc-inc-title" class="fcc-h2">Инцидент ба SLA</h2>
+                            <div t-if="!incidents.available" class="fcc-state"><p><t t-esc="denied"/></p></div>
+                            <t t-else="">
+                                <div class="fcc-sla">
+                                    <button type="button" class="fcc-sla-item fcc-tone-danger"
+                                            t-on-click="() => this.openDrill(incidents.drill_overdue)">
+                                        <span class="fcc-sla-num" t-esc="incidents.sla_overdue"/>
+                                        <span>SLA хэтэрсэн</span>
+                                    </button>
+                                    <button type="button" class="fcc-sla-item fcc-tone-success"
+                                            t-on-click="() => this.openDrill(incidents.drill_on_track)">
+                                        <span class="fcc-sla-num" t-esc="incidents.sla_on_track"/>
+                                        <span>Хугацаандаа</span>
+                                    </button>
+                                </div>
+                                <h3 class="fcc-h3">Төлөвөөр (бүгд)</h3>
+                                <ul class="fcc-list">
+                                    <t t-foreach="incidents.by_state" t-as="row" t-key="row.key">
+                                        <li>
+                                            <button type="button" class="fcc-row-btn" t-on-click="() => this.openDrill(row.drill)">
+                                                <span t-esc="row.label"/>
+                                                <span class="fcc-count" t-esc="row.count"/>
+                                            </button>
+                                        </li>
+                                    </t>
+                                </ul>
+                                <h3 class="fcc-h3">Нээлттэй, ноцтойгоор</h3>
+                                <ul class="fcc-list">
+                                    <t t-foreach="incidents.open_by_severity" t-as="row" t-key="row.key">
+                                        <li>
+                                            <button type="button" class="fcc-row-btn" t-on-click="() => this.openDrill(row.drill)">
+                                                <span t-esc="row.label"/>
+                                                <span class="fcc-count" t-esc="row.count"/>
+                                            </button>
+                                        </li>
+                                    </t>
+                                </ul>
+                            </t>
+                        </section>
+
+                        <!-- Control coverage -->
+                        <section class="fcc-panel" aria-labelledby="fcc-ctl-title">
+                            <h2 id="fcc-ctl-title" class="fcc-h2">Хяналтын хамрах хүрээ</h2>
+                            <div t-if="!controls.available" class="fcc-state"><p><t t-esc="denied"/></p></div>
+                            <t t-else="">
+                                <p class="fcc-hint">
+                                    Сонгосон <t t-esc="controls.selected"/> / нийт каталог <t t-esc="controls.catalog"/> хяналт
+                                </p>
+                                <ul class="fcc-list">
+                                    <t t-foreach="implementationRows" t-as="row" t-key="row.key">
+                                        <li>
+                                            <button type="button" class="fcc-bar-btn" t-on-click="() => this.openDrill(row.drill)">
+                                                <span class="fcc-bar-label" t-esc="row.label"/>
+                                                <span class="fcc-bar" aria-hidden="true">
+                                                    <span class="fcc-bar-fill" t-attf-style="width: {{row.pct}}%"></span>
+                                                </span>
+                                                <span class="fcc-count" t-esc="row.count"/>
+                                            </button>
+                                        </li>
+                                    </t>
+                                </ul>
+                            </t>
+                        </section>
+
+                        <!-- Assets and risks breakdown -->
+                        <section class="fcc-panel" aria-labelledby="fcc-ast-title">
+                            <h2 id="fcc-ast-title" class="fcc-h2">Хөрөнгө ба эрсдэл</h2>
+                            <div t-if="!assets.available" class="fcc-state"><p><t t-esc="denied"/></p></div>
+                            <t t-else="">
+                                <h3 class="fcc-h3">Хөрөнгө, ангилалаар</h3>
+                                <ul class="fcc-list">
+                                    <t t-foreach="assets.by_classification" t-as="row" t-key="row.key">
+                                        <li>
+                                            <button type="button" class="fcc-row-btn" t-on-click="() => this.openDrill(row.drill)">
+                                                <span t-esc="row.label"/>
+                                                <span class="fcc-count" t-esc="row.count"/>
+                                            </button>
+                                        </li>
+                                    </t>
+                                </ul>
+                            </t>
+                            <div t-if="!risks.available" class="fcc-state"><p><t t-esc="denied"/></p></div>
+                            <t t-else="">
+                                <h3 class="fcc-h3">Эрсдэл, одоогийн түвшингээр</h3>
+                                <ul class="fcc-list">
+                                    <t t-foreach="risks.by_level" t-as="row" t-key="row.key">
+                                        <li>
+                                            <button type="button" class="fcc-row-btn" t-on-click="() => this.openDrill(row.drill)">
+                                                <span t-esc="row.label"/>
+                                                <span class="fcc-count" t-esc="row.count"/>
+                                            </button>
+                                        </li>
+                                    </t>
+                                </ul>
+                            </t>
+                        </section>
+
+                        <!-- Recent activity -->
+                        <section class="fcc-panel" aria-labelledby="fcc-act-title">
+                            <div class="fcc-panel-head">
+                                <h2 id="fcc-act-title" class="fcc-h2">Сүүлийн үйл ажиллагаа</h2>
+                                <button t-if="audit.available" type="button" class="fcc-link"
+                                        t-on-click="() => this.openDrill(audit.drill)">Аудит лог</button>
+                            </div>
+                            <div t-if="!audit.available" class="fcc-state"><p><t t-esc="denied"/></p></div>
+                            <t t-elif="audit.recent.length === 0">
+                                <div class="fcc-state"><p>Сүүлийн үйл ажиллагаа алга.</p></div>
+                            </t>
+                            <t t-else="">
+                                <ol class="fcc-activity">
+                                    <t t-foreach="audit.recent" t-as="item" t-key="item.id">
+                                        <li>
+                                            <time class="fcc-time" t-esc="formatTs(item.timestamp)"/>
+                                            <span class="fcc-act-action" t-esc="item.action_label"/>
+                                            <span class="fcc-act-model" t-esc="item.model_name"/>
+                                        </li>
+                                    </t>
+                                </ol>
+                            </t>
+                        </section>
+                    </div>
+                </t>
+            </div>
+        </Layout>
+    </t>
+
+</templates>
