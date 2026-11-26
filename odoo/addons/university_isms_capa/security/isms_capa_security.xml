@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Record rules: Reporter (Мэдээлэгч) олдвор, CAPA, зөвшөөрлийг огт харахгүй (ACL-д ч байхгүй).
+     Asset owner зөвхөн өөрийн хөрөнгө/эрсдлийн олдвор, CAPA-г харна (read-only).
+     Шинжээч, аудитор бүгдийг харна. CISO нь шинжээч+аудиторын группоор бүгдийг харна. -->
+<odoo>
+    <record id="rule_finding_owner_read" model="ir.rule">
+        <field name="name">Олдвор: эзэмшигч өөрийн хөрөнгө/эрсдлийн олдвор</field>
+        <field name="model_id" ref="model_isms_finding"/>
+        <field name="domain_force">['|', '|', ('asset_id.owner_id', '=', user.id), ('risk_id.owner_id', '=', user.id), ('risk_id.asset_ids.owner_id', '=', user.id)]</field>
+        <field name="groups" eval="[(4, ref('university_isms.group_isms_asset_owner'))]"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+    <record id="rule_finding_all" model="ir.rule">
+        <field name="name">Олдвор: шинжээч, аудитор бүгдийг</field>
+        <field name="model_id" ref="model_isms_finding"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('university_isms.group_isms_analyst')), (4, ref('university_isms.group_isms_auditor'))]"/>
+    </record>
+
+    <record id="rule_capa_owner_read" model="ir.rule">
+        <field name="name">CAPA: эзэмшигч өөрийн хөрөнгө/эрсдлийн CAPA</field>
+        <field name="model_id" ref="model_isms_capa"/>
+        <field name="domain_force">['|', '|', ('finding_id.asset_id.owner_id', '=', user.id), ('finding_id.risk_id.owner_id', '=', user.id), ('finding_id.risk_id.asset_ids.owner_id', '=', user.id)]</field>
+        <field name="groups" eval="[(4, ref('university_isms.group_isms_asset_owner'))]"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+    <record id="rule_capa_all" model="ir.rule">
+        <field name="name">CAPA: шинжээч, аудитор бүгдийг</field>
+        <field name="model_id" ref="model_isms_capa"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('university_isms.group_isms_analyst')), (4, ref('university_isms.group_isms_auditor'))]"/>
+    </record>
+
+    <record id="rule_waiver_all" model="ir.rule">
+        <field name="name">Эрсдлийн зөвшөөрөл: шинжээч, аудитор бүгдийг</field>
+        <field name="model_id" ref="model_isms_risk_waiver"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('university_isms.group_isms_analyst')), (4, ref('university_isms.group_isms_auditor'))]"/>
+    </record>
+</odoo>

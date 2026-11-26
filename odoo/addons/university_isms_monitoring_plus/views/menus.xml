@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_isms_control_test_top" name="Хяналтын тест" parent="university_isms.menu_isms_root"
+              sequence="45" groups="university_isms.group_isms_analyst,university_isms.group_isms_auditor,university_isms.group_isms_manager"/>
+    <menuitem id="menu_isms_control_test_plan" name="Тестийн төлөвлөгөө" parent="menu_isms_control_test_top"
+              action="isms_control_test_plan_action" sequence="10"/>
+    <menuitem id="menu_isms_control_test_run" name="Гүйцэтгэлийн бүртгэл" parent="menu_isms_control_test_top"
+              action="isms_control_test_run_action" sequence="20"/>
+</odoo>

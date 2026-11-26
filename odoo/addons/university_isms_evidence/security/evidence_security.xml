@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Phase 4 ISMS-01/06/08 record rules.
+     Нотлох баримт: эзэмшигч / оруулагч өөрийнхөө; шинжээч, аудитор бүгдийг (CISO нь шинжээч, аудитор гэж үздэг).
+     Баталгаажуулалт: хэрэглэгч зөвхөн өөрийнхөө; шинжээч, аудитор бүгдийг.
+     Экспорт: аудитор өөрийнхөө; CISO бүгдийг. -->
+<odoo>
+    <record id="rule_isms_evidence_owner" model="ir.rule">
+        <field name="name">Нотлох баримт: эзэмшигч өөрийн болон өөрийн оруулсан</field>
+        <field name="model_id" ref="model_isms_evidence"/>
+        <field name="domain_force">['|', ('owner_id', '=', user.id), ('uploaded_by_id', '=', user.id)]</field>
+        <field name="groups" eval="[(4, ref('university_isms.group_isms_asset_owner'))]"/>
+    </record>
+    <record id="rule_isms_evidence_all" model="ir.rule">
+        <field name="name">Нотлох баримт: шинжээч, аудитор бүгдийг</field>
+        <field name="model_id" ref="model_isms_evidence"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('university_isms.group_isms_analyst')), (4, ref('university_isms.group_isms_auditor'))]"/>
+    </record>
+
+    <record id="rule_isms_attest_own" model="ir.rule">
+        <field name="name">Бодлогын баталгаажуулалт: хэрэглэгч зөвхөн өөрийнхөө</field>
+        <field name="model_id" ref="model_isms_policy_attestation"/>
+        <field name="domain_force">[('user_id', '=', user.id)]</field>
+        <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+    </record>
+    <record id="rule_isms_attest_all" model="ir.rule">
+        <field name="name">Бодлогын баталгаажуулалт: шинжээч, аудитор бүгдийг</field>
+        <field name="model_id" ref="model_isms_policy_attestation"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('university_isms.group_isms_analyst')), (4, ref('university_isms.group_isms_auditor'))]"/>
+    </record>
+
+    <record id="rule_isms_export_auditor_own" model="ir.rule">
+        <field name="name">Аудитын экспорт: аудитор өөрийнхөө</field>
+        <field name="model_id" ref="model_isms_evidence_export"/>
+        <field name="domain_force">[('requested_by_id', '=', user.id)]</field>
+        <field name="groups" eval="[(4, ref('university_isms.group_isms_auditor'))]"/>
+    </record>
+    <record id="rule_isms_export_manager_all" model="ir.rule">
+        <field name="name">Аудитын экспорт: CISO бүгдийг</field>
+        <field name="model_id" ref="model_isms_evidence_export"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('university_isms.group_isms_manager'))]"/>
+    </record>
+</odoo>

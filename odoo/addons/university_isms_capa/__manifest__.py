@@ -1,0 +1,20 @@
+{
+    'name': 'University ISMS Findings and CAPA',
+    'version': '18.0.1.0.0',
+    'category': 'Services/ISMS',
+    'summary': 'Аудит, хяналтын тест, мониторингийн олдвор, CAPA урсгал, эрсдлийн зөвшөөрөл (ISO/IEC 27001:2022 6.1.3, 10.2)',
+    'author': 'Formula5 баг (ШУТИС МХТС)',
+    'license': 'LGPL-3',
+    'depends': ['mail', 'university_isms'],
+    'data': [
+        'security/ir.model.access.csv',
+        'security/isms_capa_security.xml',
+        'data/ir_sequence_data.xml',
+        'data/ir_cron_data.xml',
+        'views/finding_views.xml',
+        'views/capa_views.xml',
+        'views/waiver_views.xml',
+        'views/risk_views.xml',
+    ],
+    'installable': True,
+}

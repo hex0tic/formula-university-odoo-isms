@@ -1,0 +1,8 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_control_test_plan_analyst,control test plan analyst,model_isms_control_test_plan,university_isms.group_isms_analyst,1,1,1,0
+access_control_test_plan_auditor,control test plan auditor,model_isms_control_test_plan,university_isms.group_isms_auditor,1,0,0,0
+access_control_test_plan_manager,control test plan manager,model_isms_control_test_plan,university_isms.group_isms_manager,1,1,1,1
+access_control_test_run_analyst,control test run analyst,model_isms_control_test_run,university_isms.group_isms_analyst,1,0,1,0
+access_control_test_run_auditor,control test run auditor,model_isms_control_test_run,university_isms.group_isms_auditor,1,0,1,0
+access_control_test_run_manager,control test run manager,model_isms_control_test_run,university_isms.group_isms_manager,1,0,1,0
+access_control_test_run_system,control test run system admin,model_isms_control_test_run,base.group_system,1,0,0,0

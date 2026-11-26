@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="isms_risk_waiver_view_list" model="ir.ui.view">
+        <field name="name">isms.risk.waiver.list</field>
+        <field name="model">isms.risk.waiver</field>
+        <field name="arch" type="xml">
+            <list decoration-muted="state in ('expired', 'revoked')">
+                <field name="code"/>
+                <field name="name"/>
+                <field name="risk_id"/>
+                <field name="owner_id" widget="many2one_avatar_user"/>
+                <field name="requested_by_id" optional="hide"/>
+                <field name="approved_by_id" optional="show"/>
+                <field name="expiry_date"/>
+                <field name="state" widget="badge"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="isms_risk_waiver_view_search" model="ir.ui.view">
+        <field name="name">isms.risk.waiver.search</field>
+        <field name="model">isms.risk.waiver</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="code"/>
+                <field name="name"/>
+                <field name="risk_id"/>
+                <field name="owner_id"/>
+                <filter name="pending" string="Батлах хүлээж буй" domain="[('state', '=', 'draft')]"/>
+                <filter name="active" string="Идэвхтэй" domain="[('state', '=', 'approved')]"/>
+                <filter name="mine" string="Миний хүсэлт" domain="[('requested_by_id', '=', uid)]"/>
+                <group expand="0" string="Бүлэглэх">
+                    <filter name="group_state" string="Төлөвөөр" context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="isms_risk_waiver_view_form" model="ir.ui.view">
+        <field name="name">isms.risk.waiver.form</field>
+        <field name="model">isms.risk.waiver</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_approve" type="object" string="Батлах" class="btn-primary"
+                            invisible="state != 'draft'"
+                            confirm="Энэ эрсдлийн зөвшөөрлийг батлах уу? Хүсэлтлэгч өөрөө батлах боломжгүй."
+                            groups="university_isms.group_isms_manager"/>
+                    <button name="action_revoke" type="object" string="Цуцлах"
+                            invisible="state != 'approved'"
+                            groups="university_isms.group_isms_manager"/>
+                    <field name="state" widget="statusbar" readonly="1"
+                           statusbar_visible="draft,approved,expired,revoked"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <div class="text-muted"><field name="code" readonly="1"/></div>
+                        <h1><field name="name" placeholder="Зөвшөөрлийн гарчиг"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="risk_id" readonly="state != 'draft'"/>
+                            <field name="owner_id" readonly="state != 'draft'"/>
+                            <field name="expiry_date" readonly="state != 'draft'"/>
+                        </group>
+                        <group>
+                            <field name="requested_by_id"/>
+                            <field name="approved_by_id"/>
+                            <field name="approved_at"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Үндэслэл" name="justification">
+                            <group>
+                                <field name="justification" readonly="state != 'draft'"/>
+                                <field name="compensating_controls" readonly="state != 'draft'"/>
+                            </group>
+                        </page>
+                        <page string="Цуцлалт" name="revoke" invisible="state not in ('approved', 'revoked')">
+                            <field name="revoke_reason" readonly="state != 'approved'"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="isms_risk_waiver_action" model="ir.actions.act_window">
+        <field name="name">Эрсдлийн зөвшөөрөл</field>
+        <field name="res_model">isms.risk.waiver</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="isms_risk_waiver_view_search"/>
+        <field name="context">{'search_default_active': 1}</field>
+    </record>
+
+    <menuitem id="isms_risk_waiver_menu" name="Эрсдлийн зөвшөөрөл" parent="isms_finding_menu"
+              action="isms_risk_waiver_action" sequence="20"
+              groups="university_isms.group_isms_analyst,university_isms.group_isms_auditor"/>
+</odoo>

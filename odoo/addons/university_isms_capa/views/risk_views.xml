@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ISMS-07: дахин үнэлгээний флаг ба товч (university_isms-ийн эрсдлийн form-д нэмэлт) -->
+    <record id="isms_risk_view_form_reeval" model="ir.ui.view">
+        <field name="name">isms.risk.form.reeval</field>
+        <field name="model">isms.risk</field>
+        <field name="inherit_id" ref="university_isms.isms_risk_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <button name="action_complete_reeval" type="object" string="Дахин үнэлсэн"
+                        class="btn-primary" invisible="not reeval_required"
+                        groups="university_isms.group_isms_analyst"/>
+            </xpath>
+            <xpath expr="//sheet" position="before">
+                <div class="alert alert-warning" role="alert" invisible="not reeval_required">
+                    <strong>Дахин үнэлгээ шаардлагатай:</strong>
+                    <field name="reeval_reason" readonly="1" nolabel="1"/>
+                </div>
+            </xpath>
+        </field>
+    </record>
+</odoo>
