@@ -1,0 +1,7 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_audit_chain_head_auditor,audit chain head auditor,model_isms_audit_chain_head,university_isms.group_isms_auditor,1,0,0,0
+access_audit_chain_head_manager,audit chain head CISO,model_isms_audit_chain_head,university_isms.group_isms_manager,1,0,0,0
+access_audit_chain_head_system,audit chain head system admin,model_isms_audit_chain_head,base.group_system,1,1,1,1
+access_audit_forward_auditor,audit forward auditor,model_isms_audit_forward,university_isms.group_isms_auditor,1,0,0,0
+access_audit_forward_manager,audit forward CISO,model_isms_audit_forward,university_isms.group_isms_manager,1,0,0,0
+access_audit_forward_system,audit forward system admin,model_isms_audit_forward,base.group_system,1,1,1,1

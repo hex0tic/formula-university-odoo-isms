@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ============================ Дахин баталгаажуулалт (GOV-01) ============================ -->
+    <record id="view_access_recert_campaign_list" model="ir.ui.view">
+        <field name="name">access.recert.campaign.list</field>
+        <field name="model">access.recert.campaign</field>
+        <field name="arch" type="xml">
+            <list string="Эрхийн дахин баталгаажуулалт">
+                <field name="name"/>
+                <field name="scope"/>
+                <field name="cadence_days"/>
+                <field name="start_date"/>
+                <field name="due_date"/>
+                <field name="line_count" string="Мөр"/>
+                <field name="pending_count" string="Хүлээгдэж буй"/>
+                <field name="state" widget="badge"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_access_recert_campaign_form" model="ir.ui.view">
+        <field name="name">access.recert.campaign.form</field>
+        <field name="model">access.recert.campaign</field>
+        <field name="arch" type="xml">
+            <form string="Эрхийн дахин баталгаажуулалт">
+                <header>
+                    <button name="action_start" string="Эхлүүлэх" type="object" class="btn-primary"
+                            invisible="state != 'draft'"/>
+                    <button name="action_close" string="Хаах" type="object"
+                            invisible="state != 'running'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,running,done"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" placeholder="Жишээ: 2026 оны улирлын тойм"/></h1>
+                    </div>
+                    <group>
+                        <group string="Давтамж ба хамрах хүрээ">
+                            <field name="cadence"/>
+                            <field name="custom_days" invisible="cadence != 'custom'"/>
+                            <field name="cadence_days"/>
+                            <field name="scope"/>
+                            <field name="group_ids" widget="many2many_tags" invisible="scope != 'groups'"
+                                   readonly="state != 'draft'"/>
+                        </group>
+                        <group string="Хянагч ба хугацаа">
+                            <field name="fallback_reviewer_id"/>
+                            <field name="start_date" readonly="state != 'draft'"/>
+                            <field name="due_days" readonly="state != 'draft'"/>
+                            <field name="due_date"/>
+                            <field name="recurring" readonly="state != 'draft'"/>
+                            <field name="parent_id"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Мөрүүд" name="lines">
+                            <field name="line_ids" readonly="1">
+                                <list>
+                                    <field name="user_id"/>
+                                    <field name="reviewer_id"/>
+                                    <field name="group_ids" widget="many2many_tags"/>
+                                    <field name="decision"/>
+                                    <field name="overdue"/>
+                                    <field name="escalated"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_access_recert_line_list" model="ir.ui.view">
+        <field name="name">access.recert.line.list</field>
+        <field name="model">access.recert.line</field>
+        <field name="arch" type="xml">
+            <list string="Тойм мөрүүд" decoration-danger="overdue" decoration-muted="decision != 'pending'">
+                <field name="user_id"/>
+                <field name="reviewer_id"/>
+                <field name="campaign_id"/>
+                <field name="due_date"/>
+                <field name="is_privileged" string="Давуу эрх"/>
+                <field name="overdue" column_invisible="1"/>
+                <field name="decision"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_access_recert_line_form" model="ir.ui.view">
+        <field name="name">access.recert.line.form</field>
+        <field name="model">access.recert.line</field>
+        <field name="arch" type="xml">
+            <form string="Тойм мөр">
+                <header>
+                    <button name="action_keep" string="Хадгалахаар баталгаажуулах" type="object"
+                            class="btn-primary" invisible="decision != 'pending'"/>
+                    <button name="action_revoke" string="Сонгосон бүлгийг хасах" type="object"
+                            class="btn-danger" invisible="decision != 'pending'"/>
+                    <field name="decision" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group string="Хэрэглэгч">
+                            <field name="campaign_id"/>
+                            <field name="user_id"/>
+                            <field name="reviewer_id"/>
+                            <field name="due_date"/>
+                            <field name="overdue"/>
+                            <field name="escalated"/>
+                            <field name="escalated_at"/>
+                        </group>
+                        <group string="Бүлгүүд">
+                            <field name="group_ids" widget="many2many_tags" readonly="1"/>
+                            <field name="revoke_group_ids" widget="many2many_tags"
+                                   readonly="decision != 'pending'"/>
+                            <field name="note" readonly="decision != 'pending'"/>
+                            <field name="decided_at"/>
+                            <field name="decided_by_id"/>
+                            <field name="outcome"/>
+                        </group>
+                    </group>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- ============================ Түр / давуу эрхийн хүсэлт (GOV-03) ============================ -->
+    <record id="view_access_request_list" model="ir.ui.view">
+        <field name="name">access.request.list</field>
+        <field name="model">access.request</field>
+        <field name="arch" type="xml">
+            <list string="Эрхийн хүсэлт">
+                <field name="name"/>
+                <field name="requester_id"/>
+                <field name="target_user_id"/>
+                <field name="is_privileged" string="Давуу эрх"/>
+                <field name="start_date"/>
+                <field name="end_date"/>
+                <field name="state" widget="badge"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_access_request_form" model="ir.ui.view">
+        <field name="name">access.request.form</field>
+        <field name="model">access.request</field>
+        <field name="arch" type="xml">
+            <form string="Эрхийн хүсэлт">
+                <header>
+                    <button name="action_submit" string="Илгээх" type="object" class="btn-primary"
+                            invisible="state != 'draft'"/>
+                    <button name="action_approve" string="Батлах" type="object" class="btn-primary"
+                            invisible="state != 'submitted'" groups="base.group_erp_manager"/>
+                    <button name="action_reject" string="Татгалзах" type="object"
+                            invisible="state != 'submitted'" groups="base.group_erp_manager"/>
+                    <button name="action_activate" string="Идэвхжүүлэх" type="object" class="btn-primary"
+                            invisible="state != 'approved'" groups="base.group_erp_manager"/>
+                    <button name="action_revoke" string="Цуцлах (эрх хасах)" type="object"
+                            invisible="state != 'active'" groups="base.group_erp_manager"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,submitted,approved,active,expired"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name"/></h1>
+                    </div>
+                    <group>
+                        <group string="Хүсэлт">
+                            <field name="requester_id"/>
+                            <field name="target_user_id" readonly="state != 'draft'"/>
+                            <field name="group_ids" widget="many2many_tags" readonly="state != 'draft'"/>
+                            <field name="is_privileged"/>
+                            <field name="justification" readonly="state != 'draft'"/>
+                        </group>
+                        <group string="Хугацаа">
+                            <field name="start_date" readonly="state != 'draft'"/>
+                            <field name="end_date" readonly="state != 'draft'"/>
+                            <field name="duration_days"/>
+                            <field name="approver_id"/>
+                            <field name="approved_at"/>
+                            <field name="activated_at"/>
+                            <field name="ended_at"/>
+                        </group>
+                        <group string="Үр дүн">
+                            <field name="added_group_ids" widget="many2many_tags"/>
+                            <field name="outcome"/>
+                            <field name="rejected_reason" readonly="state != 'submitted'"/>
+                        </group>
+                    </group>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- ============================ Тайлан (GOV-04) ============================ -->
+    <record id="view_access_gov_report_list" model="ir.ui.view">
+        <field name="name">access.gov.report.list</field>
+        <field name="model">access.gov.report</field>
+        <field name="arch" type="xml">
+            <list string="Давуу эрхийн тайлан" create="0" edit="0" delete="0">
+                <field name="login"/>
+                <field name="user_active"/>
+                <field name="group_id"/>
+                <field name="last_login"/>
+                <field name="totp_enabled"/>
+                <field name="temp_grant_count"/>
+                <field name="open_recert_count"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- ============================ Actions ============================ -->
+    <record id="action_access_recert_campaign" model="ir.actions.act_window">
+        <field name="name">Дахин баталгаажуулалт</field>
+        <field name="res_model">access.recert.campaign</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p>Эрхийн дахин баталгаажуулалтын кампанит ажил үүсгэнэ.</p>
+        </field>
+    </record>
+
+    <record id="action_access_recert_line_all" model="ir.actions.act_window">
+        <field name="name">Бүх тойм мөр</field>
+        <field name="res_model">access.recert.line</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <record id="action_access_recert_line_mine" model="ir.actions.act_window">
+        <field name="name">Миний хянах мөрүүд</field>
+        <field name="res_model">access.recert.line</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('reviewer_id', '=', uid)]</field>
+    </record>
+
+    <record id="action_access_request_all" model="ir.actions.act_window">
+        <field name="name">Түр / давуу эрхийн хүсэлт</field>
+        <field name="res_model">access.request</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <record id="action_access_request_mine" model="ir.actions.act_window">
+        <field name="name">Миний хүсэлтүүд</field>
+        <field name="res_model">access.request</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('requester_id', '=', uid)]</field>
+        <field name="context">{'default_requester_id': uid, 'default_target_user_id': uid}</field>
+    </record>
+
+    <record id="action_access_gov_report" model="ir.actions.act_window">
+        <field name="name">Давуу эрхийн тайлан</field>
+        <field name="res_model">access.gov.report</field>
+        <field name="view_mode">list</field>
+    </record>
+</odoo>

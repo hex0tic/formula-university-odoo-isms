@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <t t-name="formula_isms_copilot.Copilot">
+        <Layout display="{ controlPanel: {} }" className="'o_formula_isms_copilot'">
+            <div class="fcp" t-on-keydown="(ev) => this.onRootKeydown(ev)">
+                <header class="fcp-header">
+                    <h1 class="fcp-h1">ISMS туслах</h1>
+                    <p class="fcp-sub">Зөвхөн унших горим. Таны харах эрхээр харагдах бичлэгээс хариулна. Шийдвэрийг хүн гаргана.</p>
+                </header>
+
+                <div class="fcp-tabs" role="tablist" aria-label="Горим">
+                    <button type="button" role="tab" class="fcp-tab"
+                            t-att-aria-selected="state.tab === 'ask' ? 'true' : 'false'"
+                            t-att-tabindex="state.tab === 'ask' ? 0 : -1"
+                            t-attf-class="fcp-tab {{ state.tab === 'ask' ? 'is-active' : '' }}"
+                            t-on-click="() => this.setTab('ask')">Асуулт</button>
+                    <button type="button" role="tab" class="fcp-tab"
+                            t-att-aria-selected="state.tab === 'suggest' ? 'true' : 'false'"
+                            t-att-tabindex="state.tab === 'suggest' ? 0 : -1"
+                            t-attf-class="fcp-tab {{ state.tab === 'suggest' ? 'is-active' : '' }}"
+                            t-on-click="() => this.setTab('suggest')">Санал (AI-03)</button>
+                </div>
+
+                <!-- ============ АСУУЛТ ============ -->
+                <section t-if="state.tab === 'ask'" class="fcp-panel" role="tabpanel" aria-label="Асуулт">
+                    <form class="fcp-form" role="search" t-on-submit="(ev) => { ev.preventDefault(); this.ask(); }">
+                        <label class="fcp-label" for="fcp-question">Асуулт</label>
+                        <textarea id="fcp-question" class="fcp-textarea" rows="3"
+                                  placeholder="Жишээ: A.5.15 хяналтын нотолгоо дутуу юу?"
+                                  t-model="state.question"
+                                  t-on-keydown="(ev) => this.onQuestionKeydown(ev)"></textarea>
+                        <p class="fcp-hint" id="fcp-hint">Ctrl+Enter дарж илгээнэ. Escape дарж цэвэрлэнэ.</p>
+
+                        <fieldset class="fcp-scopes">
+                            <legend class="fcp-label">Хайлтын хүрээ</legend>
+                            <p class="fcp-hint" t-if="state.scopesLoaded and !state.selectedScopes.length">Сонгоогүй бол бүх боломжит хүрээнд хайна.</p>
+                            <div class="fcp-chips">
+                                <t t-foreach="state.scopeOptions" t-as="opt" t-key="opt.key">
+                                    <button type="button" class="fcp-chip"
+                                            t-att-aria-pressed="isScopeSelected(opt.key) ? 'true' : 'false'"
+                                            t-att-disabled="!opt.available"
+                                            t-attf-class="fcp-chip {{ isScopeSelected(opt.key) ? 'is-on' : '' }}"
+                                            t-on-click="() => this.toggleScope(opt.key)">
+                                        <t t-esc="opt.label"/>
+                                        <span t-if="!opt.available" class="fcp-chip-note"> (эрхгүй)</span>
+                                    </button>
+                                </t>
+                            </div>
+                        </fieldset>
+
+                        <div class="fcp-actions">
+                            <button type="submit" class="fcp-btn fcp-btn--primary" t-att-disabled="!canAsk">Хайх</button>
+                        </div>
+                    </form>
+
+                    <div class="fcp-results" aria-live="polite">
+                        <div t-if="state.loading" class="fcp-state" role="status">
+                            <span class="fcp-spinner" aria-hidden="true"></span> Хайж байна…
+                        </div>
+                        <div t-if="state.error" class="fcp-alert" role="alert">
+                            <t t-esc="state.error"/>
+                        </div>
+
+                        <t t-if="state.result and state.result.refused">
+                            <div class="fcp-refusal" role="status">
+                                <h2 class="fcp-h2">Энэ үйлдлийг туслах хийхгүй</h2>
+                                <p class="fcp-body"><t t-esc="state.result.message"/></p>
+                                <ul class="fcp-links" t-if="state.result.workflow_links.length">
+                                    <t t-foreach="state.result.workflow_links" t-as="link" t-key="link.url">
+                                        <li><a class="fcp-link" t-att-href="link.url"><t t-esc="link.label"/></a></li>
+                                    </t>
+                                </ul>
+                            </div>
+                        </t>
+
+                        <t t-if="state.result and !state.result.refused">
+                            <article class="fcp-answer" aria-label="Хариулт">
+                                <div class="fcp-answer-head">
+                                    <span t-attf-class="{{ answerConfidenceClass }}">
+                                        Итгэлцэл: <t t-esc="state.result.confidence_label"/>
+                                    </span>
+                                    <span class="fcp-engine">Хөдөлгүүр: <t t-esc="state.result.engine_label"/></span>
+                                </div>
+                                <p class="fcp-label-auto"><t t-esc="state.result.label"/></p>
+                                <p class="fcp-alert-note" t-if="state.result.fallback_reason">
+                                    Гадаад провайдер ашиглах боломжгүй байсан тул дотоод хөдөлгүүрээр хариулав.
+                                </p>
+                                <ul class="fcp-summary" t-if="state.result.summary.length">
+                                    <t t-foreach="state.result.summary" t-as="line" t-key="line_index">
+                                        <li><t t-esc="line"/></li>
+                                    </t>
+                                </ul>
+                                <p class="fcp-empty" t-if="state.result.empty">Таны эрхээр холбогдох бичлэг олдсонгүй.</p>
+
+                                <h2 class="fcp-h2" t-if="state.result.blocks.length">Эх сурвалж</h2>
+                                <ul class="fcp-cards" t-if="state.result.blocks.length">
+                                    <t t-foreach="state.result.blocks" t-as="block" t-key="block.model + '-' + block.res_id">
+                                        <li class="fcp-card">
+                                            <button type="button" class="fcp-card-btn"
+                                                    t-on-click="() => this.openRecord(block)">
+                                                <span class="fcp-card-scope"><t t-esc="block.scope_label"/></span>
+                                                <span class="fcp-card-title"><t t-esc="block.display_name"/></span>
+                                                <span class="fcp-card-meta" t-if="block.source_field">
+                                                    Талбар: <t t-esc="block.source_field"/>
+                                                </span>
+                                                <span class="fcp-card-meta" t-if="block.status">
+                                                    Төлөв: <t t-esc="block.status"/>
+                                                </span>
+                                            </button>
+                                            <blockquote class="fcp-quote" t-if="block.snippet">
+                                                <t t-esc="block.snippet"/>
+                                            </blockquote>
+                                            <p class="fcp-flag" t-if="block.injection_flag">
+                                                Бичлэгт заавар шиг текст илэрсэн тул шүүж, өгөгдөл гэж үзсэн.
+                                            </p>
+                                        </li>
+                                    </t>
+                                </ul>
+
+                                <h2 class="fcp-h2" t-if="state.result.gaps.length">Дутуу зүйл</h2>
+                                <ul class="fcp-gaps" t-if="state.result.gaps.length">
+                                    <t t-foreach="state.result.gaps" t-as="gap" t-key="gap_index">
+                                        <li><t t-esc="gap"/></li>
+                                    </t>
+                                </ul>
+
+                                <p class="fcp-disclaimer"><t t-esc="state.result.disclaimer"/></p>
+                            </article>
+                        </t>
+                    </div>
+                </section>
+
+                <!-- ============ САНАЛ ============ -->
+                <section t-if="state.tab === 'suggest'" class="fcp-panel" role="tabpanel" aria-label="Санал">
+                    <p class="fcp-body">Санал нь автомат тооцоолол. Шийдвэрийг эрх бүхий хүн гаргана; туслах өөрөө ямар ч өөрчлөлт хийхгүй.</p>
+                    <div class="fcp-form">
+                        <label class="fcp-label" for="fcp-kind">Төрөл</label>
+                        <select id="fcp-kind" class="fcp-select" t-on-change="(ev) => this.onKindChange(ev)">
+                            <t t-foreach="this.kinds" t-as="k" t-key="k.value">
+                                <option t-att-value="k.value" t-att-selected="state.kind === k.value"><t t-esc="k.label"/></option>
+                            </t>
+                        </select>
+
+                        <label class="fcp-label" for="fcp-target">Бичлэг</label>
+                        <select id="fcp-target" class="fcp-select" t-on-change="(ev) => this.onTargetChange(ev)">
+                            <option value="">— Сонгоно уу —</option>
+                            <t t-foreach="state.targets" t-as="t" t-key="t.id">
+                                <option t-att-value="t.id" t-att-selected="String(t.id) === state.targetId"><t t-esc="t.name"/></option>
+                            </t>
+                        </select>
+                        <div class="fcp-actions">
+                            <button type="button" class="fcp-btn fcp-btn--secondary" t-on-click="() => this.loadTargets()">Жагсаалт шинэчлэх</button>
+                            <button type="button" class="fcp-btn fcp-btn--primary" t-att-disabled="!state.targetId or state.suggestLoading"
+                                    t-on-click="() => this.requestSuggestion()">Санал авах</button>
+                        </div>
+                    </div>
+
+                    <div class="fcp-results" aria-live="polite">
+                        <div t-if="state.suggestLoading" class="fcp-state" role="status">
+                            <span class="fcp-spinner" aria-hidden="true"></span> Санал бэлдэж байна…
+                        </div>
+                        <div t-if="state.suggestError" class="fcp-alert" role="alert"><t t-esc="state.suggestError"/></div>
+
+                        <t t-if="state.suggestion">
+                            <article class="fcp-answer" aria-label="Санал">
+                                <p class="fcp-label-auto"><t t-esc="state.suggestion.label"/></p>
+                                <ul class="fcp-summary" t-if="state.suggestion.summary.length">
+                                    <t t-foreach="state.suggestion.summary" t-as="line" t-key="line_index">
+                                        <li><t t-esc="line"/></li>
+                                    </t>
+                                </ul>
+
+                                <t t-if="state.suggestion.items.length">
+                                    <h2 class="fcp-h2">Санал болгох хяналтууд</h2>
+                                    <ul class="fcp-cards">
+                                        <t t-foreach="state.suggestion.items" t-as="item" t-key="item.res_id">
+                                            <li class="fcp-card">
+                                                <button type="button" class="fcp-card-btn" t-on-click="() => this.openSuggestionItem(item)">
+                                                    <span class="fcp-card-title"><t t-esc="item.display_name"/></span>
+                                                    <span class="fcp-card-meta"><t t-esc="item.reason"/></span>
+                                                    <span class="fcp-card-meta">Итгэлцэл: <t t-esc="item.confidence === 'medium' ? 'Дунд' : 'Бага'"/></span>
+                                                    <span class="fcp-card-meta" t-if="item.already_linked">Аль хэдийн холбогдсон</span>
+                                                </button>
+                                            </li>
+                                        </t>
+                                    </ul>
+                                </t>
+
+                                <t t-if="state.suggestion.timeline.length">
+                                    <h2 class="fcp-h2">Цагийн тэнхлэг</h2>
+                                    <ol class="fcp-timeline">
+                                        <t t-foreach="state.suggestion.timeline" t-as="ev" t-key="ev_index">
+                                            <li><time t-esc="ev.date"/> — <t t-esc="ev.text"/></li>
+                                        </t>
+                                    </ol>
+                                </t>
+
+                                <t t-if="state.suggestion.gaps.length">
+                                    <h2 class="fcp-h2">Дутуу зүйл</h2>
+                                    <ul class="fcp-gaps">
+                                        <t t-foreach="state.suggestion.gaps" t-as="gap" t-key="gap_index">
+                                            <li><t t-esc="gap"/></li>
+                                        </t>
+                                    </ul>
+                                </t>
+
+                                <p class="fcp-body"><strong>Тодорхойгүй байдал:</strong> <t t-esc="state.suggestion.uncertainty"/></p>
+                                <p class="fcp-disclaimer"><t t-esc="state.suggestion.disclaimer"/></p>
+                            </article>
+                        </t>
+                    </div>
+                </section>
+            </div>
+        </Layout>
+    </t>
+
+</templates>

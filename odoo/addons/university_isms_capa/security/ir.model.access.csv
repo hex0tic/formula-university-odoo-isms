@@ -1,0 +1,12 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_finding_owner,finding asset owner,model_isms_finding,university_isms.group_isms_asset_owner,1,0,0,0
+access_finding_auditor,finding auditor,model_isms_finding,university_isms.group_isms_auditor,1,0,1,0
+access_finding_analyst,finding analyst,model_isms_finding,university_isms.group_isms_analyst,1,1,1,0
+access_finding_manager,finding manager,model_isms_finding,university_isms.group_isms_manager,1,1,1,0
+access_capa_owner,capa asset owner,model_isms_capa,university_isms.group_isms_asset_owner,1,0,0,0
+access_capa_auditor,capa auditor,model_isms_capa,university_isms.group_isms_auditor,1,1,0,0
+access_capa_analyst,capa analyst,model_isms_capa,university_isms.group_isms_analyst,1,1,1,0
+access_capa_manager,capa manager,model_isms_capa,university_isms.group_isms_manager,1,1,1,0
+access_waiver_auditor,waiver auditor,model_isms_risk_waiver,university_isms.group_isms_auditor,1,0,0,0
+access_waiver_analyst,waiver analyst,model_isms_risk_waiver,university_isms.group_isms_analyst,1,1,1,0
+access_waiver_manager,waiver manager,model_isms_risk_waiver,university_isms.group_isms_manager,1,1,1,0

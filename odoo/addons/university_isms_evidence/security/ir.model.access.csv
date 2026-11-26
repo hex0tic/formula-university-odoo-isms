@@ -1,0 +1,11 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_isms_evidence_owner,evidence asset owner,model_isms_evidence,university_isms.group_isms_asset_owner,1,1,1,1
+access_isms_evidence_analyst,evidence analyst,model_isms_evidence,university_isms.group_isms_analyst,1,1,1,1
+access_isms_evidence_auditor,evidence auditor,model_isms_evidence,university_isms.group_isms_auditor,1,1,0,0
+access_isms_campaign_analyst,attestation campaign analyst,model_isms_policy_attestation_campaign,university_isms.group_isms_analyst,1,1,1,0
+access_isms_campaign_auditor,attestation campaign auditor,model_isms_policy_attestation_campaign,university_isms.group_isms_auditor,1,0,0,0
+access_isms_attestation_user,attestation self,model_isms_policy_attestation,base.group_user,1,0,0,0
+access_isms_attestation_analyst,attestation analyst,model_isms_policy_attestation,university_isms.group_isms_analyst,1,1,1,0
+access_isms_attestation_auditor,attestation auditor,model_isms_policy_attestation,university_isms.group_isms_auditor,1,0,0,0
+access_isms_export_auditor,evidence export auditor,model_isms_evidence_export,university_isms.group_isms_auditor,1,0,1,0
+access_isms_evidence_export_wizard_user,evidence export wizard (transient),model_isms_evidence_export_wizard,base.group_user,1,1,1,1

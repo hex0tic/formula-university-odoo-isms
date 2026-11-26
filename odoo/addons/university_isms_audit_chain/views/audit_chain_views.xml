@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Аудит лог: гинжийн дугаар ба хэш багана (university_isms-ийн view-г өөрчлөхгүйгээр) -->
+    <record id="isms_audit_log_view_list_chain" model="ir.ui.view">
+        <field name="name">isms.audit.log.list.chain</field>
+        <field name="model">isms.audit.log</field>
+        <field name="inherit_id" ref="university_isms.isms_audit_log_view_list"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='timestamp']" position="after">
+                <field name="seq" optional="show"/>
+            </xpath>
+            <xpath expr="//field[@name='ip_address']" position="after">
+                <field name="prev_hash" optional="hide"/>
+                <field name="entry_hash" optional="hide"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Гинжийн төлөв (нэг мөр) -->
+    <record id="isms_audit_chain_head_view_list" model="ir.ui.view">
+        <field name="name">isms.audit.chain.head.list</field>
+        <field name="model">isms.audit.chain.head</field>
+        <field name="arch" type="xml">
+            <list create="0" delete="0">
+                <field name="name"/>
+                <field name="last_seq"/>
+                <field name="chained_count"/>
+                <field name="last_verified_at"/>
+                <field name="last_verified_ok" widget="boolean_toggle"/>
+                <field name="last_verified_reason"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="isms_audit_chain_head_view_form" model="ir.ui.view">
+        <field name="name">isms.audit.chain.head.form</field>
+        <field name="model">isms.audit.chain.head</field>
+        <field name="arch" type="xml">
+            <form string="Аудит гинжийн төлөв" create="0" delete="0">
+                <header>
+                    <button name="action_verify_chain" type="object" string="Гинжийг шалгах"
+                            class="btn-primary"
+                            groups="university_isms.group_isms_auditor,university_isms.group_isms_manager"/>
+                </header>
+                <sheet>
+                    <div class="alert alert-info" role="alert">
+                        Гинжийн шалгалт зөвхөн унших үйлдэл. Гадаад (дамжуулсан) хэштэй харьцуулснаар л
+                        бодит tamper-evidence баталгаажна. DB superuser trigger-ийг унтраах боломжтой.
+                    </div>
+                    <group>
+                        <group string="Гинж">
+                            <field name="last_seq"/>
+                            <field name="last_hash"/>
+                            <field name="chained_count"/>
+                            <field name="unchained_count"/>
+                        </group>
+                        <group string="Сүүлийн шалгалт">
+                            <field name="last_verified_at"/>
+                            <field name="last_verified_ok"/>
+                            <field name="last_verified_checked"/>
+                            <field name="last_verified_seq"/>
+                            <field name="last_verified_reason"/>
+                        </group>
+                    </group>
+                    <group string="Гадаад дамжуулалт">
+                        <field name="file_target_state"/>
+                        <field name="http_target_state"/>
+                        <field name="forward_file_seq"/>
+                        <field name="forward_http_seq"/>
+                        <field name="queue_pending"/>
+                        <field name="queue_failed"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Дамжуулалтын дараалал -->
+    <record id="isms_audit_forward_view_list" model="ir.ui.view">
+        <field name="name">isms.audit.forward.list</field>
+        <field name="model">isms.audit.forward</field>
+        <field name="arch" type="xml">
+            <list create="0" edit="0" delete="0"
+                  decoration-danger="state == 'failed'"
+                  decoration-success="state == 'sent'"
+                  decoration-muted="state == 'pending'">
+                <header>
+                    <button name="action_run_forward" type="object" string="Одоо илгээх"
+                            groups="university_isms.group_isms_manager,base.group_system"/>
+                </header>
+                <field name="target"/>
+                <field name="seq_from"/>
+                <field name="seq_to"/>
+                <field name="entry_count"/>
+                <field name="state" widget="badge"
+                       decoration-danger="state == 'failed'"
+                       decoration-success="state == 'sent'"
+                       decoration-info="state == 'pending'"/>
+                <field name="attempts"/>
+                <field name="last_error" optional="show"/>
+                <field name="sent_at"/>
+                <field name="head_hash" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="isms_audit_forward_view_form" model="ir.ui.view">
+        <field name="name">isms.audit.forward.form</field>
+        <field name="model">isms.audit.forward</field>
+        <field name="arch" type="xml">
+            <form string="Дамжуулах багц" create="0" delete="0" edit="0">
+                <header>
+                    <button name="action_retry" type="object" string="Дахин оролдох"
+                            invisible="state == 'sent'"
+                            groups="university_isms.group_isms_manager,base.group_system"/>
+                    <field name="state" widget="statusbar" statusbar_visible="pending,sent,failed"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="target"/>
+                            <field name="seq_from"/>
+                            <field name="seq_to"/>
+                            <field name="entry_count"/>
+                        </group>
+                        <group>
+                            <field name="attempts"/>
+                            <field name="sent_at"/>
+                            <field name="created_at"/>
+                        </group>
+                    </group>
+                    <group string="Криптограф баталгаа">
+                        <field name="head_hash"/>
+                        <field name="payload_digest"/>
+                    </group>
+                    <group string="Сүүлийн алдаа" invisible="not last_error">
+                        <field name="last_error" nolabel="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="isms_audit_forward_view_search" model="ir.ui.view">
+        <field name="name">isms.audit.forward.search</field>
+        <field name="model">isms.audit.forward</field>
+        <field name="arch" type="xml">
+            <search string="Дамжуулалт">
+                <filter string="Хүлээгдэж буй" name="pending" domain="[('state', '=', 'pending')]"/>
+                <filter string="Амжилтгүй" name="failed" domain="[('state', '=', 'failed')]"/>
+                <filter string="Илгээсэн" name="sent" domain="[('state', '=', 'sent')]"/>
+                <separator/>
+                <filter string="JSONL файл" name="file" domain="[('target', '=', 'file')]"/>
+                <filter string="HTTP(S)" name="http" domain="[('target', '=', 'http')]"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_isms_audit_chain_head" model="ir.actions.act_window">
+        <field name="name">Гинжийн төлөв</field>
+        <field name="res_model">isms.audit.chain.head</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <record id="action_isms_audit_forward" model="ir.actions.act_window">
+        <field name="name">Дамжуулалтын дараалал</field>
+        <field name="res_model">isms.audit.forward</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="isms_audit_forward_view_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Дамжуулах багц хараахан алга</p>
+            <p>Аудит гинжийн бичлэгүүд JSONL файл эсвэл HTTP(S) endpoint руу 15 минут тутам багцлагдана.</p>
+        </field>
+    </record>
+
+    <menuitem id="menu_isms_audit_chain_top" name="Аудит гинж" parent="university_isms.menu_isms_root"
+              sequence="71" groups="university_isms.group_isms_auditor,university_isms.group_isms_manager,base.group_system"/>
+    <menuitem id="menu_isms_audit_chain_status" name="Гинжийн төлөв" parent="menu_isms_audit_chain_top"
+              action="action_isms_audit_chain_head" sequence="10"/>
+    <menuitem id="menu_isms_audit_chain_queue" name="Дамжуулалтын дараалал" parent="menu_isms_audit_chain_top"
+              action="action_isms_audit_forward" sequence="20"/>
+</odoo>

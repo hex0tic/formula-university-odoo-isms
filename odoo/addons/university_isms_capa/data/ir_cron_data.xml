@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ISMS-07: хугацаа дууссан эрсдлийн зөвшөөрлийг өдөр бүр хаах (идемпотент) -->
+    <record id="ir_cron_isms_waiver_expiry" model="ir.cron">
+        <field name="name">ISMS: эрсдлийн зөвшөөрлийн хугацаа дуусалт</field>
+        <field name="model_id" ref="model_isms_risk_waiver"/>
+        <field name="state">code</field>
+        <field name="code">model._cron_expire_waivers()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="active" eval="True"/>
+    </record>
+</odoo>

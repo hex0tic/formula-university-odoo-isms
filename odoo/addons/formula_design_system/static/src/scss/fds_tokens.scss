@@ -1,0 +1,78 @@
+// Formula Design System - light design tokens.
+// Every token is a CSS custom property prefixed with --fds-. Other addons should
+// consume them with a fallback, e.g. var(--fds-primary, #635BFF).
+// Dark values live in fds_tokens.dark.scss (loaded only by web.assets_web_dark).
+// Text-bearing colors are AA (>= 4.5:1) against their background; brand colors
+// used only for icons, borders or large fills are documented as such in README.md.
+
+:root {
+    // Surfaces
+    --fds-bg: #F8FAFC;
+    --fds-bg-muted: #F1F5F9;
+    --fds-surface: #FFFFFF;
+    --fds-surface-raised: #FFFFFF;
+    --fds-border: #E2E8F0;
+    --fds-border-strong: #CBD5E1;
+
+    // Text
+    --fds-text: #0F172A;          // 17.9:1 on --fds-surface
+    --fds-text-muted: #475569;    // 7.2:1 on --fds-bg
+
+    // Navigation
+    --fds-navbar-bg: #0F172A;
+    --fds-navbar-text: #E2E8F0;   // 14.5:1 on --fds-navbar-bg
+
+    // Brand and semantic (brand value first; "-text" variants are AA text colors)
+    --fds-primary: #635BFF;       // button fill, white text 4.7:1
+    --fds-primary-hover: #4C44D9; // white text 6.7:1
+    --fds-primary-active: #3F38B8;
+    --fds-primary-text: #4C44D9;  // links and outline buttons on white, 6.7:1
+    --fds-primary-soft: #EEF0FF;
+
+    --fds-success: #0D9488;       // icons, borders, accents
+    --fds-success-fill: #0F766E;  // button/badge fill with white text 5.5:1
+    --fds-success-text: #0F766E;
+    --fds-success-soft: #CCFBF1;
+
+    --fds-warning: #F59E0B;       // icons, borders, accents (dark text on it, 8.3:1 with --fds-text dark)
+    --fds-warning-text: #92400E;  // text on --fds-warning-soft, 6.4:1
+    --fds-warning-soft: #FEF3C7;
+
+    --fds-danger: #EF4444;        // icons, borders, accents
+    --fds-danger-fill: #DC2626;   // button fill with white text 4.8:1
+    --fds-danger-hover: #B91C1C;
+    --fds-danger-active: #991B1B;
+    --fds-danger-text: #B91C1C;   // text on white, 6.5:1
+    --fds-danger-soft: #FEE2E2;
+
+    --fds-focus: #635BFF;         // focus ring, 4.7:1 against white surfaces
+
+    // Shape
+    --fds-radius-sm: 6px;
+    --fds-radius-md: 10px;
+    --fds-radius-lg: 12px;
+    --fds-radius-pill: 999px;
+
+    // Spacing (4/8px scale)
+    --fds-space-1: 4px;
+    --fds-space-2: 8px;
+    --fds-space-3: 12px;
+    --fds-space-4: 16px;
+    --fds-space-6: 24px;
+    --fds-space-8: 32px;
+
+    // Elevation
+    --fds-shadow-card: 0 1px 2px rgba(15, 23, 42, .06), 0 1px 3px rgba(15, 23, 42, .08);
+    --fds-shadow-hover: 0 4px 12px rgba(15, 23, 42, .10);
+    --fds-shadow-overlay: 0 12px 32px rgba(15, 23, 42, .18);
+
+    // Motion (keep within 150-250ms; disabled under prefers-reduced-motion)
+    --fds-duration-fast: 150ms;
+    --fds-duration-base: 200ms;
+    --fds-duration-slow: 250ms;
+    --fds-ease: cubic-bezier(.2, 0, 0, 1);
+
+    // Typography. Cyrillic (Mongolian) is covered by Noto Sans / Segoe UI / Roboto.
+    // No web fonts are loaded from external hosts.
+    --fds-font-family: "Inter", "Segoe UI", Roboto, "Noto Sans", Arial, sans-serif;
+}

@@ -1,0 +1,53 @@
+<odoo>
+    <record id="action_report_transcript" model="ir.actions.report">
+        <field name="name">Сургалтын транскрипт</field>
+        <field name="model">campus.student</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">campus_academic_plus.report_transcript_document</field>
+        <field name="report_file">campus_academic_plus.report_transcript_document</field>
+        <field name="print_report_name">'Транскрипт - %s' % (object.student_code)</field>
+    </record>
+
+    <template id="report_transcript_document">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <h2>Сургалтын транскрипт</h2>
+                        <p><strong>Оюутны код:</strong> <span t-field="doc.student_code"/></p>
+                        <p><strong>Нэр:</strong> <span t-field="doc.name"/></p>
+                        <p><strong>Хөтөлбөр:</strong> <span t-field="doc.program_id.name"/></p>
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Улирал</th>
+                                    <th>Хичээл</th>
+                                    <th>Кредит</th>
+                                    <th>Дүн</th>
+                                    <th>Үсгэн дүн</th>
+                                    <th>Төлөв</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-foreach="doc.enrollment_ids" t-as="enr">
+                                    <tr t-if="enr.reg_state != 'dropped'">
+                                        <td><span t-field="enr.offering_id.semester"/></td>
+                                        <td><span t-field="enr.offering_id.course_id.name"/></td>
+                                        <td><span t-field="enr.credits"/></td>
+                                        <td><span t-field="enr.score"/></td>
+                                        <td><span t-field="enr.letter_grade"/></td>
+                                        <td><span t-field="enr.reg_state"/></td>
+                                    </tr>
+                                </t>
+                            </tbody>
+                        </table>
+                        <p><strong>GPA:</strong> <span t-field="doc.gpa"/></p>
+                        <p><strong>Олгосон кредит:</strong> <span t-field="doc.credits_earned"/></p>
+                        <p><strong>Төгсөлтийн байдал:</strong> <span t-field="doc.graduation_missing"/></p>
+                        <p class="text-muted">Үсгэн дүн, GPA нь тохируулж болох таамаглал бодлогоор тооцогдсон.</p>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

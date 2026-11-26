@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_formula_integration_endpoint_list" model="ir.ui.view">
+        <field name="name">formula.integration.endpoint.list</field>
+        <field name="model">formula.integration.endpoint</field>
+        <field name="arch" type="xml">
+            <list string="Интеграцийн тохиргоо">
+                <field name="name"/>
+                <field name="kind"/>
+                <field name="enabled"/>
+                <field name="base_url"/>
+                <field name="auth_method"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_formula_integration_endpoint_form" model="ir.ui.view">
+        <field name="name">formula.integration.endpoint.form</field>
+        <field name="model">formula.integration.endpoint</field>
+        <field name="arch" type="xml">
+            <form string="Интеграцийн тохиргоо">
+                <sheet>
+                    <div class="alert alert-info" role="alert">
+                        Нууцын утгыг энд оруулахгүй. Зөвхөн ir.config_parameter эсвэл орчны хувьсагчийн нэрийг заана.
+                        Feature flag анхдагчаар унтраалттай.
+                    </div>
+                    <group>
+                        <group string="Ерөнхий">
+                            <field name="name"/>
+                            <field name="kind"/>
+                            <field name="enabled" string="Идэвхтэй (feature flag)"/>
+                            <field name="base_url"/>
+                            <field name="timeout_seconds"/>
+                            <field name="max_attempts"/>
+                        </group>
+                        <group string="Нууц ба нэвтрэлт">
+                            <field name="auth_method"/>
+                            <field name="header_name"/>
+                            <field name="secret_source"/>
+                            <field name="secret_key" string="Нууцын лавлагаа (утга биш)"/>
+                        </group>
+                    </group>
+                    <group string="SSO (OIDC)">
+                        <field name="issuer"/>
+                        <field name="client_id"/>
+                        <field name="allowed_domains"/>
+                    </group>
+                    <notebook>
+                        <page string="SSO бүлгийн дүрэм" name="sso_rules">
+                            <field name="group_rule_ids">
+                                <list editable="bottom">
+                                    <field name="idp_group"/>
+                                    <field name="group_id"/>
+                                    <field name="active"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Тэмдэглэл" name="note">
+                            <field name="note" nolabel="1"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_formula_integration_endpoint" model="ir.actions.act_window">
+        <field name="name">Интеграцийн тохиргоо</field>
+        <field name="res_model">formula.integration.endpoint</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

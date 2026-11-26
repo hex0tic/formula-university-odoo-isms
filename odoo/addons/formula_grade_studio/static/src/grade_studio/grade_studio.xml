@@ -1,0 +1,256 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <t t-name="formula_grade_studio.DecisionDialog">
+        <Dialog size="'md'" title="props.title">
+            <div class="fgs-dialog">
+                <p class="fgs-dialog-body" t-esc="props.body"/>
+                <label class="fgs-label" for="fgs-decision-note"><t t-esc="labels.noteLabel"/> <span aria-hidden="true">*</span></label>
+                <textarea id="fgs-decision-note" class="fgs-textarea" rows="4" required="required"
+                          aria-required="true"
+                          t-att-aria-invalid="state.error ? 'true' : undefined"
+                          t-att-aria-describedby="state.error ? 'fgs-decision-error' : undefined"
+                          t-att-placeholder="labels.notePlaceholder"
+                          t-model="state.note"/>
+                <p t-if="state.error" id="fgs-decision-error" class="fgs-error-text" role="alert"><t t-esc="state.error"/></p>
+            </div>
+            <t t-set-slot="footer">
+                <button type="button" class="fgs-btn fgs-btn--danger" t-att-disabled="state.submitting" t-on-click="() => this.confirm()"><t t-esc="props.confirmLabel"/></button>
+                <button type="button" class="fgs-btn" t-on-click="() => this.props.close()"><t t-esc="labels.cancel"/></button>
+            </t>
+        </Dialog>
+    </t>
+
+    <t t-name="formula_grade_studio.Studio">
+        <Layout display="{ controlPanel: {} }" className="'o_formula_grade_studio'">
+            <div class="fgs">
+                <header class="fgs-header">
+                    <div class="fgs-heading">
+                        <h1 class="fgs-h1">Дүн өөрчлөх хүсэлтийн батлах студио</h1>
+                        <p class="fgs-sub">Дүнгийн өөрчлөлтийг өөр ажилтан шалгаж батална. Батлагдах хүртэл баталгаат дүн өөрчлөгдөхгүй.</p>
+                    </div>
+                    <button type="button" class="fgs-btn" t-att-disabled="state.loading or state.busy"
+                            t-on-click="() => this.refresh()">Шинэчлэх</button>
+                </header>
+
+                <!-- Access denied: never list records for roles outside the studio -->
+                <div t-if="state.accessDenied" class="fgs-state fgs-state--denied" role="status">
+                    <h2 class="fgs-h2">Хандах эрх байхгүй</h2>
+                    <p class="fgs-text">Дүн өөрчлөх хүсэлтийн студиог багш, сургалтын алба, академик аудитор харна.</p>
+                </div>
+
+                <div t-else="" class="fgs-layout">
+                    <section class="fgs-queue" aria-labelledby="fgs-queue-title">
+                        <h2 id="fgs-queue-title" class="fgs-h2">Хүсэлтийн жагсаалт</h2>
+                        <div class="fgs-filters" role="group" aria-label="Шүүлтүүр">
+                            <t t-foreach="counterLabels" t-as="f" t-key="f.key">
+                                <button type="button" class="fgs-chip"
+                                        t-att-class="{ 'is-active': state.filter === f.key }"
+                                        t-att-aria-pressed="state.filter === f.key ? 'true' : 'false'"
+                                        t-att-disabled="state.loading"
+                                        t-on-click="() => this.setFilter(f.key)">
+                                    <span t-esc="f.label"/>
+                                    <span class="fgs-count" t-esc="f.count"/>
+                                </button>
+                            </t>
+                        </div>
+
+                        <p t-if="state.loading and !state.items.length" class="fgs-text" role="status" aria-live="polite">Хүсэлтүүдийг ачаалж байна...</p>
+
+                        <div t-elif="state.queueError" class="fgs-state fgs-state--error" role="alert">
+                            <p class="fgs-text">Жагсаалтыг ачаалж чадсангүй.</p>
+                            <button type="button" class="fgs-btn" t-on-click="() => this.loadQueue()">Дахин ачаалах</button>
+                        </div>
+
+                        <p t-elif="!state.items.length" class="fgs-text fgs-empty" role="status"><t t-esc="noItemsMessage"/></p>
+
+                        <ul t-else="" class="fgs-list" role="list">
+                            <li t-foreach="state.items" t-as="item" t-key="item.id" class="fgs-list-item">
+                                <button type="button" class="fgs-row"
+                                        t-att-class="{ 'is-selected': state.selectedId === item.id }"
+                                        t-att-aria-current="state.selectedId === item.id ? 'true' : undefined"
+                                        t-on-click="() => this.selectRequest(item.id)">
+                                    <span class="fgs-row-title" t-esc="item.name"/>
+                                    <span class="fgs-row-sub"><t t-esc="item.student.name"/> / <t t-esc="item.offering.name"/></span>
+                                    <span class="fgs-row-meta">
+                                        <span>Өмнөх <t t-esc="item.old_score"/></span>
+                                        <span>Шинэ <t t-esc="item.proposed_score"/></span>
+                                        <span class="fgs-badge" t-att-class="item.state === 'submitted' ? 'is-pending' : (item.state === 'approved' ? 'is-ok' : 'is-muted')" t-esc="item.state_label"/>
+                                        <span t-if="item.stale" class="fgs-badge is-warn">Хуучирсан</span>
+                                    </span>
+                                </button>
+                            </li>
+                        </ul>
+                        <p t-if="state.truncated" class="fgs-hint" role="status">Хэт олон хүсэлт байна. Эхний <t t-esc="state.items.length"/> харуулж байна.</p>
+                    </section>
+
+                    <section class="fgs-detail" aria-live="polite" aria-labelledby="fgs-detail-title">
+                        <p t-if="state.detailLoading" class="fgs-text" role="status">Дэлгэрэнгүйг ачаалж байна...</p>
+
+                        <div t-elif="state.detailError" class="fgs-state fgs-state--error" role="alert">
+                            <p class="fgs-text">Хүсэлтийг ачаалж чадсангүй. <t t-esc="state.detailError"/></p>
+                        </div>
+
+                        <p t-elif="!state.detail" class="fgs-text fgs-empty" role="status">Жагсаалтаас хүсэлт сонгоно уу.</p>
+
+                        <t t-else="">
+                            <article class="fgs-card" t-att-data-state="state.detail.state">
+                                <header class="fgs-detail-head">
+                                    <div>
+                                        <h2 id="fgs-detail-title" class="fgs-h2" t-esc="state.detail.name"/>
+                                        <p class="fgs-text">
+                                            <t t-esc="state.detail.student.name"/>
+                                            <t t-if="state.detail.student.code"> (<t t-esc="state.detail.student.code"/>)</t>
+                                            / <t t-esc="state.detail.offering.name"/>
+                                            <t t-if="state.detail.offering.semester"> / <t t-esc="state.detail.offering.semester"/></t>
+                                        </p>
+                                    </div>
+                                    <span class="fgs-badge" t-att-class="state.detail.state === 'submitted' ? 'is-pending' : (state.detail.state === 'approved' ? 'is-ok' : 'is-muted')" t-esc="state.detail.state_label"/>
+                                </header>
+
+                                <div t-if="state.detail.stale" class="fgs-alert fgs-alert--warn" role="alert">
+                                    <p class="fgs-alert-title">Анхааруулга: хуучирсан хувилбар</p>
+                                    <p class="fgs-text">Хүсэлт гаргасны дараа баталгаат дүн эсвэл хувилбар өөрчлөгдсөн байна
+                                        (<t t-esc="staleReasonLabels.join(', ')"/>). Энэ хүсэлтийг батлах боломжгүй. Шинэ хүсэлт гаргана уу.</p>
+                                </div>
+
+                                <section class="fgs-section" aria-labelledby="fgs-compare-title">
+                                    <h3 id="fgs-compare-title" class="fgs-h3">Дүнгийн харьцуулалт</h3>
+                                    <dl class="fgs-compare">
+                                        <div class="fgs-compare-cell">
+                                            <dt class="fgs-dt">Өмнөх дүн</dt>
+                                            <dd class="fgs-dd fgs-num" t-esc="state.detail.old_score"/>
+                                        </div>
+                                        <div class="fgs-compare-cell">
+                                            <dt class="fgs-dt">Хүссэн дүн</dt>
+                                            <dd class="fgs-dd fgs-num" t-esc="state.detail.proposed_score"/>
+                                        </div>
+                                        <div class="fgs-compare-cell">
+                                            <dt class="fgs-dt">Зөрүү</dt>
+                                            <dd class="fgs-dd fgs-num" t-att-class="state.detail.delta &lt; 0 ? 'is-down' : (state.detail.delta &gt; 0 ? 'is-up' : '')" t-esc="deltaLabel"/>
+                                        </div>
+                                    </dl>
+                                </section>
+
+                                <section class="fgs-section" aria-labelledby="fgs-rev-title">
+                                    <h3 id="fgs-rev-title" class="fgs-h3">Хувилбарын мэдээлэл</h3>
+                                    <dl class="fgs-meta">
+                                        <dt>Хүсэлт гаргах үеийн хувилбар</dt>
+                                        <dd t-esc="state.detail.old_revision"/>
+                                        <dt>Одоогийн хувилбар</dt>
+                                        <dd>
+                                            <t t-if="state.detail.enrollment_visible" t-esc="state.detail.current_revision"/>
+                                            <t t-else="">Таны эрхээр харагдахгүй</t>
+                                        </dd>
+                                        <dt>Одоогийн баталгаат дүн</dt>
+                                        <dd>
+                                            <t t-if="state.detail.enrollment_visible" t-esc="state.detail.current_score"/>
+                                            <t t-else="">Таны эрхээр харагдахгүй</t>
+                                        </dd>
+                                        <dt>Хувилбарын төлөв</dt>
+                                        <dd t-esc="state.detail.stale ? 'Хуучирсан' : 'Шинэ'"/>
+                                    </dl>
+                                </section>
+
+                                <section class="fgs-section" aria-labelledby="fgs-reason-title">
+                                    <h3 id="fgs-reason-title" class="fgs-h3">Үндэслэл ба нотолгоо</h3>
+                                    <p class="fgs-text fgs-prewrap" t-esc="state.detail.reason"/>
+                                    <dl class="fgs-meta">
+                                        <dt>Нотолгооны лавлагаа</dt>
+                                        <dd t-esc="state.detail.evidence_ref || 'Байхгүй'"/>
+                                        <dt>Хавсаргасан файл</dt>
+                                        <dd t-esc="state.detail.evidence_count"/>
+                                    </dl>
+                                    <t t-if="state.detail.review_note">
+                                        <p class="fgs-label">Хянасан тайлбар</p>
+                                        <p class="fgs-text fgs-prewrap" t-esc="state.detail.review_note"/>
+                                    </t>
+                                </section>
+
+                                <section class="fgs-section" aria-labelledby="fgs-people-title">
+                                    <h3 id="fgs-people-title" class="fgs-h3">Хүмүүс ба огноо</h3>
+                                    <dl class="fgs-meta">
+                                        <dt>Багш</dt>
+                                        <dd t-esc="state.detail.offering.lecturer"/>
+                                        <dt>Хүсэлт гаргагч</dt>
+                                        <dd t-esc="state.detail.requester.name"/>
+                                        <dt>Батлагч</dt>
+                                        <dd t-esc="state.detail.approver ? state.detail.approver.name : 'Байхгүй'"/>
+                                        <dt>Хичээл</dt>
+                                        <dd t-esc="state.detail.offering.course"/>
+                                        <dt>Үүсгэсэн</dt>
+                                        <dd t-esc="formatDate(state.detail.created_at)"/>
+                                        <dt>Илгээсэн</dt>
+                                        <dd t-esc="formatDate(state.detail.submitted_at)"/>
+                                        <dt>Шийдвэрлэсэн</dt>
+                                        <dd t-esc="formatDate(state.detail.approved_at)"/>
+                                    </dl>
+                                </section>
+
+                                <section class="fgs-section" aria-labelledby="fgs-actions-title">
+                                    <h3 id="fgs-actions-title" class="fgs-h3">Үйлдэл</h3>
+                                    <p class="fgs-hint" role="status" t-if="state.busy">Боловсруулж байна. Түр хүлээнэ үү.</p>
+                                    <div class="fgs-actions">
+                                        <div class="fgs-action">
+                                            <button type="button" class="fgs-btn" t-att-disabled="state.busy or !state.detail.actions.submit.allowed"
+                                                    t-att-aria-describedby="state.detail.actions.submit.allowed ? undefined : 'fgs-why-submit'"
+                                                    t-on-click="() => this.confirmDecision('submit')">Хянуулахаар илгээх</button>
+                                            <p t-if="!state.detail.actions.submit.allowed" id="fgs-why-submit" class="fgs-hint"><t t-esc="state.detail.actions.submit.reason"/></p>
+                                        </div>
+                                        <div class="fgs-action">
+                                            <button type="button" class="fgs-btn fgs-btn--primary" t-att-disabled="state.busy or !state.detail.actions.approve.allowed"
+                                                    t-att-aria-describedby="state.detail.actions.approve.allowed ? undefined : 'fgs-why-approve'"
+                                                    t-on-click="() => this.confirmDecision('approve')">Батлах</button>
+                                            <p t-if="!state.detail.actions.approve.allowed" id="fgs-why-approve" class="fgs-hint"><t t-esc="state.detail.actions.approve.reason"/></p>
+                                        </div>
+                                        <div class="fgs-action">
+                                            <button type="button" class="fgs-btn fgs-btn--danger" t-att-disabled="state.busy or !state.detail.actions.reject.allowed"
+                                                    t-att-aria-describedby="state.detail.actions.reject.allowed ? undefined : 'fgs-why-reject'"
+                                                    t-on-click="() => this.confirmDecision('reject')">Татгалзах</button>
+                                            <p t-if="!state.detail.actions.reject.allowed" id="fgs-why-reject" class="fgs-hint"><t t-esc="state.detail.actions.reject.reason"/></p>
+                                        </div>
+                                    </div>
+                                </section>
+
+                                <section class="fgs-section" aria-labelledby="fgs-history-title">
+                                    <h3 id="fgs-history-title" class="fgs-h3">Шийдвэрийн түүх</h3>
+                                    <p t-if="!historyEntries.length" class="fgs-text">Бүртгэгдсэн түүх алга.</p>
+                                    <ol t-else="" class="fgs-timeline">
+                                        <li t-foreach="historyEntries" t-as="entry" t-key="entry_index" class="fgs-timeline-item">
+                                            <t t-if="entry.type === 'tracking'">
+                                                <span class="fgs-timeline-date" t-esc="formatDate(entry.date)"/>
+                                                <span class="fgs-timeline-text">
+                                                    <t t-esc="entry.author"/>: <t t-esc="entry.field"/> (<t t-esc="entry.old"/> / <t t-esc="entry.new"/>)
+                                                </span>
+                                            </t>
+                                            <t t-else="">
+                                                <span class="fgs-timeline-date" t-esc="formatDate(entry.date)"/>
+                                                <span class="fgs-timeline-text">
+                                                    <t t-esc="entry.author"/>: <t t-esc="entry.text"/>
+                                                </span>
+                                            </t>
+                                        </li>
+                                    </ol>
+                                </section>
+
+                                <section class="fgs-section" aria-labelledby="fgs-isms-title">
+                                    <h3 id="fgs-isms-title" class="fgs-h3">ISMS аудитын бүртгэл</h3>
+                                    <p t-if="!ismsVisible" class="fgs-text">Энэ бүртгэлийг зөвхөн ISMS аудитор харна.</p>
+                                    <p t-elif="!ismsEntries.length" class="fgs-text">Аудитын бүртгэл алга.</p>
+                                    <ul t-else="" class="fgs-audit-list" role="list">
+                                        <li t-foreach="ismsEntries" t-as="log" t-key="log_index" class="fgs-audit-item">
+                                            <span class="fgs-timeline-date" t-esc="formatDate(log.timestamp)"/>
+                                            <span><t t-esc="log.user"/> / <t t-esc="log.action"/> / <t t-esc="log.model"/></span>
+                                            <span t-if="log.changes" class="fgs-prewrap fgs-audit-changes" t-esc="log.changes"/>
+                                        </li>
+                                    </ul>
+                                </section>
+                            </article>
+                        </t>
+                    </section>
+                </div>
+            </div>
+        </Layout>
+    </t>
+
+</templates>

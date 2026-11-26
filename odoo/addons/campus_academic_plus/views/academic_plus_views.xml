@@ -1,0 +1,284 @@
+<odoo>
+    <!-- Terms -->
+    <record id="view_term_list" model="ir.ui.view">
+        <field name="name">campus.academic.term.list</field>
+        <field name="model">campus.academic.term</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="code"/>
+                <field name="name"/>
+                <field name="date_start"/>
+                <field name="date_end"/>
+                <field name="registration_start"/>
+                <field name="registration_end"/>
+                <field name="add_drop_end"/>
+                <field name="state" widget="badge"/>
+            </list>
+        </field>
+    </record>
+    <record id="view_term_form" model="ir.ui.view">
+        <field name="name">campus.academic.term.form</field>
+        <field name="model">campus.academic.term</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_title"><h1><field name="name"/></h1></div>
+                    <group>
+                        <group>
+                            <field name="code"/>
+                            <field name="state"/>
+                        </group>
+                        <group>
+                            <field name="date_start"/>
+                            <field name="date_end"/>
+                        </group>
+                    </group>
+                    <group string="Бүртгэл ба нэмэх/хасах">
+                        <field name="registration_start"/>
+                        <field name="registration_end"/>
+                        <field name="add_drop_end"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="action_term" model="ir.actions.act_window">
+        <field name="name">Академик улирал</field>
+        <field name="res_model">campus.academic.term</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <!-- Sessions: calendar + list -->
+    <record id="view_session_list" model="ir.ui.view">
+        <field name="name">campus.session.list</field>
+        <field name="model">campus.session</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="offering_id"/>
+                <field name="start"/>
+                <field name="end"/>
+                <field name="room"/>
+                <field name="kind" widget="badge"/>
+                <field name="lecturer_id"/>
+            </list>
+        </field>
+    </record>
+    <record id="view_session_form" model="ir.ui.view">
+        <field name="name">campus.session.form</field>
+        <field name="model">campus.session</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="offering_id"/>
+                        <field name="kind"/>
+                        <field name="start"/>
+                        <field name="end"/>
+                        <field name="room"/>
+                        <field name="lecturer_id" readonly="1"/>
+                    </group>
+                    <field name="attendance_ids" readonly="1">
+                        <list>
+                            <field name="enrollment_id"/>
+                            <field name="status" widget="badge"/>
+                        </list>
+                    </field>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="view_session_calendar" model="ir.ui.view">
+        <field name="name">campus.session.calendar</field>
+        <field name="model">campus.session</field>
+        <field name="arch" type="xml">
+            <calendar string="Цагийн хуваарь" date_start="start" date_stop="end" color="kind" mode="week">
+                <field name="offering_id"/>
+                <field name="room"/>
+            </calendar>
+        </field>
+    </record>
+    <record id="action_session" model="ir.actions.act_window">
+        <field name="name">Цагийн хуваарь</field>
+        <field name="res_model">campus.session</field>
+        <field name="view_mode">calendar,list,form</field>
+    </record>
+
+    <!-- Attendance -->
+    <record id="view_attendance_list" model="ir.ui.view">
+        <field name="name">campus.attendance.list</field>
+        <field name="model">campus.attendance</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="session_id"/>
+                <field name="enrollment_id"/>
+                <field name="student_id"/>
+                <field name="status" widget="badge"/>
+                <field name="recorded_by"/>
+                <field name="recorded_at"/>
+            </list>
+        </field>
+    </record>
+    <record id="view_attendance_form" model="ir.ui.view">
+        <field name="name">campus.attendance.form</field>
+        <field name="model">campus.attendance</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="session_id"/>
+                        <field name="enrollment_id"/>
+                        <field name="student_id"/>
+                        <field name="status"/>
+                        <field name="recorded_by"/>
+                        <field name="recorded_at"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="action_attendance" model="ir.actions.act_window">
+        <field name="name">Ирц</field>
+        <field name="res_model">campus.attendance</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <!-- Policy (single record) -->
+    <record id="view_policy_form" model="ir.ui.view">
+        <field name="name">campus.academic.policy.form</field>
+        <field name="model">campus.academic.policy</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_title"><h1><field name="name"/></h1></div>
+                    <div class="alert alert-warning" role="alert"><field name="note"/></div>
+                    <group>
+                        <group>
+                            <field name="active"/>
+                            <field name="pass_score"/>
+                            <field name="max_credits_per_term"/>
+                        </group>
+                        <group>
+                            <field name="min_graduation_gpa"/>
+                        </group>
+                    </group>
+                    <group string="Үнэлгээний шатлал">
+                        <field name="scale_ids" nolabel="1">
+                            <list editable="bottom">
+                                <field name="min_score"/>
+                                <field name="letter"/>
+                                <field name="grade_point"/>
+                            </list>
+                        </field>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="action_policy" model="ir.actions.act_window">
+        <field name="name">Академик бодлого</field>
+        <field name="res_model">campus.academic.policy</field>
+        <field name="view_mode">form</field>
+        <field name="res_id" ref="academic_policy_default"/>
+    </record>
+
+    <!-- Inherited forms of campus_university views -->
+    <record id="view_offering_form_academic" model="ir.ui.view">
+        <field name="name">campus.offering.form.academic</field>
+        <field name="model">campus.offering</field>
+        <field name="inherit_id" ref="campus_university.view_offering_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='lecturer_id']" position="after">
+                <field name="term_id"/>
+                <field name="capacity"/>
+                <field name="seats_taken"/>
+                <field name="seats_left"/>
+            </xpath>
+            <xpath expr="//sheet" position="inside">
+                <notebook>
+                    <page string="Цагийн хуваарь">
+                        <field name="session_ids">
+                            <list>
+                                <field name="start"/>
+                                <field name="end"/>
+                                <field name="room"/>
+                                <field name="kind" widget="badge"/>
+                            </list>
+                        </field>
+                    </page>
+                </notebook>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_enrollment_form_academic" model="ir.ui.view">
+        <field name="name">campus.enrollment.form.academic</field>
+        <field name="model">campus.enrollment</field>
+        <field name="inherit_id" ref="campus_university.view_enrollment_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='grade_revision']" position="after">
+                <field name="reg_state" widget="badge"/>
+                <field name="credits"/>
+                <field name="letter_grade"/>
+                <field name="grade_point"/>
+                <field name="attendance_rate"/>
+                <field name="registered_by_id"/>
+                <field name="registered_at"/>
+                <field name="dropped_by_id"/>
+                <field name="dropped_at"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_student_form_academic" model="ir.ui.view">
+        <field name="name">campus.student.form.academic</field>
+        <field name="model">campus.student</field>
+        <field name="inherit_id" ref="campus_university.view_student_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet" position="before">
+                <header>
+                    <button name="action_transcript" type="object" string="Транскрипт хэвлэх"/>
+                </header>
+            </xpath>
+            <xpath expr="//notebook" position="before">
+                <group string="Академик явц" groups="campus_university.group_campus_student,campus_university.group_campus_registrar,campus_university.group_campus_auditor">
+                    <field name="gpa"/>
+                    <field name="credits_earned"/>
+                    <field name="graduation_eligible"/>
+                    <field name="graduation_missing"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_course_form_academic" model="ir.ui.view">
+        <field name="name">campus.course.form.academic</field>
+        <field name="model">campus.course</field>
+        <field name="inherit_id" ref="campus_university.view_course_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='program_id']" position="after">
+                <field name="prerequisite_ids" widget="many2many_tags"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_program_form_academic" model="ir.ui.view">
+        <field name="name">campus.program.form.academic</field>
+        <field name="model">campus.program</field>
+        <field name="inherit_id" ref="campus_university.view_program_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='owner_id']" position="after">
+                <field name="required_credits"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Menus under the existing Formula Campus root -->
+    <menuitem id="menu_academic_term" name="Академик улирал" parent="campus_university.menu_catalog"
+              action="action_term" sequence="5"/>
+    <menuitem id="menu_academic_session" name="Цагийн хуваарь" parent="campus_university.menu_campus_root"
+              action="action_session" sequence="50"/>
+    <menuitem id="menu_academic_attendance" name="Ирц" parent="campus_university.menu_campus_root"
+              action="action_attendance" sequence="55"/>
+    <menuitem id="menu_academic_policy" name="Академик бодлого" parent="campus_university.menu_campus_root"
+              action="action_policy" sequence="90" groups="campus_university.group_campus_registrar"/>
+</odoo>

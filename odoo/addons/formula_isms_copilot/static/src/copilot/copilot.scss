@@ -1,0 +1,408 @@
+// ISMS туслах. Бүх селектор `.o_formula_isms_copilot`-ийн доор байна.
+// Өнгө нь formula_design_system-ийн --fds-* токеныг fallback-тай ашиглана (addon-оос хамаардаггүй).
+
+.o_formula_isms_copilot {
+    --fcp-primary: var(--fds-primary, #635BFF);
+    --fcp-bg: var(--fds-bg, #F8FAFC);
+    --fcp-surface: var(--fds-surface, #FFFFFF);
+    --fcp-text: var(--fds-text, #0F172A);
+    --fcp-muted: var(--fds-text-muted, #475569);
+    --fcp-border: var(--fds-border, #E2E8F0);
+    --fcp-success: var(--fds-success, #0D9488);
+    --fcp-warning: var(--fds-warning, #B45309);
+    --fcp-danger: var(--fds-danger, #B91C1C);
+    --fcp-focus: var(--fds-focus, #4338CA);
+    --fcp-radius: var(--fds-radius, 12px);
+    --fcp-gap: 16px;
+    --fcp-conf-high-bg: #DCFCE7;
+    --fcp-conf-high-ink: #166534;
+    --fcp-conf-medium-bg: #FEF3C7;
+    --fcp-conf-medium-ink: #92400E;
+    --fcp-conf-low-bg: #FFEDD5;
+    --fcp-conf-low-ink: #9A3412;
+    --fcp-conf-none-bg: #E2E8F0;
+    --fcp-conf-none-ink: #334155;
+
+    .fcp {
+        background: var(--fcp-bg);
+        color: var(--fcp-text);
+        padding: var(--fcp-gap);
+        min-height: 100%;
+        box-sizing: border-box;
+        font-size: 14px;
+        line-height: 1.5;
+        overflow-x: hidden;
+        max-width: 960px;
+        margin: 0 auto;
+    }
+
+    .fcp *,
+    .fcp *::before,
+    .fcp *::after {
+        box-sizing: border-box;
+    }
+
+    .fcp-h1 {
+        color: var(--fcp-text);
+        font-size: 22px;
+        font-weight: 700;
+        margin: 0 0 4px;
+    }
+
+    .fcp-h2 {
+        color: var(--fcp-text);
+        font-size: 15px;
+        font-weight: 600;
+        margin: 16px 0 8px;
+    }
+
+    .fcp-sub,
+    .fcp-hint,
+    .fcp-meta,
+    .fcp-card-meta {
+        color: var(--fcp-muted);
+        margin: 0 0 8px;
+    }
+
+    .fcp-body {
+        color: var(--fcp-text);
+        margin: 8px 0;
+    }
+
+    .fcp-tabs {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin: 12px 0;
+        border-bottom: 1px solid var(--fcp-border);
+    }
+
+    .fcp-tab {
+        background: transparent;
+        border: 0;
+        border-bottom: 3px solid transparent;
+        padding: 8px 12px;
+        color: var(--fcp-muted);
+        cursor: pointer;
+        font: inherit;
+        font-weight: 600;
+
+        &.is-active {
+            color: var(--fcp-primary);
+            border-bottom-color: var(--fcp-primary);
+        }
+    }
+
+    .fcp-panel {
+        display: block;
+    }
+
+    .fcp-form {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        background: var(--fcp-surface);
+        border: 1px solid var(--fcp-border);
+        border-radius: var(--fcp-radius);
+        padding: 12px;
+    }
+
+    .fcp-label {
+        color: var(--fcp-text);
+        font-weight: 600;
+        font-size: 13px;
+    }
+
+    .fcp-label-auto {
+        color: var(--fcp-muted);
+        font-size: 12px;
+        font-style: italic;
+        margin: 0 0 8px;
+    }
+
+    .fcp-textarea,
+    .fcp-select {
+        width: 100%;
+        border: 1px solid var(--fcp-border);
+        border-radius: 8px;
+        padding: 8px 10px;
+        font: inherit;
+        color: var(--fcp-text);
+        background: var(--fcp-surface);
+    }
+
+    .fcp-textarea {
+        resize: vertical;
+        min-height: 72px;
+    }
+
+    .fcp-scopes {
+        border: 0;
+        padding: 0;
+        margin: 4px 0 0;
+    }
+
+    .fcp-chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .fcp-chip {
+        border: 1px solid var(--fcp-border);
+        background: var(--fcp-surface);
+        color: var(--fcp-text);
+        border-radius: 999px;
+        padding: 4px 12px;
+        cursor: pointer;
+        font: inherit;
+
+        &.is-on {
+            background: var(--fcp-primary);
+            border-color: var(--fcp-primary);
+            color: #FFFFFF;
+        }
+
+        &:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+    }
+
+    .fcp-chip-note {
+        font-size: 12px;
+    }
+
+    .fcp-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        justify-content: flex-end;
+    }
+
+    .fcp-btn {
+        border-radius: 8px;
+        padding: 8px 16px;
+        font: inherit;
+        font-weight: 600;
+        cursor: pointer;
+        border: 1px solid var(--fcp-border);
+        background: var(--fcp-surface);
+        color: var(--fcp-text);
+
+        &--primary {
+            background: var(--fcp-primary);
+            border-color: var(--fcp-primary);
+            color: #FFFFFF;
+        }
+
+        &:disabled {
+            opacity: 0.55;
+            cursor: not-allowed;
+        }
+    }
+
+    .fcp-link {
+        color: var(--fcp-primary);
+        text-decoration: underline;
+    }
+
+    .fcp-tab:focus-visible,
+    .fcp-chip:focus-visible,
+    .fcp-btn:focus-visible,
+    .fcp-card-btn:focus-visible,
+    .fcp-textarea:focus-visible,
+    .fcp-select:focus-visible,
+    .fcp-link:focus-visible {
+        outline: 3px solid var(--fcp-focus);
+        outline-offset: 2px;
+    }
+
+    .fcp-results {
+        margin-top: 12px;
+    }
+
+    .fcp-state {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: var(--fcp-muted);
+        padding: 8px 0;
+    }
+
+    .fcp-spinner {
+        width: 14px;
+        height: 14px;
+        border: 2px solid var(--fcp-border);
+        border-top-color: var(--fcp-primary);
+        border-radius: 50%;
+        animation: fcp-spin 0.9s linear infinite;
+    }
+
+    @keyframes fcp-spin {
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    .fcp-alert,
+    .fcp-refusal {
+        border-radius: var(--fcp-radius);
+        padding: 12px;
+        margin: 8px 0;
+        border: 1px solid var(--fcp-border);
+        background: var(--fcp-surface);
+    }
+
+    .fcp-alert {
+        color: var(--fcp-danger);
+        border-color: var(--fcp-danger);
+    }
+
+    .fcp-refusal {
+        border-color: var(--fcp-warning);
+    }
+
+    .fcp-answer {
+        background: var(--fcp-surface);
+        border: 1px solid var(--fcp-border);
+        border-radius: var(--fcp-radius);
+        padding: 12px 14px;
+    }
+
+    .fcp-answer-head {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        align-items: center;
+        justify-content: space-between;
+        color: var(--fcp-muted);
+        font-size: 12px;
+    }
+
+    .fcp-conf {
+        border-radius: 999px;
+        padding: 2px 10px;
+        font-weight: 600;
+
+        &--high {
+            background: var(--fcp-conf-high-bg);
+            color: var(--fcp-conf-high-ink);
+        }
+
+        &--medium {
+            background: var(--fcp-conf-medium-bg);
+            color: var(--fcp-conf-medium-ink);
+        }
+
+        &--low {
+            background: var(--fcp-conf-low-bg);
+            color: var(--fcp-conf-low-ink);
+        }
+
+        &--none {
+            background: var(--fcp-conf-none-bg);
+            color: var(--fcp-conf-none-ink);
+        }
+    }
+
+    .fcp-summary,
+    .fcp-gaps {
+        padding-left: 18px;
+        margin: 8px 0;
+
+        li {
+            margin-bottom: 4px;
+        }
+    }
+
+    .fcp-gaps li {
+        color: var(--fcp-warning);
+    }
+
+    .fcp-cards {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 8px;
+    }
+
+    .fcp-card {
+        border: 1px solid var(--fcp-border);
+        border-radius: 10px;
+        padding: 8px 10px;
+        background: var(--fcp-bg);
+    }
+
+    .fcp-card-btn {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        width: 100%;
+        background: transparent;
+        border: 0;
+        padding: 0;
+        text-align: left;
+        cursor: pointer;
+        font: inherit;
+        color: var(--fcp-text);
+    }
+
+    .fcp-card-scope {
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        color: var(--fcp-primary);
+        font-weight: 700;
+    }
+
+    .fcp-card-title {
+        font-weight: 600;
+        color: var(--fcp-text);
+    }
+
+    .fcp-quote {
+        margin: 6px 0 0;
+        padding: 6px 10px;
+        border-left: 3px solid var(--fcp-border);
+        color: var(--fcp-muted);
+        font-size: 13px;
+        white-space: pre-wrap;
+        word-break: break-word;
+    }
+
+    .fcp-flag {
+        color: var(--fcp-warning);
+        font-size: 12px;
+        margin: 4px 0 0;
+    }
+
+    .fcp-disclaimer,
+    .fcp-empty,
+    .fcp-alert-note {
+        color: var(--fcp-muted);
+        font-size: 12px;
+        margin: 10px 0 0;
+    }
+
+    .fcp-timeline {
+        padding-left: 18px;
+        margin: 0;
+    }
+
+    @media (min-width: 768px) {
+        .fcp {
+            padding: 24px;
+        }
+
+        .fcp-form {
+            padding: 16px;
+        }
+
+        .fcp-cards {
+            grid-template-columns: 1fr 1fr;
+        }
+    }
+}

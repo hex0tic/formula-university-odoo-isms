@@ -1,0 +1,20 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_recert_campaign_user,access.recert.campaign user,model_access_recert_campaign,base.group_user,1,0,0,0
+access_recert_campaign_manager,access.recert.campaign manager,model_access_recert_campaign,base.group_erp_manager,1,1,1,0
+access_recert_campaign_auditor,access.recert.campaign auditor,model_access_recert_campaign,university_isms.group_isms_auditor,1,0,0,0
+access_recert_campaign_ciso,access.recert.campaign ciso,model_access_recert_campaign,university_isms.group_isms_manager,1,0,0,0
+access_recert_campaign_system,access.recert.campaign system,model_access_recert_campaign,base.group_system,1,1,1,1
+access_recert_line_user,access.recert.line reviewer,model_access_recert_line,base.group_user,1,1,0,0
+access_recert_line_manager,access.recert.line manager,model_access_recert_line,base.group_erp_manager,1,1,1,0
+access_recert_line_auditor,access.recert.line auditor,model_access_recert_line,university_isms.group_isms_auditor,1,0,0,0
+access_recert_line_ciso,access.recert.line ciso,model_access_recert_line,university_isms.group_isms_manager,1,0,0,0
+access_recert_line_system,access.recert.line system,model_access_recert_line,base.group_system,1,1,1,1
+access_request_user,access.request requester,model_access_request,base.group_user,1,1,1,0
+access_request_manager,access.request manager,model_access_request,base.group_erp_manager,1,1,1,0
+access_request_auditor,access.request auditor,model_access_request,university_isms.group_isms_auditor,1,0,0,0
+access_request_ciso,access.request ciso,model_access_request,university_isms.group_isms_manager,1,0,0,0
+access_request_system,access.request system,model_access_request,base.group_system,1,1,1,1
+access_gov_report_manager,access.gov.report manager,model_access_gov_report,base.group_erp_manager,1,0,0,0
+access_gov_report_system,access.gov.report system,model_access_gov_report,base.group_system,1,0,0,0
+access_gov_report_auditor,access.gov.report auditor,model_access_gov_report,university_isms.group_isms_auditor,1,0,0,0
+access_gov_report_ciso,access.gov.report ciso,model_access_gov_report,university_isms.group_isms_manager,1,0,0,0

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="seq_isms_control_test_plan" model="ir.sequence">
+        <field name="name">ISMS хяналтын тестийн төлөвлөгөө</field>
+        <field name="code">isms.control.test.plan</field>
+        <field name="prefix">CTP-%(year)s-</field>
+        <field name="padding">4</field>
+        <field name="company_id" eval="False"/>
+    </record>
+</odoo>

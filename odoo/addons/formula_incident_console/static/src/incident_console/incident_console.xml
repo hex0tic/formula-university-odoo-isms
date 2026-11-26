@@ -1,0 +1,316 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <t t-name="formula_incident_console.Console">
+        <Layout display="{ controlPanel: {} }" className="'o_formula_incident_console'">
+            <div class="fic" t-on-keydown="(ev) => this.onRootKeydown(ev)">
+                <header class="fic-header">
+                    <div class="fic-title">
+                        <h1 class="fic-h1">Incident Console</h1>
+                        <p class="fic-sub">SLA-гийн яаралтай байдлаар эрэмбэлсэн инцидентүүд. Харагдах бүртгэл таны эрхээс хамаарна.</p>
+                        <p class="fic-meta" t-if="state.loading === false and !state.error and !state.denied">
+                            Нийт <t t-esc="state.total"/> инцидент
+                            <t t-if="state.truncated">(эхний 200-г харуулж байна)</t>
+                        </p>
+                    </div>
+                    <div class="fic-toolbar">
+                        <button type="button" class="fic-btn" t-att-disabled="state.loading"
+                                t-on-click="() => this.loadList()">Шинэчлэх</button>
+                    </div>
+                </header>
+
+                <form class="fic-filters" role="search" aria-label="Инцидент шүүх" t-on-submit="(ev) => ev.preventDefault()">
+                    <div class="fic-field">
+                        <label class="fic-label" for="fic-filter-state">Үе шат</label>
+                        <select id="fic-filter-state" class="fic-select" t-att-disabled="state.loading"
+                                t-on-change="(ev) => this.onFilterChange('state', ev.target.value)">
+                            <option value="" t-att-selected="!state.filters.state">Бүгд</option>
+                            <t t-foreach="stateOptions" t-as="opt" t-key="opt.key">
+                                <option t-att-value="opt.key" t-att-selected="state.filters.state === opt.key">
+                                    <t t-esc="opt.label"/>
+                                </option>
+                            </t>
+                        </select>
+                    </div>
+                    <div class="fic-field">
+                        <label class="fic-label" for="fic-filter-severity">Ноцтой байдал</label>
+                        <select id="fic-filter-severity" class="fic-select" t-att-disabled="state.loading"
+                                t-on-change="(ev) => this.onFilterChange('severity', ev.target.value)">
+                            <option value="" t-att-selected="!state.filters.severity">Бүгд</option>
+                            <t t-foreach="severityOptions" t-as="opt" t-key="opt.key">
+                                <option t-att-value="opt.key" t-att-selected="state.filters.severity === opt.key">
+                                    <t t-esc="opt.label"/>
+                                </option>
+                            </t>
+                        </select>
+                    </div>
+                    <label class="fic-check">
+                        <input type="checkbox" t-att-checked="state.filters.overdue" t-att-disabled="state.loading"
+                               t-on-change="(ev) => this.onFilterChange('overdue', ev.target.checked)"/>
+                        <span>Хугацаа хэтэрсэн</span>
+                    </label>
+                    <label class="fic-check">
+                        <input type="checkbox" t-att-checked="state.filters.mine" t-att-disabled="state.loading"
+                               t-on-change="(ev) => this.onFilterChange('mine', ev.target.checked)"/>
+                        <span>Миний инцидент</span>
+                    </label>
+                    <button type="button" class="fic-btn fic-btn-link" t-if="hasActiveFilters"
+                            t-on-click="() => this.clearFilters()">Шүүлтүүр цэвэрлэх</button>
+                </form>
+
+                <div class="fic-live" aria-live="polite">
+                    <span t-if="state.loading and state.rows.length">Шинэчилж байна…</span>
+                </div>
+
+                <div class="fic-body" t-attf-class="{{state.selectedId !== null ? 'has-drawer' : ''}}">
+                    <section class="fic-list" aria-labelledby="fic-list-title">
+                        <h2 id="fic-list-title" class="fic-h2">Инцидентийн дараалал</h2>
+
+                        <div t-if="state.loading and !state.rows.length" class="fic-skeleton" role="status"
+                             aria-busy="true" aria-label="Ачаалж байна">
+                            <div class="fic-skel-row"></div>
+                            <div class="fic-skel-row"></div>
+                            <div class="fic-skel-row"></div>
+                        </div>
+
+                        <div t-elif="state.denied" class="fic-state fic-state-denied" role="alert">
+                            <p class="fic-strong">Энэ хэсгийг харах эрх байхгүй.</p>
+                            <p class="fic-hint">Инцидентийн консолыг МАБ-ын эрхтэй хэрэглэгч ашиглана.</p>
+                        </div>
+
+                        <div t-elif="state.error" class="fic-state fic-state-error" role="alert">
+                            <p class="fic-strong">Жагсаалт ачаалж чадсангүй</p>
+                            <p class="fic-hint">Сүлжээ эсвэл серверийн алдаа гарсан байж магадгүй.</p>
+                            <button type="button" class="fic-btn fic-btn-primary" t-on-click="() => this.loadList()">Дахин оролдох</button>
+                        </div>
+
+                        <div t-elif="!state.rows.length" class="fic-state fic-state-empty" role="status">
+                            <p class="fic-strong">Таны эрхээр харагдах инцидент алга.</p>
+                            <p class="fic-hint" t-if="hasActiveFilters">Шүүлтүүрээ өөрчилж үзнэ үү.</p>
+                        </div>
+
+                        <ul t-else="" class="fic-items" role="list" aria-label="Инцидентүүд">
+                            <t t-foreach="sortedRows" t-as="row" t-key="row.id">
+                                <li class="fic-item">
+                                    <button type="button"
+                                            t-attf-class="fic-row fic-sev-{{row.severity}} {{row.id === state.selectedId ? 'is-selected' : ''}}"
+                                            t-att-aria-current="row.id === state.selectedId ? 'true' : 'false'"
+                                            t-att-aria-label="row.code + ' ' + row.name + ', ' + row.state_label + ', ' + row.severity_label + ', ' + slaLabel(row)"
+                                            t-on-click="() => this.openIncident(row.id)">
+                                        <span class="fic-row-top">
+                                            <span class="fic-code" t-esc="row.code"/>
+                                            <span t-attf-class="fic-chip fic-state-{{row.state}}" t-esc="row.state_label"/>
+                                            <span t-attf-class="fic-chip fic-sevchip-{{row.severity}}" t-esc="row.severity_label"/>
+                                        </span>
+                                        <span class="fic-row-title" t-esc="row.name"/>
+                                        <span class="fic-row-bottom">
+                                            <span t-attf-class="fic-sla fic-tone-{{slaTone(row)}}" t-esc="slaLabel(row)"/>
+                                            <span class="fic-meta">Шинжээч: <t t-esc="row.assignee ? row.assignee.name : 'томилогдоогүй'"/></span>
+                                        </span>
+                                    </button>
+                                </li>
+                            </t>
+                        </ul>
+                    </section>
+
+                    <aside t-if="state.selectedId !== null" class="fic-drawer" aria-label="Инцидентийн дэлгэрэнгүй">
+                        <div t-if="state.detailLoading" class="fic-skeleton" role="status" aria-busy="true" aria-label="Дэлгэрэнгүй ачаалж байна">
+                            <div class="fic-skel-row"></div>
+                            <div class="fic-skel-block"></div>
+                            <div class="fic-skel-block"></div>
+                        </div>
+
+                        <div t-elif="state.detailError === 'denied'" class="fic-state fic-state-denied" role="alert">
+                            <p class="fic-strong">Энэ инцидентийг харах эрх байхгүй.</p>
+                            <button type="button" class="fic-btn" t-on-click="() => this.closeDetail()">Хаах</button>
+                        </div>
+
+                        <div t-elif="state.detailError === 'error'" class="fic-state fic-state-error" role="alert">
+                            <p class="fic-strong">Дэлгэрэнгүй ачаалж чадсангүй</p>
+                            <button type="button" class="fic-btn fic-btn-primary"
+                                    t-on-click="() => this.openIncident(state.selectedId)">Дахин оролдох</button>
+                        </div>
+
+                        <t t-elif="state.detail">
+                            <t t-set="d" t-value="state.detail"/>
+                            <div class="fic-drawer-head">
+                                <div>
+                                    <p class="fic-code" t-esc="d.row.code"/>
+                                    <h2 class="fic-h2 fic-drawer-title" tabindex="-1" t-ref="drawerTitle" t-esc="d.row.name"/>
+                                </div>
+                                <button type="button" class="fic-btn" aria-label="Дэлгэрэнгүйг хаах"
+                                        t-on-click="() => this.closeDetail()">Хаах</button>
+                            </div>
+
+                            <div class="fic-chips">
+                                <span t-attf-class="fic-chip fic-state-{{d.row.state}}" t-esc="d.row.state_label"/>
+                                <span t-attf-class="fic-chip fic-sevchip-{{d.row.severity}}" t-esc="d.row.severity_label"/>
+                                <span class="fic-chip fic-chip-plain" t-esc="d.row.category_label"/>
+                            </div>
+
+                            <div class="fic-alerts">
+                                <p t-if="d.row.sla_overdue" class="fic-alert fic-alert-danger" role="status">
+                                    SLA хугацаа хэтэрсэн. Эскалаци шаардлагатай эсэхийг удирдлагад мэдэгдэж шийдвэрлүүлнэ үү.
+                                </p>
+                                <p t-if="d.row.is_open and !d.row.assignee" class="fic-alert fic-alert-warning" role="status">
+                                    Шалгагч томилогдоогүй байна.
+                                </p>
+                                <p t-if="d.impact.personal_data_breach" class="fic-alert fic-alert-warning" role="status">
+                                    Хувийн мэдээллийн зөрчил. Мэдэгдэх шийдвэрийг «Мэдэгдлийн тэмдэглэл»-д бичнэ.
+                                </p>
+                            </div>
+
+                            <dl class="fic-dl">
+                                <dt>SLA хугацаа</dt>
+                                <dd><t t-esc="formatTs(d.row.sla_deadline)"/> <span t-attf-class="fic-sla fic-tone-{{slaTone(d.row)}}" t-esc="slaLabel(d.row)"/></dd>
+                                <dt>Илэрсэн</dt>
+                                <dd><t t-esc="formatTs(d.timestamps.detected_at)"/></dd>
+                                <dt>Бүртгэсэн</dt>
+                                <dd><t t-esc="formatTs(d.timestamps.reported_at)"/></dd>
+                                <dt>Шалгаж эхэлсэн</dt>
+                                <dd><t t-esc="formatTs(d.timestamps.investigation_at)"/></dd>
+                                <dt>Шийдвэрлэсэн</dt>
+                                <dd><t t-esc="formatTs(d.timestamps.resolved_at)"/></dd>
+                                <dt>Хаасан</dt>
+                                <dd><t t-esc="formatTs(d.timestamps.closed_at)"/></dd>
+                                <dt>Мэдээлэгч</dt>
+                                <dd><t t-esc="d.row.reporter ? d.row.reporter.name : '—'"/></dd>
+                                <dt>Шалгагч</dt>
+                                <dd><t t-esc="d.row.assignee ? d.row.assignee.name : 'томилогдоогүй'"/></dd>
+                                <dt>Нотлох баримт</dt>
+                                <dd><t t-esc="d.attachment_count"/> файл</dd>
+                            </dl>
+
+                            <section class="fic-section" aria-labelledby="fic-transitions-title">
+                                <h3 id="fic-transitions-title" class="fic-h3">Үе шилжилт</h3>
+                                <div class="fic-actions" t-if="transitions.length">
+                                    <t t-foreach="transitions" t-as="t" t-key="t.action">
+                                        <button type="button" class="fic-btn fic-btn-primary"
+                                                t-att-disabled="!t.allowed or isBusy"
+                                                t-att-aria-describedby="t.allowed ? false : 'fic-reason-' + t.action"
+                                                t-att-title="t.allowed ? t.label : t.reason"
+                                                t-on-click="() => this.runTransition(t.action)">
+                                            <t t-if="state.pendingAction === t.action">Гүйцэтгэж байна…</t>
+                                            <t t-else="" t-esc="t.label"/>
+                                        </button>
+                                    </t>
+                                </div>
+                                <p t-else="" class="fic-hint">Энэ үе шатаас шилжих алхам алга.</p>
+                                <t t-foreach="blockedReasons" t-as="t" t-key="t.action">
+                                    <p class="fic-hint fic-reason" t-att-id="'fic-reason-' + t.action" t-esc="t.label + ': ' + t.reason"/>
+                                </t>
+                                <p class="fic-hint" t-if="state.pendingAction">Нэг шилжилт гүйцэтгэгдэж байна. Дуустал хүлээнэ үү.</p>
+                            </section>
+
+                            <section class="fic-section" aria-labelledby="fic-desc-title">
+                                <h3 id="fic-desc-title" class="fic-h3">Юу болсон бэ?</h3>
+                                <p class="fic-body-text" t-esc="d.description || 'Тайлбар оруулаагүй.'"/>
+                                <p class="fic-hint">
+                                    Нөлөөлөл:
+                                    <t t-esc="impactLabel"/>
+                                </p>
+                            </section>
+
+                            <section class="fic-section" aria-labelledby="fic-assets-title">
+                                <h3 id="fic-assets-title" class="fic-h3">Нөлөөлсөн хөрөнгө</h3>
+                                <t t-if="!d.assets.available">
+                                    <p class="fic-hint">Хөрөнгийн мэдээллийг таны эрхээр харах боломжгүй.</p>
+                                </t>
+                                <t t-elif="!d.assets.items.length">
+                                    <p class="fic-hint">Хөрөнгө холбоогүй.</p>
+                                </t>
+                                <ul t-else="" class="fic-plain-list">
+                                    <t t-foreach="d.assets.items" t-as="asset" t-key="asset.id">
+                                        <li t-esc="asset.name"/>
+                                    </t>
+                                </ul>
+                            </section>
+
+                            <section class="fic-section" aria-labelledby="fic-ticket-title">
+                                <h3 id="fic-ticket-title" class="fic-h3">Холбогдох Helpdesk тасалбар</h3>
+                                <t t-if="d.ticket">
+                                    <p class="fic-body-text"><t t-esc="d.ticket.name"/>
+                                        <t t-if="d.ticket.stage"> · <t t-esc="d.ticket.stage"/></t></p>
+                                    <button type="button" class="fic-btn" t-on-click="() => this.openTicket(d.ticket)">Тасалбар нээх</button>
+                                </t>
+                                <p t-else="" class="fic-hint">Харах боломжтой холбогдох тасалбар алга.</p>
+                            </section>
+
+                            <section class="fic-section" aria-labelledby="fic-notes-title">
+                                <h3 id="fic-notes-title" class="fic-h3">Шалгалтын тэмдэглэл</h3>
+                                <t t-if="!d.investigation_visible">
+                                    <p class="fic-hint">Шалгалтын тэмдэглэлийг зөвхөн МАБ шинжээч болон аудитор харна.</p>
+                                </t>
+                                <t t-else="">
+                                    <p class="fic-hint" t-if="!canSaveNotes">Энэ тэмдэглэлийг засах эрх байхгүй эсвэл инцидент хаагдсан байна.</p>
+                                    <div class="fic-notes">
+                                        <label class="fic-label" for="fic-note-containment">Хязгаарлах арга хэмжээ</label>
+                                        <textarea id="fic-note-containment" class="fic-textarea" rows="2"
+                                                  t-att-readonly="!canSaveNotes or isBusy"
+                                                  t-model="state.notes.containment"></textarea>
+                                        <label class="fic-label" for="fic-note-root">Үндсэн шалтгаан</label>
+                                        <textarea id="fic-note-root" class="fic-textarea" rows="2"
+                                                  t-att-readonly="!canSaveNotes or isBusy"
+                                                  t-model="state.notes.root_cause"></textarea>
+                                        <label class="fic-label" for="fic-note-resolution">Авсан арга хэмжээ, шийдэл</label>
+                                        <textarea id="fic-note-resolution" class="fic-textarea" rows="2"
+                                                  t-att-readonly="!canSaveNotes or isBusy"
+                                                  t-model="state.notes.resolution"></textarea>
+                                        <label class="fic-label" for="fic-note-lessons">Сургамж</label>
+                                        <textarea id="fic-note-lessons" class="fic-textarea" rows="2"
+                                                  t-att-readonly="!canSaveNotes or isBusy"
+                                                  t-model="state.notes.lessons_learned"></textarea>
+                                        <label class="fic-label" for="fic-note-notify">Мэдэгдлийн тэмдэглэл</label>
+                                        <textarea id="fic-note-notify" class="fic-textarea" rows="2"
+                                                  t-att-readonly="!canSaveNotes or isBusy"
+                                                  t-model="state.notes.notification_note"></textarea>
+                                        <button type="button" class="fic-btn fic-btn-primary"
+                                                t-att-disabled="!canSaveNotes or state.saving or !noteDirty"
+                                                t-on-click="() => this.saveNotes()">
+                                            <t t-if="state.saving">Хадгалж байна…</t>
+                                            <t t-else="">Тэмдэглэл хадгалах</t>
+                                        </button>
+                                    </div>
+                                </t>
+                            </section>
+
+                            <section class="fic-section" aria-labelledby="fic-timeline-title">
+                                <h3 id="fic-timeline-title" class="fic-h3">Цагийн тэнхлэг</h3>
+                                <p class="fic-hint" t-if="!d.timeline.length">Бүртгэгдсэн үйл явдал алга.</p>
+                                <ol class="fic-timeline" t-else="">
+                                    <t t-foreach="d.timeline" t-as="entry" t-key="entry.id">
+                                        <li class="fic-tl-item">
+                                            <p class="fic-tl-meta"><time t-esc="formatTs(entry.date)"/> · <t t-esc="entry.author || 'Систем'"/></p>
+                                            <p t-if="entry.text" class="fic-tl-text" t-esc="entry.text"/>
+                                            <ul class="fic-tl-tracking" t-if="entry.tracking.length">
+                                                <t t-foreach="entry.tracking" t-as="tr" t-key="tr_index">
+                                                    <li t-esc="tr.field + ': ' + (tr.old || '—') + ' → ' + (tr.new || '—')"/>
+                                                </t>
+                                            </ul>
+                                        </li>
+                                    </t>
+                                </ol>
+                            </section>
+
+                            <section class="fic-section" aria-labelledby="fic-audit-title">
+                                <h3 id="fic-audit-title" class="fic-h3">Аудит лог</h3>
+                                <t t-if="!d.audit.available">
+                                    <p class="fic-hint">Аудит логийг зөвхөн дотоод аудитор харна.</p>
+                                </t>
+                                <t t-elif="!d.audit.items.length">
+                                    <p class="fic-hint">Аудит бичлэг алга.</p>
+                                </t>
+                                <ul t-else="" class="fic-tl-tracking">
+                                    <t t-foreach="d.audit.items" t-as="log" t-key="log.id">
+                                        <li><time t-esc="formatTs(log.timestamp)"/> · <t t-esc="log.action"/> · <t t-esc="log.user"/></li>
+                                    </t>
+                                </ul>
+                            </section>
+                        </t>
+                    </aside>
+                </div>
+            </div>
+        </Layout>
+    </t>
+
+</templates>

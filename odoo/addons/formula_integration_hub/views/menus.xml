@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_formula_integration_root" name="Интеграцүүд"
+              parent="base.menu_administration" sequence="90" groups="base.group_system"/>
+    <menuitem id="menu_formula_integration_endpoint" name="Тохиргоо (endpoint)"
+              parent="menu_formula_integration_root" action="action_formula_integration_endpoint" sequence="10"/>
+    <menuitem id="menu_formula_integration_event" name="Гаралтын дараалал"
+              parent="menu_formula_integration_root" action="action_formula_integration_event" sequence="20"/>
+    <menuitem id="menu_formula_integration_mapping" name="ID холбоосууд"
+              parent="menu_formula_integration_root" action="action_formula_integration_mapping" sequence="30"/>
+    <menuitem id="menu_formula_notification_log" name="Мэдэгдлийн бүртгэл"
+              parent="menu_formula_integration_root" action="action_formula_notification_log" sequence="40"/>
+    <menuitem id="menu_formula_notification_pref" name="Миний мэдэгдэл"
+              action="action_formula_notification_preference" groups="base.group_user" sequence="95"/>
+</odoo>

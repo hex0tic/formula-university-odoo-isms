@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Lecturer portal: backend Owl client action. Only group_campus_lecturer sees the menu;
+         every RPC method re-checks the lecturer group and ownership on the server. -->
+    <record id="action_campus_teacher_portal" model="ir.actions.client">
+        <field name="name">Багшийн портал</field>
+        <field name="tag">campus_portal_teacher</field>
+    </record>
+
+    <menuitem id="menu_campus_teacher_portal" name="Багшийн портал"
+              parent="campus_university.menu_campus_root" action="action_campus_teacher_portal"
+              sequence="12" groups="campus_university.group_campus_lecturer"/>
+</odoo>

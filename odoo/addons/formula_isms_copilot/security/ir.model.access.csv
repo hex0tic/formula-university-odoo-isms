@@ -1,0 +1,3 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_copilot_query_log_auditor,copilot query log auditor,model_formula_copilot_query_log,university_isms.group_isms_auditor,1,0,0,0
+access_copilot_query_log_manager,copilot query log manager,model_formula_copilot_query_log,university_isms.group_isms_manager,1,0,0,0

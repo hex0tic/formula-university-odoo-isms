@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ISMS-06: баталгаажуулалтын хугацаа дуусгах (өдөр тутам) -->
+    <record id="ir_cron_isms_attestation_expiry" model="ir.cron">
+        <field name="name">ISMS: бодлогын баталгаажуулалтын хугацаа дуусгах</field>
+        <field name="model_id" ref="model_isms_policy_attestation"/>
+        <field name="state">code</field>
+        <field name="code">model._cron_expire_attestations()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="active" eval="True"/>
+    </record>
+</odoo>

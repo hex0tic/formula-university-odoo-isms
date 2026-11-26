@@ -1,0 +1,11 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_integration_endpoint_admin,integration endpoint admin,model_formula_integration_endpoint,base.group_system,1,1,1,1
+access_integration_event_admin,integration event admin,model_formula_integration_event,base.group_system,1,1,1,1
+access_integration_event_auditor,integration event auditor,model_formula_integration_event,university_isms.group_isms_auditor,1,0,0,0
+access_integration_event_manager,integration event CISO,model_formula_integration_event,university_isms.group_isms_manager,1,0,0,0
+access_integration_mapping_admin,integration mapping admin,model_formula_integration_mapping,base.group_system,1,1,1,1
+access_integration_mapping_auditor,integration mapping auditor,model_formula_integration_mapping,university_isms.group_isms_auditor,1,0,0,0
+access_sso_group_rule_admin,sso group rule admin,model_formula_sso_group_rule,base.group_system,1,1,1,1
+access_notification_pref_user,notification preference user,model_formula_notification_preference,base.group_user,1,1,1,1
+access_notification_log_admin,notification log admin,model_formula_notification_log,base.group_system,1,0,0,0
+access_notification_log_manager,notification log CISO,model_formula_notification_log,university_isms.group_isms_manager,1,0,0,0

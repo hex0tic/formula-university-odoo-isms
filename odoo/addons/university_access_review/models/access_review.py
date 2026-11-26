@@ -56,6 +56,19 @@ REVIEW_ACTIONS = [
 ]
 
 MANAGER_GROUP = 'base.group_erp_manager'
+# GOV-05: зөвхөн системийн администратор олгож, хурааж болох давуу эрх (A.8.2).
+PRIVILEGED_GROUPS = ['base.group_system', 'base.group_erp_manager']
+# GOV-02: нэг хүнд хамт олгохгүй эрхийн хослол (A.5.3). (бүлэг 1, бүлэг 2, шалтгаан[, чөлөөлөх бүлэг])
+SOD_RULES = [
+    ('campus_university.group_campus_lecturer', 'campus_university.group_campus_registrar',
+     'Дүнгийн засварын хүсэлт гаргагч ба батлагч нэг хүн болно'),
+    ('university_isms.group_isms_auditor', 'university_isms.group_isms_analyst',
+     'Дотоод аудитор өөрийн шалгах ISMS бүртгэлийг засах эрхтэй болно',
+     # CISO-гийн бүлэг хоёуланг нь загвараар агуулдаг тул энэ дүрэмд хамаарахгүй.
+     'university_isms.group_isms_manager'),
+    ('university_isms.group_isms_auditor', 'base.group_system',
+     'Аудитор системийн тохиргоо ба аудит логийн орчныг өөрчлөх эрхтэй болно'),
+]
 OPS = ('read', 'write', 'create', 'unlink')
 
 
@@ -73,6 +86,7 @@ class AccessReview(models.TransientModel):
     project_summary = fields.Char('Төсөл')
     channel_summary = fields.Char('Чат')
     model_summary = fields.Char('Модел')
+    sod_warnings = fields.Text('Үүргийн тусгаарлалтын зөрчил')
     model_line_ids = fields.One2many('access.review.model.line', 'review_id', 'Модел ба бичлэг')
     project_line_ids = fields.One2many('access.review.project.line', 'review_id', 'Төслүүд')
     channel_line_ids = fields.One2many('access.review.channel.line', 'review_id', 'Чат')
@@ -111,6 +125,7 @@ class AccessReview(models.TransientModel):
             'job_title': employee.job_title or employee.job_id.name or '',
             'department': employee.department_id.name or '',
             'isms_role': self._isms_role(user),
+            'sod_warnings': '\n'.join(self._sod_conflicts(user.groups_id)),
         }
         vals.update(self._model_lines(user, as_user))
         vals.update(self._project_lines(as_user))
@@ -148,16 +163,44 @@ class AccessReview(models.TransientModel):
                 except AccessError:
                     visible = writable = 0
             readable += bool(visible)
+            granted_by = self._acl_sources(user, model)
             lines.append({
                 'sequence': seq, 'category': category, 'name': label, 'model': model,
                 'can_read': rights['read'], 'can_write': rights['write'],
                 'can_create': rights['create'], 'can_unlink': rights['unlink'],
                 'visible_count': visible, 'writable_count': writable, 'total_count': total,
+                'granted_by': granted_by,
             })
         return {
             'model_line_ids': [Command.clear()] + [Command.create(v) for v in lines],
             'model_summary': _('%(n)s моделоос %(r)s-д бичлэг харна', n=len(lines), r=readable),
         }
+
+    def _acl_sources(self, user, model):
+        """Тухайн моделийг унших эрхийг аль бүлэг олгож байгааг тайлбарлана (WF-06)."""
+        acls = self.env['ir.model.access'].sudo().search([
+            ('model_id.model', '=', model), ('perm_read', '=', True), ('active', '=', True)])
+        names = []
+        for acl in acls:
+            if not acl.group_id:
+                names.append(_('Бүх хэрэглэгч'))
+            elif acl.group_id in user.groups_id:
+                names.append(acl.group_id.name)
+        return ', '.join(sorted(set(names)))
+
+    def _sod_conflicts(self, groups):
+        groups = groups | groups.trans_implied_ids
+        found = []
+        for rule in SOD_RULES:
+            first, second, reason = rule[:3]
+            g1 = self.env.ref(first, raise_if_not_found=False)
+            g2 = self.env.ref(second, raise_if_not_found=False)
+            exempt = self.env.ref(rule[3], raise_if_not_found=False) if len(rule) > 3 else False
+            if exempt and exempt in groups:
+                continue
+            if g1 and g2 and g1 in groups and g2 in groups:
+                found.append('%s + %s: %s' % (g1.sudo().name, g2.sudo().name, reason))
+        return found
 
     def _project_lines(self, as_user):
         Project = self.env['project.project'].sudo()
@@ -278,6 +321,17 @@ class AccessReview(models.TransientModel):
         keep = user.groups_id.filtered(lambda g: g.category_id in hidden or g.share)
         wanted = self.group_line_ids.filtered('granted').group_id
         new_groups = keep | wanted
+        before = user.groups_id
+        after = new_groups | new_groups.trans_implied_ids
+        changed = (after - before) | (before - after)
+        privileged = self.env['res.groups'].browse([
+            g.id for g in (self.env.ref(x, raise_if_not_found=False) for x in PRIVILEGED_GROUPS) if g])
+        if changed & privileged and not self.env.user.has_group('base.group_system'):
+            raise AccessError(_('Давуу эрх (%s)-ийг зөвхөн системийн администратор олгож, хураана (A.8.2).')
+                              % ', '.join((changed & privileged).mapped('name')))
+        new_conflicts = set(self._sod_conflicts(new_groups)) - set(self._sod_conflicts(before))
+        if new_conflicts:
+            raise UserError(_('Үүргийн тусгаарлалтын зөрчил үүснэ (A.5.3):\n%s') % '\n'.join(sorted(new_conflicts)))
         if set(new_groups.ids) != set(user.groups_id.ids):
             user.write({'groups_id': [Command.set(new_groups.ids)]})
         self.write(self._review_values(user))
@@ -309,6 +363,7 @@ class AccessReviewModelLine(models.TransientModel):
     visible_count = fields.Integer('Харах бичлэг')
     writable_count = fields.Integer('Засах боломжтой')
     total_count = fields.Integer('Нийт бичлэг')
+    granted_by = fields.Char('Унших эрх олгосон бүлэг')
 
 
 class AccessReviewProjectLine(models.TransientModel):

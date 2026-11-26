@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="isms_capa_view_list" model="ir.ui.view">
+        <field name="name">isms.capa.list</field>
+        <field name="model">isms.capa</field>
+        <field name="arch" type="xml">
+            <list decoration-danger="is_overdue" decoration-muted="state in ('closed', 'cancelled')">
+                <field name="code"/>
+                <field name="name"/>
+                <field name="finding_id"/>
+                <field name="owner_id" widget="many2one_avatar_user"/>
+                <field name="deadline"/>
+                <field name="is_overdue" optional="show"/>
+                <field name="verifier_id" optional="hide"/>
+                <field name="state" widget="badge"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="isms_capa_view_kanban" model="ir.ui.view">
+        <field name="name">isms.capa.kanban</field>
+        <field name="model">isms.capa</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="state" records_draggable="0" group_create="0">
+                <field name="state"/>
+                <field name="is_overdue"/>
+                <templates>
+                    <t t-name="card">
+                        <field name="name" class="fw-bold"/>
+                        <div class="text-muted"><field name="code"/> · <field name="finding_id"/></div>
+                        <div class="d-flex justify-content-between align-items-center mt-1">
+                            <field name="owner_id" widget="many2one_avatar_user"/>
+                            <field name="deadline"/>
+                        </div>
+                        <div t-if="record.is_overdue.raw_value" class="text-danger fw-bold">Хугацаа хэтэрсэн</div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="isms_capa_view_search" model="ir.ui.view">
+        <field name="name">isms.capa.search</field>
+        <field name="model">isms.capa</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="code"/>
+                <field name="name"/>
+                <field name="finding_id"/>
+                <field name="owner_id"/>
+                <filter name="open" string="Идэвхтэй" domain="[('state', 'in', ['draft', 'in_progress', 'implemented'])]"/>
+                <filter name="mine" string="Миний" domain="[('owner_id', '=', uid)]"/>
+                <filter name="overdue" string="Хугацаа хэтэрсэн" domain="[('is_overdue', '=', True)]"/>
+                <filter name="awaiting_verification" string="Баталгаажуулалт хүлээж буй" domain="[('state', '=', 'implemented')]"/>
+                <group expand="0" string="Бүлэглэх">
+                    <filter name="group_state" string="Төлөвөөр" context="{'group_by': 'state'}"/>
+                    <filter name="group_owner" string="Хариуцагчаар" context="{'group_by': 'owner_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="isms_capa_view_form" model="ir.ui.view">
+        <field name="name">isms.capa.form</field>
+        <field name="model">isms.capa</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_start" type="object" string="Эхлүүлэх" class="btn-primary"
+                            invisible="state != 'draft'" groups="university_isms.group_isms_analyst"/>
+                    <button name="action_mark_implemented" type="object" string="Хэрэгжүүлсэн" class="btn-primary"
+                            invisible="state != 'in_progress'" groups="university_isms.group_isms_analyst"/>
+                    <button name="action_verify" type="object" string="Баталгаажуулах" class="btn-primary"
+                            invisible="state != 'implemented'" groups="university_isms.group_isms_auditor"/>
+                    <button name="action_reject" type="object" string="Буцаах"
+                            invisible="state != 'implemented'" groups="university_isms.group_isms_auditor"/>
+                    <button name="action_close" type="object" string="Хаах" class="btn-primary"
+                            invisible="state != 'verified'" groups="university_isms.group_isms_manager"/>
+                    <button name="action_cancel" type="object" string="Цуцлах"
+                            invisible="state not in ('draft', 'in_progress', 'implemented')"
+                            confirm="CAPA-г цуцлах уу? Шалтгаан бичигдсэн байх ёстой."
+                            groups="university_isms.group_isms_manager"/>
+                    <field name="state" widget="statusbar" readonly="1"
+                           statusbar_visible="draft,in_progress,implemented,verified,closed"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <div class="text-muted"><field name="code" readonly="1"/></div>
+                        <h1><field name="name" placeholder="Залруулах арга хэмжээний гарчиг"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="finding_id" readonly="state != 'draft'"/>
+                            <field name="finding_severity"/>
+                            <field name="owner_id" readonly="state not in ('draft', 'in_progress')"/>
+                            <field name="deadline" readonly="state not in ('draft', 'in_progress')"/>
+                            <field name="is_overdue"/>
+                        </group>
+                        <group>
+                            <field name="implemented_by_id"/>
+                            <field name="implemented_at"/>
+                            <field name="verifier_id"/>
+                            <field name="verified_at"/>
+                            <field name="closed_at"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Шалтгаан ба төлөвлөгөө" name="plan">
+                            <group>
+                                <field name="root_cause" readonly="state not in ('draft', 'in_progress')"/>
+                                <field name="corrective_action" readonly="state not in ('draft', 'in_progress')"/>
+                            </group>
+                        </page>
+                        <page string="Хэрэгжилт" name="implementation">
+                            <group>
+                                <field name="implementation_notes" readonly="state not in ('draft', 'in_progress')"/>
+                                <field name="evidence_ref" readonly="state not in ('draft', 'in_progress', 'implemented')"/>
+                            </group>
+                        </page>
+                        <page string="Баталгаажуулалт" name="verification">
+                            <group>
+                                <field name="verification_notes" readonly="state != 'implemented'"
+                                       placeholder="Аудитор: нотолгоо шалгасан дүгнэлт (буцаах бол шалтгаан)"/>
+                                <field name="cancel_reason" readonly="state not in ('draft', 'in_progress', 'implemented')"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="isms_capa_action" model="ir.actions.act_window">
+        <field name="name">CAPA</field>
+        <field name="res_model">isms.capa</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="search_view_id" ref="isms_capa_view_search"/>
+        <field name="context">{'search_default_open': 1}</field>
+    </record>
+
+    <menuitem id="isms_capa_menu" name="CAPA" parent="isms_finding_menu" action="isms_capa_action"
+              sequence="10" groups="university_isms.group_isms_asset_owner,university_isms.group_isms_auditor"/>
+</odoo>

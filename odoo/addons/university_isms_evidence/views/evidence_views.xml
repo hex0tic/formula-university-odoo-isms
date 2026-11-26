@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="isms_evidence_view_list" model="ir.ui.view">
+        <field name="name">isms.evidence.list</field>
+        <field name="model">isms.evidence</field>
+        <field name="arch" type="xml">
+            <list string="Нотлох баримт" decoration-muted="state == 'rejected'" decoration-danger="is_expired">
+                <field name="name"/>
+                <field name="control_ids" widget="many2many_tags"/>
+                <field name="version"/>
+                <field name="owner_id" widget="many2one_avatar_user"/>
+                <field name="reviewer_id" widget="many2one_avatar_user" optional="show"/>
+                <field name="valid_until"/>
+                <field name="sha256" optional="hide"/>
+                <field name="state" widget="badge"
+                       decoration-success="state == 'approved'"
+                       decoration-warning="state == 'submitted'"
+                       decoration-danger="state == 'rejected'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="isms_evidence_view_kanban" model="ir.ui.view">
+        <field name="name">isms.evidence.kanban</field>
+        <field name="model">isms.evidence</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="state" class="o_kanban_small_column">
+                <field name="state"/>
+                <field name="name"/>
+                <field name="version"/>
+                <field name="sha256"/>
+                <field name="valid_until"/>
+                <field name="reviewer_id"/>
+                <field name="is_expired"/>
+                <templates>
+                    <t t-name="card">
+                        <field name="name" class="fw-bold"/>
+                        <div class="text-muted small">Хувилбар <field name="version"/></div>
+                        <div class="text-muted small text-truncate">SHA-256: <field name="sha256"/></div>
+                        <div class="text-muted small">Хүчинтэй дуусах: <field name="valid_until"/></div>
+                        <div class="text-muted small">Хянагч: <field name="reviewer_id"/></div>
+                        <div class="text-danger small" invisible="not is_expired">Хугацаа дууссан</div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="isms_evidence_view_form" model="ir.ui.view">
+        <field name="name">isms.evidence.form</field>
+        <field name="model">isms.evidence</field>
+        <field name="arch" type="xml">
+            <form string="Нотлох баримт">
+                <header>
+                    <button name="action_submit" type="object" string="Хянуулахаар илгээх" class="btn-primary"
+                            invisible="state not in ('draft', 'rejected') or not can_submit"/>
+                    <button name="action_withdraw" type="object" string="Буцаан авах"
+                            invisible="state != 'submitted' or not can_submit"/>
+                    <button name="action_approve" type="object" string="Батлах" class="btn-success"
+                            invisible="state != 'submitted' or not is_reviewer"/>
+                    <button name="action_reject" type="object" string="Татгалзах" class="btn-danger"
+                            invisible="state != 'submitted' or not is_reviewer"/>
+                    <button name="action_verify_digest" type="object" string="SHA-256 шалгах"
+                            invisible="not sha256"/>
+                    <button name="action_new_version" type="object" string="Шинэ хувилбар үүсгэх"
+                            invisible="state != 'approved'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,submitted,approved"/>
+                </header>
+                <sheet>
+                    <field name="can_submit" invisible="1"/>
+                    <field name="is_reviewer" invisible="1"/>
+                    <field name="is_expired" invisible="1"/>
+                    <div class="alert alert-warning" role="alert" invisible="not is_expired">
+                        Энэ нотолгооны хүчинтэй хугацаа дууссан байна.
+                    </div>
+                    <div class="oe_title">
+                        <div class="text-muted"><field name="display_name" readonly="1"/></div>
+                        <h1><field name="name" placeholder="жишээ: Хандалтын хяналтын тайлан 2026 Q4"
+                                   readonly="state not in ('draft', 'rejected')"/></h1>
+                    </div>
+                    <group>
+                        <group string="Тодорхойлолт">
+                            <field name="control_ids" widget="many2many_tags"
+                                   readonly="state not in ('draft', 'rejected')"/>
+                            <field name="asset_id" readonly="state not in ('draft', 'rejected')"/>
+                            <field name="risk_id" readonly="state not in ('draft', 'rejected')"/>
+                            <field name="owner_id" widget="many2one_avatar_user"
+                                   readonly="state not in ('draft', 'rejected')"/>
+                            <field name="uploaded_by_id" widget="many2one_avatar_user"/>
+                            <field name="source" readonly="state not in ('draft', 'rejected')"/>
+                            <field name="collected_at"/>
+                            <field name="valid_until" readonly="state not in ('draft', 'rejected')"/>
+                        </group>
+                        <group string="Файл ба хувилбар">
+                            <field name="attachment" readonly="state not in ('draft', 'rejected')"
+                                   filename="file_name"/>
+                            <field name="file_name" readonly="1"/>
+                            <field name="file_size"/>
+                            <field name="mimetype"/>
+                            <field name="sha256"/>
+                            <field name="version"/>
+                            <field name="previous_version_id"/>
+                            <field name="is_superseded"/>
+                        </group>
+                    </group>
+                    <group string="Хяналт (хянагч)">
+                        <group>
+                            <field name="reviewer_id" widget="many2one_avatar_user"
+                                   readonly="state not in ('draft', 'rejected')"/>
+                            <field name="reviewed_at"/>
+                        </group>
+                        <group>
+                            <field name="review_note" placeholder="Хянагчийн тэмдэглэл"
+                                   readonly="state != 'submitted' or not is_reviewer"/>
+                        </group>
+                    </group>
+                    <field name="description" placeholder="Нотолгооны тайлбар"
+                           readonly="state not in ('draft', 'rejected')"/>
+                    <notebook>
+                        <page string="Хувилбарын гинж" name="versions">
+                            <field name="next_version_ids" readonly="1">
+                                <list>
+                                    <field name="version"/>
+                                    <field name="name"/>
+                                    <field name="state" widget="badge"/>
+                                    <field name="sha256"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="isms_evidence_view_search" model="ir.ui.view">
+        <field name="name">isms.evidence.search</field>
+        <field name="model">isms.evidence</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="sha256"/>
+                <field name="control_ids"/>
+                <field name="owner_id"/>
+                <field name="reviewer_id"/>
+                <filter name="f_approved" string="Батлагдсан" domain="[('state', '=', 'approved')]"/>
+                <filter name="f_pending" string="Хянагдаж буй" domain="[('state', '=', 'submitted')]"/>
+                <filter name="f_expired" string="Хугацаа дууссан" domain="[('is_expired', '=', True)]"/>
+                <group>
+                    <filter name="g_state" string="Төлөв" context="{'group_by': 'state'}"/>
+                    <filter name="g_owner" string="Эзэмшигч" context="{'group_by': 'owner_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_isms_evidence" model="ir.actions.act_window">
+        <field name="name">Нотлох баримтын сан</field>
+        <field name="res_model">isms.evidence</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="search_view_id" ref="isms_evidence_view_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Нотлох баримт бүртгээрэй</p>
+            <p>Файл, хяналт, эзэмшигч, хянагч, SHA-256 нийлбэр, хугацааг хамт бүртгэнэ.</p>
+        </field>
+    </record>
+</odoo>

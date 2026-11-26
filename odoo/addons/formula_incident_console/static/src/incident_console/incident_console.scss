@@ -1,0 +1,517 @@
+// Formula Incident Console. Бүх селектор `.o_formula_incident_console`-ий доор байна.
+// Өнгө нь formula_design_system-ийн --fds-* токеныг fallback-тай ашиглана (addon-оос хамаардаггүй).
+
+.o_formula_incident_console {
+    --fic-primary: var(--fds-primary, #635BFF);
+    --fic-bg: var(--fds-bg, #F8FAFC);
+    --fic-surface: var(--fds-surface, #FFFFFF);
+    --fic-text: var(--fds-text, #0F172A);
+    --fic-muted: var(--fds-text-muted, #475569);
+    --fic-border: var(--fds-border, #E2E8F0);
+    --fic-success: var(--fds-success, #0D9488);
+    --fic-warning: var(--fds-warning, #B45309);
+    --fic-danger: var(--fds-danger, #B91C1C);
+    --fic-focus: var(--fds-focus, #4338CA);
+    --fic-radius: var(--fds-radius, 12px);
+    --fic-gap: 16px;
+    --fic-sev-critical: #FEE2E2;
+    --fic-sev-high: #FFEDD5;
+    --fic-sev-medium: #FEF3C7;
+    --fic-sev-low: #DCFCE7;
+    --fic-ink-critical: #991B1B;
+    --fic-ink-high: #9A3412;
+    --fic-ink-medium: #92400E;
+    --fic-ink-low: #166534;
+    --fic-state-bg: #E0E7FF;
+    --fic-state-ink: #3730A3;
+
+    .fic {
+        background: var(--fic-bg);
+        color: var(--fic-text);
+        padding: var(--fic-gap);
+        min-height: 100%;
+        box-sizing: border-box;
+        font-size: 14px;
+        line-height: 1.45;
+        overflow-x: hidden;
+    }
+
+    .fic *,
+    .fic *::before,
+    .fic *::after {
+        box-sizing: border-box;
+    }
+
+    .fic-h1 {
+        color: var(--fic-text);
+        font-size: 22px;
+        font-weight: 700;
+        margin: 0 0 4px;
+    }
+
+    .fic-h2 {
+        color: var(--fic-text);
+        font-size: 16px;
+        font-weight: 650;
+        margin: 0 0 8px;
+    }
+
+    .fic-h3 {
+        color: var(--fic-muted);
+        font-size: 13px;
+        font-weight: 600;
+        margin: 0 0 6px;
+    }
+
+    .fic-header {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px 24px;
+        align-items: flex-start;
+        justify-content: space-between;
+        margin-bottom: var(--fic-gap);
+    }
+
+    .fic-sub,
+    .fic-meta,
+    .fic-hint {
+        color: var(--fic-muted);
+        font-size: 13px;
+        margin: 0;
+    }
+
+    .fic-strong {
+        font-weight: 600;
+        margin: 0 0 4px;
+    }
+
+    .fic-code {
+        color: var(--fic-muted);
+        font-family: monospace;
+        font-size: 12px;
+        margin: 0;
+    }
+
+    .fic-label {
+        color: var(--fic-muted);
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .fic-filters {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px 16px;
+        align-items: flex-end;
+        background: var(--fic-surface);
+        border: 1px solid var(--fic-border);
+        border-radius: var(--fic-radius);
+        padding: 12px;
+        margin-bottom: 12px;
+    }
+
+    .fic-field {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        min-width: 0;
+        flex: 1 1 160px;
+    }
+
+    .fic-check {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        color: var(--fic-text);
+        min-height: 36px;
+    }
+
+    .fic-select,
+    .fic-textarea {
+        background: var(--fic-surface);
+        color: var(--fic-text);
+        border: 1px solid var(--fic-border);
+        border-radius: 8px;
+        padding: 8px 10px;
+        font: inherit;
+        width: 100%;
+    }
+
+    .fic-textarea {
+        resize: vertical;
+        min-height: 56px;
+    }
+
+    .fic-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 36px;
+        padding: 6px 14px;
+        border-radius: 8px;
+        border: 1px solid var(--fic-border);
+        background: var(--fic-surface);
+        color: var(--fic-text);
+        font: inherit;
+        font-weight: 600;
+        cursor: pointer;
+
+        &:disabled {
+            opacity: 0.55;
+            cursor: not-allowed;
+        }
+
+        &:focus-visible,
+        &:focus {
+            outline: 2px solid var(--fic-focus);
+            outline-offset: 2px;
+        }
+    }
+
+    .fic-btn-primary {
+        background: var(--fic-primary);
+        border-color: var(--fic-primary);
+        color: #FFFFFF;
+    }
+
+    .fic-btn-link {
+        background: transparent;
+        border-color: transparent;
+        color: var(--fic-primary);
+        text-decoration: underline;
+    }
+
+    .fic-select:focus-visible,
+    .fic-textarea:focus-visible,
+    .fic-check input:focus-visible {
+        outline: 2px solid var(--fic-focus);
+        outline-offset: 2px;
+    }
+
+    .fic-body {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr);
+        gap: var(--fic-gap);
+        align-items: start;
+    }
+
+    .fic-list,
+    .fic-drawer {
+        background: var(--fic-surface);
+        border: 1px solid var(--fic-border);
+        border-radius: var(--fic-radius);
+        padding: 12px;
+        min-width: 0;
+    }
+
+    .fic-items {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .fic-row {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        width: 100%;
+        text-align: left;
+        background: var(--fic-surface);
+        color: var(--fic-text);
+        border: 1px solid var(--fic-border);
+        border-left: 4px solid var(--fic-border);
+        border-radius: 10px;
+        padding: 10px 12px;
+        font: inherit;
+        cursor: pointer;
+        min-width: 0;
+
+        &.fic-sev-critical { border-left-color: var(--fic-ink-critical); }
+        &.fic-sev-high { border-left-color: var(--fic-ink-high); }
+        &.fic-sev-medium { border-left-color: var(--fic-ink-medium); }
+        &.fic-sev-low { border-left-color: var(--fic-ink-low); }
+
+        &:hover {
+            border-color: var(--fic-primary);
+        }
+
+        &.is-selected {
+            box-shadow: inset 0 0 0 2px var(--fic-primary);
+        }
+
+        &:focus-visible {
+            outline: 2px solid var(--fic-focus);
+            outline-offset: 2px;
+        }
+    }
+
+    .fic-row-top,
+    .fic-row-bottom,
+    .fic-chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px 8px;
+        align-items: center;
+    }
+
+    .fic-row-title {
+        font-weight: 600;
+        color: var(--fic-text);
+        overflow-wrap: anywhere;
+    }
+
+    .fic-chip {
+        display: inline-block;
+        border-radius: 999px;
+        padding: 2px 8px;
+        font-size: 12px;
+        font-weight: 600;
+        background: var(--fic-border);
+        color: var(--fic-text);
+        white-space: nowrap;
+
+        &.fic-chip-plain {
+            background: transparent;
+            border: 1px solid var(--fic-border);
+            color: var(--fic-muted);
+        }
+    }
+
+    .fic-state-incident,
+    .fic-state-report,
+    .fic-state-investigate,
+    .fic-state-resolve,
+    .fic-state-close {
+        background: var(--fic-state-bg);
+        color: var(--fic-state-ink);
+    }
+
+    .fic-sevchip-critical { background: var(--fic-sev-critical); color: var(--fic-ink-critical); }
+    .fic-sevchip-high { background: var(--fic-sev-high); color: var(--fic-ink-high); }
+    .fic-sevchip-medium { background: var(--fic-sev-medium); color: var(--fic-ink-medium); }
+    .fic-sevchip-low { background: var(--fic-sev-low); color: var(--fic-ink-low); }
+
+    .fic-sla {
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--fic-muted);
+        font-variant-numeric: tabular-nums;
+
+        &.fic-tone-danger { color: var(--fds-danger-text, #B91C1C); }
+        &.fic-tone-warning { color: var(--fds-warning-text, #92400E); }
+        &.fic-tone-ok { color: var(--fds-success-text, #0F766E); }
+    }
+
+    .fic-state {
+        border: 1px dashed var(--fic-border);
+        border-radius: var(--fic-radius);
+        padding: 16px;
+        text-align: center;
+        color: var(--fic-text);
+
+        &.fic-state-error,
+        &.fic-state-denied {
+            border-style: solid;
+            border-color: var(--fic-danger);
+        }
+
+        .fic-btn {
+            margin-top: 8px;
+        }
+    }
+
+    .fic-skeleton {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .fic-skel-row,
+    .fic-skel-block {
+        background: var(--fic-border);
+        border-radius: 10px;
+        height: 56px;
+        opacity: 0.7;
+    }
+
+    .fic-skel-block {
+        height: 120px;
+    }
+
+    .fic-drawer-head {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        align-items: flex-start;
+        margin-bottom: 8px;
+
+        .fic-drawer-title {
+            color: var(--fic-text);
+            margin: 0;
+            overflow-wrap: anywhere;
+
+            &:focus {
+                outline: 2px solid var(--fic-focus);
+                outline-offset: 2px;
+            }
+        }
+    }
+
+    .fic-chips {
+        margin-bottom: 10px;
+    }
+
+    .fic-alerts {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .fic-alert {
+        margin: 0;
+        padding: 8px 10px;
+        border-radius: 8px;
+        font-size: 13px;
+
+        &.fic-alert-danger {
+            background: var(--fic-sev-critical);
+            color: var(--fic-ink-critical);
+        }
+
+        &.fic-alert-warning {
+            background: var(--fic-sev-medium);
+            color: var(--fic-ink-medium);
+        }
+    }
+
+    .fic-dl {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+        gap: 6px 12px;
+        margin: 12px 0;
+        font-size: 13px;
+
+        dt {
+            color: var(--fic-muted);
+            font-weight: 600;
+        }
+
+        dd {
+            margin: 0;
+            color: var(--fic-text);
+            overflow-wrap: anywhere;
+        }
+    }
+
+    .fic-section {
+        border-top: 1px solid var(--fic-border);
+        padding-top: 12px;
+        margin-top: 12px;
+    }
+
+    .fic-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .fic-reason {
+        margin-top: 6px;
+    }
+
+    .fic-body-text {
+        color: var(--fic-text);
+        margin: 0 0 6px;
+        white-space: pre-wrap;
+        overflow-wrap: anywhere;
+    }
+
+    .fic-plain-list {
+        margin: 0;
+        padding-left: 18px;
+    }
+
+    .fic-notes {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+
+        .fic-btn {
+            align-self: flex-start;
+            margin-top: 6px;
+        }
+    }
+
+    .fic-timeline,
+    .fic-tl-tracking {
+        margin: 0;
+        padding-left: 18px;
+    }
+
+    .fic-tl-item {
+        margin-bottom: 10px;
+    }
+
+    .fic-tl-meta {
+        color: var(--fic-muted);
+        font-size: 12px;
+        margin: 0;
+    }
+
+    .fic-tl-text {
+        margin: 2px 0 0;
+        overflow-wrap: anywhere;
+    }
+
+    .fic-tl-tracking {
+        font-size: 12px;
+        color: var(--fic-muted);
+    }
+
+    .fic-live {
+        min-height: 18px;
+        font-size: 12px;
+        color: var(--fic-muted);
+        margin-bottom: 4px;
+    }
+
+    @media (min-width: 768px) {
+        .fic {
+            padding: 24px;
+        }
+
+        .fic-items {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+    }
+
+    @media (min-width: 1024px) {
+        .fic-body.has-drawer {
+            grid-template-columns: minmax(0, 1fr) minmax(0, 440px);
+        }
+
+        .fic-items {
+            grid-template-columns: minmax(0, 1fr);
+        }
+
+        .fic-drawer {
+            position: sticky;
+            top: 12px;
+            max-height: #{"calc(100vh - 120px)"};
+            overflow-y: auto;
+        }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .fic *,
+        .fic *::before,
+        .fic *::after {
+            transition: none !important;
+            animation: none !important;
+        }
+    }
+}

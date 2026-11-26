@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="campus_portal.TeacherPortal">
+        <Layout display="{ controlPanel: {} }" className="'o_campus_teacher'">
+            <div class="ctp" role="region" aria-label="Багшийн портал">
+                <header class="ctp-head">
+                    <h1 class="ctp-title">Багшийн портал</h1>
+                    <p class="ctp-muted">Улирал: <t t-esc="termName"/></p>
+                </header>
+
+                <nav class="ctp-tabs" role="tablist" aria-label="Багшийн портал хэсгүүд">
+                    <button type="button" role="tab" class="ctp-tab" t-att-class="state.tab === 'offerings' || state.tab === 'offering' ? 'ctp-tab is-active' : 'ctp-tab'"
+                            t-att-aria-selected="state.tab === 'offerings' || state.tab === 'offering' ? 'true' : 'false'"
+                            t-on-click="() => this.setTab('offerings')">Миний хичээл</button>
+                    <button type="button" role="tab" class="ctp-tab" t-att-class="state.tab === 'notifications' ? 'ctp-tab is-active' : 'ctp-tab'"
+                            t-att-aria-selected="state.tab === 'notifications' ? 'true' : 'false'"
+                            t-on-click="() => this.setTab('notifications')">Мэдэгдэл</button>
+                    <span class="ctp-pending" aria-live="polite">Хянуулж буй хүсэлт: <t t-esc="pendingCount"/></span>
+                </nav>
+
+                <!-- Offerings list -->
+                <section t-if="state.tab === 'offerings'" class="ctp-panel" role="tabpanel" aria-label="Миний хичээлүүд">
+                    <div t-if="state.loading" class="ctp-state" role="status">Ачаалж байна…</div>
+                    <div t-elif="state.loadError" class="ctp-alert ctp-alert--danger" role="alert">
+                        <p><t t-esc="state.loadError"/></p>
+                        <button type="button" class="ctp-btn" t-on-click="() => this.loadDashboard()">Дахин оролдох</button>
+                    </div>
+                    <p t-elif="!offerings.length" class="ctp-state">Танд оноогдсон хичээл алга.</p>
+                    <ul t-else="" class="ctp-cards">
+                        <li t-foreach="offerings" t-as="offering" t-key="offering.id" class="ctp-card">
+                            <h2 class="ctp-h2"><t t-esc="offering.course_code"/> · <t t-esc="offering.name"/></h2>
+                            <p class="ctp-muted"><t t-esc="offering.semester"/> · <t t-esc="offering.state_label"/> · <t t-esc="offering.seats_taken"/> / <t t-esc="offering.capacity"/> оюутан</p>
+                            <button type="button" class="ctp-btn ctp-btn--primary" t-att-aria-label="'Жагсаалт нээх: ' + offering.name"
+                                    t-on-click="() => this.openOffering(offering.id)">Жагсаалт, ирц, дүн</button>
+                        </li>
+                    </ul>
+                </section>
+
+                <!-- One offering: roster, attendance, grade requests -->
+                <section t-if="state.tab === 'offering'" class="ctp-panel" aria-label="Хичээлийн жагсаалт">
+                    <button type="button" class="ctp-btn" t-on-click="() => this.backToOfferings()">← Хичээлүүд рүү буцах</button>
+
+                    <h2 class="ctp-h2" id="ctp-roster-title">Оюутны жагсаалт</h2>
+                    <div t-if="state.rosterLoading" class="ctp-state" role="status">Ачаалж байна…</div>
+                    <div t-elif="state.rosterError" class="ctp-alert ctp-alert--danger" role="alert"><t t-esc="state.rosterError"/></div>
+                    <p t-elif="state.roster and !state.roster.rows.length" class="ctp-state">Бүртгэлтэй оюутан алга.</p>
+                    <ul t-elif="state.roster" class="ctp-cards" aria-labelledby="ctp-roster-title">
+                        <li t-foreach="state.roster.rows" t-as="row" t-key="row.enrollment_id" class="ctp-card">
+                            <h3 class="ctp-h3"><t t-esc="row.student_code"/> · <t t-esc="row.student_name"/></h3>
+                            <dl class="ctp-dl">
+                                <dt>Төлөв</dt><dd><t t-esc="row.reg_state_label"/></dd>
+                                <dt>Баталгаат дүн</dt><dd><t t-esc="row.score"/> (хувилбар <t t-esc="row.grade_revision"/>)</dd>
+                                <dt>Сүүлийн хүсэлт</dt><dd><t t-if="row.request_name"><t t-esc="row.request_name"/> · <t t-esc="row.request_state_label"/></t><t t-else="">Байхгүй</t></dd>
+                            </dl>
+
+                            <button t-if="!isDraftOpen(row.enrollment_id)" type="button" class="ctp-btn"
+                                    t-att-aria-label="'Дүн өөрчлөх хүсэлт гаргах: ' + row.student_name"
+                                    t-on-click="() => this.startRequest(row)">Дүн өөрчлөх хүсэлт</button>
+
+                            <form t-else="" class="ctp-form" t-on-submit.prevent="() => this.submitRequest(row)">
+                                <p class="ctp-muted">Хүсэлт нь сургалтын албаар батлагдана. Таны гаргасан хүсэлтийг өөрөө батлахгүй.</p>
+                                <label class="ctp-label" t-att-for="'ctp-score-' + row.enrollment_id">Шинэ дүн (0–100)</label>
+                                <input type="number" min="0" max="100" step="0.01" class="ctp-input" t-att-id="'ctp-score-' + row.enrollment_id"
+                                       t-model="state.drafts[row.enrollment_id].score" required="required"/>
+                                <label class="ctp-label" t-att-for="'ctp-reason-' + row.enrollment_id">Үндэслэл (хамгийн багадаа 10 тэмдэгт)</label>
+                                <textarea rows="3" class="ctp-input" t-att-id="'ctp-reason-' + row.enrollment_id" required="required"
+                                          t-model="state.drafts[row.enrollment_id].reason"/>
+                                <label class="ctp-label" t-att-for="'ctp-evidence-' + row.enrollment_id">Нотолгооны лавлагаа (заавал биш)</label>
+                                <input type="text" class="ctp-input" t-att-id="'ctp-evidence-' + row.enrollment_id"
+                                       t-model="state.drafts[row.enrollment_id].evidence"/>
+                                <p t-if="state.drafts[row.enrollment_id].error" class="ctp-alert ctp-alert--danger" role="alert"><t t-esc="state.drafts[row.enrollment_id].error"/></p>
+                                <div class="ctp-actions">
+                                    <button type="submit" class="ctp-btn ctp-btn--primary" t-att-disabled="isBusy('grade-' + row.enrollment_id) or state.drafts[row.enrollment_id].pending">Хүсэлт илгээх</button>
+                                    <button type="button" class="ctp-btn" t-on-click="() => this.cancelRequest(row)">Болих</button>
+                                </div>
+                            </form>
+                        </li>
+                    </ul>
+
+                    <h2 class="ctp-h2">Ирц бүртгэх</h2>
+                    <div t-if="state.sessionsLoading" class="ctp-state" role="status">Ачаалж байна…</div>
+                    <div t-elif="state.sessionsError" class="ctp-alert ctp-alert--danger" role="alert"><t t-esc="state.sessionsError"/></div>
+                    <p t-elif="!state.sessions.length" class="ctp-state">Энэ хичээлд цагийн хуваарь алга.</p>
+                    <div t-else="" class="ctp-sessions">
+                        <article t-foreach="state.sessions" t-as="session" t-key="session.id" class="ctp-card">
+                            <h3 class="ctp-h3"><t t-esc="session.start"/> – <t t-esc="session.end"/> · <t t-esc="session.kind"/><t t-if="session.room"> · <t t-esc="session.room"/></t></h3>
+                            <p t-if="!session.rows.length" class="ctp-muted">Идэвхтэй оюутан алга.</p>
+                            <table t-else="" class="ctp-table">
+                                <caption class="ctp-sr">Ирцийн бүртгэл: <t t-esc="session.start"/></caption>
+                                <thead><tr><th scope="col">Код</th><th scope="col">Оюутан</th><th scope="col">Төлөв</th></tr></thead>
+                                <tbody>
+                                    <tr t-foreach="session.rows" t-as="arow" t-key="arow.enrollment_id">
+                                        <td><t t-esc="arow.student_code"/></td>
+                                        <td><t t-esc="arow.student_name"/></td>
+                                        <td>
+                                            <label class="ctp-sr" t-att-for="'ctp-att-' + session.id + '-' + arow.enrollment_id">Ирцийн төлөв: <t t-esc="arow.student_name"/></label>
+                                            <select class="ctp-input" t-att-id="'ctp-att-' + session.id + '-' + arow.enrollment_id"
+                                                    t-on-change="(ev) => this.setAttendance(session.id, arow.enrollment_id, ev.target.value)">
+                                                <option t-foreach="['present', 'late', 'absent', 'excused']" t-as="st" t-key="st" t-att-value="st" t-att-selected="state.attendance[session.id][arow.enrollment_id] === st">
+                                                    <t t-esc="attendanceLabel(st)"/>
+                                                </option>
+                                            </select>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <button t-if="session.rows.length" type="button" class="ctp-btn ctp-btn--primary"
+                                    t-att-disabled="isBusy('attendance-' + session.id)"
+                                    t-on-click="() => this.saveAttendance(session)">Ирц хадгалах</button>
+                        </article>
+                    </div>
+                </section>
+
+                <!-- Notifications -->
+                <section t-if="state.tab === 'notifications'" class="ctp-panel" aria-label="Мэдэгдэл">
+                    <div t-if="state.notificationsLoading" class="ctp-state" role="status">Ачаалж байна…</div>
+                    <div t-elif="state.notificationsError" class="ctp-alert ctp-alert--danger" role="alert"><t t-esc="state.notificationsError"/></div>
+                    <p t-elif="!state.notifications.length" class="ctp-state">Мэдэгдэл алга.</p>
+                    <ol t-else="" class="ctp-feed">
+                        <li t-foreach="state.notifications" t-as="note" t-key="note.id" class="ctp-card">
+                            <time class="ctp-muted"><t t-esc="note.date"/></time>
+                            <p class="ctp-strong"><t t-esc="note.subject || 'Шинэчлэлт'"/></p>
+                            <p t-if="note.body"><t t-esc="note.body"/></p>
+                        </li>
+                    </ol>
+                </section>
+            </div>
+        </Layout>
+    </t>
+</templates>

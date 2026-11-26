@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Studio нь зөвхөн сургалтын багш, сургалтын алба, академик аудиторт харагдана.
+         Сервисийн талд ORM эрхээр дахин шалгана (formula.grade.studio). -->
+    <record id="action_formula_grade_studio" model="ir.actions.client">
+        <field name="name">Дүн өөрчлөх хүсэлтийн студио</field>
+        <field name="tag">formula_grade_studio</field>
+    </record>
+
+    <menuitem id="menu_formula_grade_studio" name="Дүн батлах студио"
+              parent="campus_university.menu_campus_root" action="action_formula_grade_studio"
+              sequence="15"
+              groups="campus_university.group_campus_lecturer,campus_university.group_campus_registrar,campus_university.group_campus_auditor"/>
+</odoo>

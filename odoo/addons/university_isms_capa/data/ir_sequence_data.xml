@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <record id="seq_isms_finding" model="ir.sequence">
+        <field name="name">ISMS олдвор</field>
+        <field name="code">isms.finding</field>
+        <field name="prefix">FND-%(year)s-</field>
+        <field name="padding">4</field>
+    </record>
+    <record id="seq_isms_capa" model="ir.sequence">
+        <field name="name">ISMS CAPA</field>
+        <field name="code">isms.capa</field>
+        <field name="prefix">CAPA-%(year)s-</field>
+        <field name="padding">4</field>
+    </record>
+    <record id="seq_isms_risk_waiver" model="ir.sequence">
+        <field name="name">ISMS эрсдлийн зөвшөөрөл</field>
+        <field name="code">isms.risk.waiver</field>
+        <field name="prefix">WVR-%(year)s-</field>
+        <field name="padding">4</field>
+    </record>
+</odoo>

@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="isms_finding_view_list" model="ir.ui.view">
+        <field name="name">isms.finding.list</field>
+        <field name="model">isms.finding</field>
+        <field name="arch" type="xml">
+            <list decoration-danger="severity in ('high', 'critical') and state == 'open'" decoration-muted="state == 'closed'">
+                <field name="code"/>
+                <field name="name"/>
+                <field name="source"/>
+                <field name="severity" widget="badge"/>
+                <field name="control_id"/>
+                <field name="risk_id"/>
+                <field name="owner_id" widget="many2one_avatar_user"/>
+                <field name="capa_count"/>
+                <field name="occurrence_count"/>
+                <field name="detected_at"/>
+                <field name="state" widget="badge"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="isms_finding_view_search" model="ir.ui.view">
+        <field name="name">isms.finding.search</field>
+        <field name="model">isms.finding</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="code"/>
+                <field name="name"/>
+                <field name="owner_id"/>
+                <field name="risk_id"/>
+                <field name="control_id"/>
+                <filter name="open" string="Нээлттэй" domain="[('state', '!=', 'closed')]"/>
+                <filter name="mine" string="Миний" domain="[('owner_id', '=', uid)]"/>
+                <filter name="overdue_capa" string="CAPA хугацаа хэтэрсэн" domain="[('capa_ids.is_overdue', '=', True)]"/>
+                <separator/>
+                <filter name="severity_high" string="Өндөр / ноцтой" domain="[('severity', 'in', ['high', 'critical'])]"/>
+                <filter name="severity_critical" string="Ноцтой" domain="[('severity', '=', 'critical')]"/>
+                <separator/>
+                <filter name="state_capa" string="Залруулж буй" domain="[('state', '=', 'capa')]"/>
+                <filter name="state_verified" string="Баталгаажсан" domain="[('state', '=', 'verified')]"/>
+                <group expand="0" string="Бүлэглэх">
+                    <filter name="group_severity" string="Ноцтой байдлаар" context="{'group_by': 'severity'}"/>
+                    <filter name="group_state" string="Төлөвөөр" context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="isms_finding_view_form" model="ir.ui.view">
+        <field name="name">isms.finding.form</field>
+        <field name="model">isms.finding</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_new_capa" type="object" string="CAPA нээх" class="btn-primary"
+                            invisible="state in ('verified', 'closed')"
+                            groups="university_isms.group_isms_analyst"/>
+                    <button name="action_accept_risk" type="object" string="Хүлээн зөвшөөрч хаах"
+                            invisible="state not in ('open', 'capa')"
+                            confirm="Эрсдлийг CAPA-гүйгээр хүлээн зөвшөөрч хаах уу? Шалтгаан бичигдсэн байх ёстой."
+                            groups="university_isms.group_isms_manager"/>
+                    <button name="action_close" type="object" string="Хаах" class="btn-primary"
+                            invisible="state != 'verified'"
+                            groups="university_isms.group_isms_manager"/>
+                    <field name="state" widget="statusbar" readonly="1"
+                           statusbar_visible="open,capa,verified,closed"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_capas" type="object" class="oe_stat_button" icon="fa-tasks">
+                            <field name="capa_count" widget="statinfo" string="CAPA"/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <div class="text-muted"><field name="code" readonly="1"/></div>
+                        <h1><field name="name" placeholder="Олдворын гарчиг"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="source"/>
+                            <field name="severity"/>
+                            <field name="owner_id"/>
+                        </group>
+                        <group>
+                            <field name="control_id"/>
+                            <field name="risk_id"/>
+                            <field name="asset_id"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group>
+                            <field name="detected_at"/>
+                            <field name="last_seen_at"/>
+                        </group>
+                        <group>
+                            <field name="occurrence_count"/>
+                            <field name="closed_at"/>
+                        </group>
+                    </group>
+                    <field name="description" placeholder="Юу илэрсэн, ямар нотолгоогоор"/>
+                    <notebook>
+                        <page string="Залруулах арга хэмжээ" name="capa">
+                            <field name="capa_ids" readonly="1">
+                                <list>
+                                    <field name="code"/>
+                                    <field name="name"/>
+                                    <field name="owner_id"/>
+                                    <field name="deadline"/>
+                                    <field name="is_overdue"/>
+                                    <field name="state" widget="badge"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Хүлээн зөвшөөрөлт" name="acceptance"
+                              invisible="state not in ('open', 'capa', 'closed')">
+                            <group>
+                                <field name="acceptance_reason" readonly="state not in ('open', 'capa')"
+                                       placeholder="CAPA-гүйгээр хүлээн зөвшөөрөх үндэслэл (зөвхөн CISO)"/>
+                                <field name="accepted_by_id"/>
+                                <field name="accepted_at"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="isms_finding_action" model="ir.actions.act_window">
+        <field name="name">Олдвор</field>
+        <field name="res_model">isms.finding</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="isms_finding_view_search"/>
+        <field name="context">{'search_default_open': 1}</field>
+    </record>
+
+    <menuitem id="isms_finding_menu" name="Олдвор ба CAPA" parent="university_isms.menu_isms_root"
+              action="isms_finding_action" sequence="45"
+              groups="university_isms.group_isms_asset_owner,university_isms.group_isms_auditor"/>
+</odoo>

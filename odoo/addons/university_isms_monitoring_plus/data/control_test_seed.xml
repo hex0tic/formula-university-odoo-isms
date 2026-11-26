@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Автомат шалгалтууд: зөвхөн унших, давуу эрх, нууцгүй агрегат үр дүн -->
+        <record id="plan_mfa_privileged" model="isms.control.test.plan">
+            <field name="name">MFA: давуу эрхтэй хэрэглэгчид TOTP идэвхжсэн эсэх</field>
+            <field name="control_id" ref="university_isms.control_8_5"/>
+            <field name="method">automated</field>
+            <field name="check_key">privileged_no_totp</field>
+            <field name="frequency">weekly</field>
+            <field name="description">Settings, Access Rights, CISO группийн идэвхтэй хэрэглэгчдийг шалгана. Нууц утга уншихгүй.</field>
+        </record>
+        <record id="plan_privileged_group_size" model="isms.control.test.plan">
+            <field name="name">Давуу эрхтэй группын хэмжээ (босготой харьцуулах)</field>
+            <field name="control_id" ref="university_isms.control_8_2"/>
+            <field name="method">automated</field>
+            <field name="check_key">privileged_group_size</field>
+            <field name="frequency">monthly</field>
+        </record>
+        <record id="plan_inactive_privileged" model="isms.control.test.plan">
+            <field name="name">Удаан нэвтрээгүй давуу эрхтэй хэрэглэгч</field>
+            <field name="control_id" ref="university_isms.control_5_18"/>
+            <field name="method">automated</field>
+            <field name="check_key">inactive_privileged_users</field>
+            <field name="frequency">monthly</field>
+        </record>
+        <record id="plan_audit_log_guard" model="isms.control.test.plan">
+            <field name="name">Аудит логийн өөрчлөх, устгах хамгаалалт</field>
+            <field name="control_id" ref="university_isms.control_8_15"/>
+            <field name="method">automated</field>
+            <field name="check_key">audit_log_tamper_guard</field>
+            <field name="frequency">monthly</field>
+        </record>
+        <record id="plan_policy_review" model="isms.control.test.plan">
+            <field name="name">Бодлогын дахин хянах хугацаа</field>
+            <field name="control_id" ref="university_isms.control_5_1"/>
+            <field name="method">automated</field>
+            <field name="check_key">policies_past_review</field>
+            <field name="frequency">monthly</field>
+        </record>
+        <record id="plan_incident_sla" model="isms.control.test.plan">
+            <field name="name">Инцидентийн SLA хэтэрсэн, шалгагчгүй</field>
+            <field name="control_id" ref="university_isms.control_5_26"/>
+            <field name="method">automated</field>
+            <field name="check_key">incidents_past_sla_unassigned</field>
+            <field name="frequency">daily</field>
+        </record>
+        <record id="plan_evidence_freshness" model="isms.control.test.plan">
+            <field name="name">Хугацаа дууссан нотолгоо (ISMS-01 ирсний дараа)</field>
+            <field name="control_id" ref="university_isms.control_5_33"/>
+            <field name="method">automated</field>
+            <field name="check_key">evidence_freshness</field>
+            <field name="frequency">weekly</field>
+        </record>
+        <!-- Гар аргын шалгалтууд: аудитор бүртгэнэ -->
+        <record id="plan_manual_backup_restore" model="isms.control.test.plan">
+            <field name="name">Нөөц хуулбарыг сэргээх туршилт (гар аргаар)</field>
+            <field name="control_id" ref="university_isms.control_8_13"/>
+            <field name="method">manual</field>
+            <field name="severity">high</field>
+            <field name="frequency">quarterly</field>
+            <field name="description">Тусгаарласан орчинд нөөц хуулбарыг сэргээж, мөрийн тоог харьцуулна. Өгөгдлийн агууламжийг тайланд оруулахгүй.</field>
+        </record>
+        <record id="plan_manual_ir_tabletop" model="isms.control.test.plan">
+            <field name="name">Зөрчлийн хариу арга хэмжээний дадлага (tabletop)</field>
+            <field name="control_id" ref="university_isms.control_5_24"/>
+            <field name="method">manual</field>
+            <field name="severity">medium</field>
+            <field name="frequency">quarterly</field>
+            <field name="description">Зөрчлийн төлөвлөгөөг хэрэглэн сценари дээр дадлага хийж, алхмуудыг баримтална.</field>
+        </record>
+
+        <record id="ir_cron_control_tests" model="ir.cron">
+            <field name="name">ISMS: хяналтын автомат тестүүд (товлолт)</field>
+            <field name="model_id" ref="model_isms_control_test_plan"/>
+            <field name="state">code</field>
+            <field name="code">model._run_due_plans()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">hours</field>
+            <field name="active" eval="True"/>
+        </record>
+    </data>
+</odoo>

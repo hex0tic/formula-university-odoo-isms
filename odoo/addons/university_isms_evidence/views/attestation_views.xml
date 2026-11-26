@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="isms_attestation_campaign_view_list" model="ir.ui.view">
+        <field name="name">isms.policy.attestation.campaign.list</field>
+        <field name="model">isms.policy.attestation.campaign</field>
+        <field name="arch" type="xml">
+            <list string="Баталгаажуулалтын кампанит ажил">
+                <field name="name"/>
+                <field name="policy_id"/>
+                <field name="policy_revision"/>
+                <field name="scope"/>
+                <field name="start_date"/>
+                <field name="due_date"/>
+                <field name="total_count"/>
+                <field name="attested_count"/>
+                <field name="state" widget="badge" decoration-success="state == 'open'"
+                       decoration-muted="state == 'closed'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="isms_attestation_campaign_view_form" model="ir.ui.view">
+        <field name="name">isms.policy.attestation.campaign.form</field>
+        <field name="model">isms.policy.attestation.campaign</field>
+        <field name="arch" type="xml">
+            <form string="Баталгаажуулалтын кампанит ажил">
+                <header>
+                    <button name="action_open" type="object" string="Нээх (хэрэглэгч бүрт үүсгэх)" class="btn-primary"
+                            invisible="state != 'draft'"/>
+                    <button name="action_close" type="object" string="Хаах" invisible="state != 'open'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,open,closed"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" placeholder="жишээ: 2026 Q4 бодлогын баталгаажуулалт"
+                                   readonly="state != 'draft'"/></h1>
+                    </div>
+                    <group>
+                        <group string="Бодлого">
+                            <field name="policy_id" readonly="state != 'draft'"/>
+                            <field name="policy_revision"/>
+                            <field name="scope" readonly="state != 'draft'"/>
+                            <field name="group_ids" widget="many2many_tags"
+                                   readonly="state != 'draft'" invisible="scope != 'groups'"/>
+                        </group>
+                        <group string="Хугацаа">
+                            <field name="start_date" readonly="state != 'draft'"/>
+                            <field name="due_date" readonly="state != 'draft'"/>
+                            <field name="validity_days" readonly="state != 'draft'"/>
+                        </group>
+                    </group>
+                    <group string="Явц">
+                        <field name="total_count"/>
+                        <field name="attested_count"/>
+                        <field name="open_count"/>
+                    </group>
+                    <notebook>
+                        <page string="Баталгаажуулалт" name="attestations">
+                            <field name="attestation_ids" readonly="1">
+                                <list>
+                                    <field name="user_id"/>
+                                    <field name="revision"/>
+                                    <field name="attested_at"/>
+                                    <field name="expires_on"/>
+                                    <field name="state" widget="badge"
+                                           decoration-success="state == 'attested'"
+                                           decoration-warning="state == 'pending'"
+                                           decoration-danger="state in ('stale', 'expired')"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="isms_attestation_view_list" model="ir.ui.view">
+        <field name="name">isms.policy.attestation.list</field>
+        <field name="model">isms.policy.attestation</field>
+        <field name="arch" type="xml">
+            <list string="Бодлогын баталгаажуулалт" create="0">
+                <field name="policy_id"/>
+                <field name="campaign_id"/>
+                <field name="user_id" widget="many2one_avatar_user"/>
+                <field name="revision"/>
+                <field name="attested_at"/>
+                <field name="expires_on"/>
+                <field name="state" widget="badge"
+                       decoration-success="state == 'attested'"
+                       decoration-warning="state == 'pending'"
+                       decoration-danger="state in ('stale', 'expired')"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="isms_attestation_view_form" model="ir.ui.view">
+        <field name="name">isms.policy.attestation.form</field>
+        <field name="model">isms.policy.attestation</field>
+        <field name="arch" type="xml">
+            <form string="Бодлогын баталгаажуулалт" create="0" edit="0">
+                <header>
+                    <button name="action_attest" type="object" string="Баталгаажуулах" class="btn-primary"
+                            invisible="state != 'pending' or not is_mine"/>
+                    <field name="state" widget="statusbar" statusbar_visible="pending,attested"/>
+                </header>
+                <sheet>
+                    <field name="is_mine" invisible="1"/>
+                    <div class="alert alert-success" role="alert" invisible="state != 'attested'">
+                        Та энэ бодлогын одоогийн хувилбарыг баталгаажуулсан байна.
+                    </div>
+                    <div class="alert alert-warning" role="alert" invisible="state != 'stale'">
+                        Бодлогын шинэ хувилбар гарсан тул энэ баталгаажуулалт хуучирсан. Шинэ баталгаажуулалт хийнэ үү.
+                    </div>
+                    <div class="oe_title">
+                        <h1><field name="policy_id" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="user_id" widget="many2one_avatar_user"/>
+                            <field name="campaign_id"/>
+                        </group>
+                        <group>
+                            <field name="revision"/>
+                            <field name="attested_at"/>
+                            <field name="expires_on"/>
+                        </group>
+                    </group>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="isms_attestation_view_search" model="ir.ui.view">
+        <field name="name">isms.policy.attestation.search</field>
+        <field name="model">isms.policy.attestation</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="user_id"/>
+                <field name="policy_id"/>
+                <filter name="f_pending" string="Хүлээгдэж буй" domain="[('state', '=', 'pending')]"/>
+                <filter name="f_stale" string="Хуучирсан" domain="[('state', 'in', ('stale', 'expired'))]"/>
+                <group>
+                    <filter name="g_state" string="Төлөв" context="{'group_by': 'state'}"/>
+                    <filter name="g_policy" string="Бодлого" context="{'group_by': 'policy_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_isms_attestation_campaign" model="ir.actions.act_window">
+        <field name="name">Баталгаажуулалтын кампанит ажил</field>
+        <field name="res_model">isms.policy.attestation.campaign</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <record id="action_isms_attestation_all" model="ir.actions.act_window">
+        <field name="name">Баталгаажуулалтын бүртгэл</field>
+        <field name="res_model">isms.policy.attestation</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="isms_attestation_view_search"/>
+    </record>
+
+    <record id="action_isms_attestation_mine" model="ir.actions.act_window">
+        <field name="name">Миний баталгаажуулалт</field>
+        <field name="res_model">isms.policy.attestation</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('user_id', '=', uid)]</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Танд ирсэн бодлогын баталгаажуулалт байхгүй байна</p>
+            <p>Бодлогыг уншсаны дараа «Баталгаажуулах» товчийг дарна.</p>
+        </field>
+    </record>
+</odoo>
