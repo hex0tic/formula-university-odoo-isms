@@ -35,7 +35,7 @@ services:
       USER: odoo
       PASSWORD: ${POSTGRES_PASSWORD:?run scripts/setup.sh first}
     ports:
-      - "127.0.0.1:8069:8069"   # зөвхөн localhost (A.8.20 сүлжээний хамгаалалт)
+      - "${ISMS_HTTP_BIND:-127.0.0.1}:8069:8069"   # localhost default; scripts/start-lan.sh selects LAN IP
     volumes:
       - ./config/odoo.conf:/etc/odoo/odoo.conf:ro
       - ./addons:/mnt/extra-addons:ro

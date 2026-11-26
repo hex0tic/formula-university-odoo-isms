@@ -22,3 +22,15 @@ docker compose up -d          # http://127.0.0.1:8069
 | `config/odoo.conf.template` | Тохиргооны загвар (`odoo.conf` нь нууц үгтэй, git-д орохгүй) |
 | `scripts/` | setup, init-db, odoo-cli (flock), odoo-shell, bootstrap, import, sync_incident_notifications, run-tests (тусдаа DB) |
 | `logs/` | Odoo болон CLI лог (git-д орохгүй) |
+
+## Нэг Wi-Fi/LAN-аас нэвтрэх (2026-11-18)
+
+Хэрэглэгчийн хүсэлтээр багийнхан нэг Wi-Fi/LAN-аас нэвтрэх горим нэмэв. `odoo/` дотор:
+
+```bash
+./scripts/start-lan.sh
+```
+
+Скрипт default route-ийн private IPv4-г сонгон Odoo-ийн HTTP портыг зөвхөн тэр хаягт холбоно. Одоогийн URL: `http://172.16.151.135:8069/web/login?db=orgil_isms`. Компьютер ба багийн төхөөрөмжүүд нэг сүлжээнд байна. IP солигдвол скриптийг дахин ажиллуулж хэвлэсэн URL-ийг ашиглана. Автомат сонголт зөвхөн RFC1918 IPv4 зөвшөөрнө. PostgreSQL хост порт нээхгүй.
+
+`docker compose up -d` дангаараа ажиллавал `ISMS_HTTP_BIND` өгөгдөөгүй үед анхдагч localhost горимд буцна. LAN горимд үргэлж дээрх скриптийг ашиглана. LAN холбоос нээгдэхгүй бол Wi-Fi client isolation эсвэл host firewall-ийг шалгана; энэ скрипт firewall/router-ийн тохиргоог өөрчлөхгүй.

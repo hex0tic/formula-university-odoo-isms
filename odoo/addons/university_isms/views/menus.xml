@@ -4,8 +4,8 @@
         <field name="name">Эрсдэлийг бууруулах даалгавар</field>
         <field name="res_model">project.task</field>
         <field name="view_mode">kanban,list,form</field>
-        <field name="domain">[('project_id', '=', ref('university_isms.project_risk_treatment'))]</field>
-        <field name="context">{'default_project_id': ref('university_isms.project_risk_treatment')}</field>
+        <field name="domain" eval="[('project_id', '=', ref('university_isms.project_risk_treatment'))]"/>
+        <field name="context" eval="{'default_project_id': ref('university_isms.project_risk_treatment')}"/>
     </record>
 
     <menuitem id="menu_isms_root" name="ISMS" sequence="5"

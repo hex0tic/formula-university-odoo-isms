@@ -1,0 +1,15 @@
+{
+  "date": "2026-11-18",
+  "user_confirmed": "Bypassed certificate warning; CA not imported",
+  "nss_databases": [
+    "/home/sembee/.pki/nssdb",
+    "/home/sembee/.local/share/pki/nssdb"
+  ],
+  "before": "Both empty certificate lists",
+  "after": "CA installed with SSL server trust C,,; exported certificate fingerprint matched",
+  "ca_sha256_fingerprint": "81:52:8B:EB:31:D0:05:10:55:63:DD:23:CF:03:E8:F7:E4:6B:33:98:6E:74:8C:CF:F7:29:12:33:62:0F:93:3A",
+  "public_ca_download": "HTTP200, content equals ca.crt",
+  "https_login": 200,
+  "nginx_config_test": "PASS",
+  "browser_restart_and_call": "Pending user verification"
+}

@@ -1,0 +1,21 @@
+{
+  "date": "2026-11-18",
+  "module": "campus_rtc_fix",
+  "native_odoo_test_count_unchanged": true,
+  "regression_cases": {
+    "baseline_missing_transceiver_reproduced": true,
+    "fixed_audio_camera_screen_order": true,
+    "existing_upload_track_preserved": true,
+    "download_direction_change_without_recovery": true,
+    "streaming_disabled_preserved": true
+  },
+  "method": "Actual upstream PeerToPeer class and Odoo patch utility executed with a mocked RTCPeerConnection. Real browser media behavior is pending user verification.",
+  "frontend_asset_check": {
+    "login": true,
+    "asset": "/web/assets/9a6085e/web.assets_web.min.js",
+    "rtc_fix_bundled": true
+  },
+  "runtime_install": "campus_rtc_fix installed; Odoo available over validated HTTPS",
+  "real_two_device_call": "FAIL: user confirmed only local preview; 20:16 peer state/ICE new",
+  "followup_diagnostics_asset": "/web/assets/04afd42/web.assets_web.min.js"
+}

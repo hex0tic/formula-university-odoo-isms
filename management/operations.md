@@ -31,8 +31,8 @@ docker compose ps
 
 1. Docker Compose, `odoo:18.0`, `postgres:16-alpine` image болон дискний багтаамжийг шалгана. Өөр хичээлийн service, дискийг өөрчлөхгүй.
 2. `odoo/` дотор `scripts/setup.sh` ажиллуулна. Admin login-д ашиглах санамсаргүй `ODOO_ADMIN_PASSWORD` утгыг `.env` файлд хамгаалж нэмнэ. `ADMIN_PASSWD` нь database manager-ийн тусдаа нууц үг юм.
-3. `scripts/init-db.sh` нь суурь модулиуд ба Монгол хэлийг бэлтгэнэ.
-4. `scripts/odoo-cli.sh -i university_isms,university_isms_stock,campus_university,campus_isms_bridge,helpdesk_mgmt,university_isms_helpdesk,university_isms_inventory_catalog --without-demo=all` ажиллуулна.
+3. `scripts/init-db.sh` нь суурь модулиуд ба Монгол хэлийг бэлтгэнэ. Дараа нь `scripts/odoo-shell.sh scripts/set_discuss_translation.py` ажиллуулж Discuss цэсийг «Хэлэлцэх» гэж нэрлэнэ. Суурь орчуулгыг дарж шинэчилсэн бол энэ командыг давтаж болно.
+4. `scripts/odoo-cli.sh -i university_isms,university_isms_stock,campus_university,campus_isms_bridge,helpdesk_mgmt,university_isms_helpdesk,university_isms_inventory_catalog,campus_rtc_fix --without-demo=all` ажиллуулна.
 5. `scripts/odoo-shell.sh scripts/bootstrap.py`, дараа `scripts/odoo-shell.sh scripts/import_case_data.py` ажиллуулна. Импорт төгсгөлдөө workflow-ийн нийцлийг (CISO-гийн хүлээн зөвшөөрөлт, үлдэгдэл батлалт, Risk Treatment даалгавар) шалгаж засна. Эх data-ийн policy огноо нь кейсийн simulation metadata; бодит workflow approval-ийн actor/time нь тусдаа evidence юм.
 6. Вебийг асааж, үндсэн хавтаснаас `python3 odoo/addons/campus_university/scripts/run_demo_seed.py` ажиллуулна. Энэ helper гаднаас `management/runtime.lock`-оор зохицуулалт шаарддаг. Нууц үг stdout-д гарахгүй.
 7. `scripts/odoo-shell.sh ../evidence/tools/seed_inventory_catalog.py` ажиллуулж 16 product ба 5 DEMO serial үүсгэнэ. Өмнөх incident-ийг `env['isms.incident'].search([])._sync_helpdesk_tickets()`-ээр нэг удаа sync хийнэ; шинэ incident автоматаар холбогдоно.
@@ -52,3 +52,31 @@ docker compose ps
 - Үндсэн 3 бодлогын live approval болон demo acknowledgment.
 
 Шинэ demo нь энэ snapshot-оос хойших өөрчлөлт болно. Үүнийг огноо, actor, үр дүнтэй нь worklog-д нэмнэ. Дэлгэрэнгүй: `reports/demo-script.md`.
+
+## Бүртгэл тус бүрийн жишээ өгөгдөл
+
+Кейс, академик демо бүртгэлүүдийг суулгасны дараа `odoo/` хавтсаас доорх командыг ажиллуулна. Давтаж ажиллуулахад жишээ бүртгэлүүд давхардахгүй.
+
+```bash
+flock ../management/runtime.lock docker exec -e ISMS_DEMO_APPLY=1 -i isms-odoo \
+  odoo shell -c /etc/odoo/odoo.conf -d orgil_isms --no-http \
+  --logfile=/var/log/odoo/shell.log < scripts/seed_account_examples.py
+```
+
+`ISMS_DEMO_APPLY=1`-ийг өгөөгүй үед скрипт шалгаад өөрчлөлт хадгалалгүй гарна. Жишээ нь тайлангийн өмнөх snapshot-аас хойш нэмэгдсэн сургалтын өгөгдөл тул `[ДЭМО]` тэмдэгтэй шинэ инцидент, эрсдэлийг өмнөх тайлангийн тоонд оруулахгүй.
+
+## Нэг Wi-Fi/LAN-аас нэвтрэх (2026-11-18)
+
+Хэрэглэгчийн хүсэлтээр багийнхан нэг Wi-Fi/LAN-аас нэвтрэх горим нэмэв. `odoo/` дотор:
+
+```bash
+./scripts/start-lan.sh
+```
+
+Скрипт default route-ийн private IPv4-г сонгон Odoo-ийн HTTP портыг зөвхөн тэр хаягт холбоно. Одоогийн URL: `http://172.16.151.135:8069/web/login?db=orgil_isms`. Компьютер ба багийн төхөөрөмжүүд нэг сүлжээнд байна. IP солигдвол скриптийг дахин ажиллуулж хэвлэсэн URL-ийг ашиглана. Автомат сонголт зөвхөн RFC1918 IPv4 зөвшөөрнө. PostgreSQL хост порт нээхгүй.
+
+`docker compose up -d` дангаараа ажиллавал `ISMS_HTTP_BIND` өгөгдөөгүй үед анхдагч localhost горимд буцна. LAN горимд үргэлж дээрх скриптийг ашиглана. LAN холбоос нээгдэхгүй бол Wi-Fi client isolation эсвэл host firewall-ийг шалгана; энэ скрипт firewall/router-ийн тохиргоог өөрчлөхгүй.
+
+## LAN camera/mic-д HTTPS ашиглах
+
+Өмнөх HTTP LAN хаягийг HTTPS горим орлов: `./scripts/start-lan.sh`, дараа `https://<LAN-IP>:8443`. Төхөөрөмж бүрд CA trust import шаардлагатай. Дэлгэрэнгүй: [lan-https.md](lan-https.md).

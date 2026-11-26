@@ -1,0 +1,22 @@
+services:
+  https:
+    image: nginx:1.30.5-alpine3.24
+    container_name: isms-https
+    restart: unless-stopped
+    ports:
+      - "${ISMS_LAN_IP:?use scripts/start-lan.sh}:8443:443"
+    volumes:
+      - ./config/lan-nginx.conf:/etc/nginx/nginx.conf:ro
+      - ../evidence/private/tls/lan/server.crt:/etc/nginx/tls/server.crt:ro
+      - ../evidence/private/tls/lan/server.key:/etc/nginx/tls/server.key:ro
+      - ../evidence/private/tls/lan/ca.crt:/etc/nginx/tls/ca.crt:ro
+    networks: [isms]
+  turn:
+    image: coturn/coturn:4.19.1-r0
+    container_name: isms-turn
+    restart: unless-stopped
+    network_mode: host
+    entrypoint: ["turnserver"]
+    command: ["-c", "/etc/coturn/turnserver.conf", "--log-file=stdout"]
+    volumes:
+      - ../evidence/private/turn/turnserver.conf:/etc/coturn/turnserver.conf:ro

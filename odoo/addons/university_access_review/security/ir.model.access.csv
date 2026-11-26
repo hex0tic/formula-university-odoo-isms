@@ -1,0 +1,7 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_review_manager,access.review manager,model_access_review,base.group_erp_manager,1,1,1,1
+access_review_model_line_manager,access.review.model.line manager,model_access_review_model_line,base.group_erp_manager,1,1,1,1
+access_review_project_line_manager,access.review.project.line manager,model_access_review_project_line,base.group_erp_manager,1,1,1,1
+access_review_channel_line_manager,access.review.channel.line manager,model_access_review_channel_line,base.group_erp_manager,1,1,1,1
+access_review_action_line_manager,access.review.action.line manager,model_access_review_action_line,base.group_erp_manager,1,1,1,1
+access_review_group_line_manager,access.review.group.line manager,model_access_review_group_line,base.group_erp_manager,1,1,1,1

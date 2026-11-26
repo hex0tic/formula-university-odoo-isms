@@ -1,0 +1,22 @@
+[
+  {
+    "login": "dorjsembe",
+    "uid": 53,
+    "action_type": "ir.actions.report",
+    "report_name": "university_isms.report_asset_register",
+    "status": 200,
+    "pdf_valid": true,
+    "pdf_bytes": 47343,
+    "record_count": 16
+  },
+  {
+    "login": "erkhembayar",
+    "uid": 56,
+    "action_type": "ir.actions.report",
+    "report_name": "university_isms.report_asset_register",
+    "status": 200,
+    "pdf_valid": true,
+    "pdf_bytes": 47343,
+    "record_count": 16
+  }
+]
