@@ -10,7 +10,7 @@ the way an RPC client would. Each test documents the attack it simulates.
 Run: MODULES=university_security_tests TAGS=/university_security_tests
 """,
     "author": "Formula5 баг (ШУТИС МХТС)",
-    "license": "LGPL-3",
+    "license": 'AGPL-3',
     "category": "Hidden",
     "depends": ["university_isms", "campus_university", "university_access_review"],
     "installable": True,

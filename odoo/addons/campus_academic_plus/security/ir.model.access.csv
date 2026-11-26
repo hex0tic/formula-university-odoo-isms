@@ -1,0 +1,15 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_term_user,term campus user,model_campus_academic_term,campus_university.group_campus_user,1,0,0,0
+access_term_registrar,term registrar,model_campus_academic_term,campus_university.group_campus_registrar,1,1,1,1
+access_policy_user,policy campus user,model_campus_academic_policy,campus_university.group_campus_user,1,0,0,0
+access_policy_registrar,policy registrar,model_campus_academic_policy,campus_university.group_campus_registrar,1,1,1,1
+access_scale_user,scale campus user,model_campus_grade_scale_line,campus_university.group_campus_user,1,0,0,0
+access_scale_registrar,scale registrar,model_campus_grade_scale_line,campus_university.group_campus_registrar,1,1,1,1
+access_session_student,session student,model_campus_session,campus_university.group_campus_student,1,0,0,0
+access_session_lecturer,session lecturer,model_campus_session,campus_university.group_campus_lecturer,1,0,0,0
+access_session_registrar,session registrar,model_campus_session,campus_university.group_campus_registrar,1,1,1,1
+access_session_auditor,session auditor,model_campus_session,campus_university.group_campus_auditor,1,0,0,0
+access_attendance_student,attendance student,model_campus_attendance,campus_university.group_campus_student,1,0,0,0
+access_attendance_lecturer,attendance lecturer,model_campus_attendance,campus_university.group_campus_lecturer,1,1,1,0
+access_attendance_registrar,attendance registrar,model_campus_attendance,campus_university.group_campus_registrar,1,1,1,1
+access_attendance_auditor,attendance auditor,model_campus_attendance,campus_university.group_campus_auditor,1,0,0,0

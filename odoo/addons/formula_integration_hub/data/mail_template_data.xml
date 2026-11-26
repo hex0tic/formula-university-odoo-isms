@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="mail_tpl_grade_decided" model="mail.template">
+        <field name="name">Дүн өөрчлөх хүсэлтийн шийдвэр</field>
+        <field name="model_id" ref="campus_university.model_campus_grade_change"/>
+        <field name="subject">Дүн өөрчлөх хүсэлт шийдвэрлэгдлээ: {{ object.name }}</field>
+        <field name="body_html" type="html">
+            <div>
+                <p>Таны дүн өөрчлөх хүсэлт <t t-out="object.name"/> шийдвэрлэгдлээ.</p>
+                <p>Төлөв: <t t-out="object.state"/></p>
+                <p>Дэлгэрэнгүйг ERP системд харна уу.</p>
+            </div>
+        </field>
+        <field name="auto_delete" eval="False"/>
+    </record>
+    <record id="mail_tpl_incident_assigned" model="mail.template">
+        <field name="name">МАБ инцидент танд оноогдлоо</field>
+        <field name="model_id" ref="university_isms.model_isms_incident"/>
+        <field name="subject">Инцидент танд оноогдлоо: {{ object.code }}</field>
+        <field name="body_html" type="html">
+            <div>
+                <p>МАБ инцидент <t t-out="object.code"/> танд шалгуулахаар оноогдлоо.</p>
+                <p>ERP системд нэвтэрч шалгана уу.</p>
+            </div>
+        </field>
+        <field name="auto_delete" eval="False"/>
+    </record>
+</odoo>

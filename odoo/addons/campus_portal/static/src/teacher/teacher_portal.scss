@@ -1,0 +1,100 @@
+// Formula Campus lecturer portal (backend client action).
+// Colours come from --fds-* tokens with fallbacks; no min()/max()/clamp() (libsass).
+
+.o_campus_teacher {
+    .ctp {
+        --ctp-bg: var(--fds-bg, #F8FAFC);
+        --ctp-surface: var(--fds-surface, #FFFFFF);
+        --ctp-border: var(--fds-border, #E2E8F0);
+        --ctp-text: var(--fds-text, #0F172A);
+        --ctp-muted: var(--fds-text-muted, #475569);
+        --ctp-primary: var(--fds-primary, #635BFF);
+        --ctp-primary-hover: var(--fds-primary-hover, #4C44D9);
+        --ctp-primary-text: #FFFFFF;
+        --ctp-link: var(--fds-primary-text, #4C44D9);
+        --ctp-focus: var(--fds-focus, #635BFF);
+        --ctp-danger: var(--fds-danger-fill, #DC2626);
+        --ctp-danger-text: var(--fds-danger-text, #B91C1C);
+        --ctp-danger-soft: var(--fds-danger-soft, #FEE2E2);
+        --ctp-radius: var(--fds-radius-md, 10px);
+        --ctp-radius-sm: var(--fds-radius-sm, 6px);
+        --ctp-space: var(--fds-space-4, 16px);
+        --ctp-shadow: var(--fds-shadow-card, 0 1px 2px rgba(15, 23, 42, .06), 0 1px 3px rgba(15, 23, 42, .08));
+
+        font-family: var(--fds-font-family, inherit);
+        color: var(--ctp-text);
+        background: var(--ctp-bg);
+        padding: 16px;
+        box-sizing: border-box;
+        width: 100%;
+        *, *::before, *::after { box-sizing: border-box; }
+
+        // Headings need explicit colours from tokens (the backend theme otherwise may override them).
+        .ctp-title, .ctp-h2, .ctp-h3 { color: var(--ctp-text); margin: 0 0 8px; font-weight: 600; }
+        .ctp-title { font-size: 1.5rem; }
+        .ctp-h2 { font-size: 1.125rem; margin-top: 16px; }
+        .ctp-h3 { font-size: 1rem; }
+        .ctp-muted { color: var(--ctp-muted); margin: 4px 0; }
+        .ctp-strong { font-weight: 600; color: var(--ctp-text); margin: 0 0 4px; }
+        .ctp-state { color: var(--ctp-muted); padding: 16px 0; }
+        .ctp-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+        .ctp-tabs { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 12px 0 16px; }
+        .ctp-tab, .ctp-btn {
+            min-height: 40px; padding: 8px 14px; border-radius: var(--ctp-radius-sm);
+            border: 1px solid var(--ctp-border); background: var(--ctp-surface); color: var(--ctp-link);
+            font: inherit; cursor: pointer; text-decoration: none;
+            &:focus-visible { outline: 3px solid var(--ctp-focus); outline-offset: 2px; }
+            &:hover { background: var(--ctp-bg); }
+            &:disabled { opacity: .6; cursor: not-allowed; }
+        }
+        .ctp-tab.is-active { background: var(--ctp-primary); border-color: var(--ctp-primary); color: var(--ctp-primary-text); }
+        .ctp-btn--primary { background: var(--ctp-primary); border-color: var(--ctp-primary); color: var(--ctp-primary-text);
+            &:hover { background: var(--ctp-primary-hover); } }
+        .ctp-pending { margin-left: auto; color: var(--ctp-muted); font-size: 0.9375rem; }
+
+        .ctp-cards { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: 1fr; gap: 16px; }
+        .ctp-card {
+            background: var(--ctp-surface); border: 1px solid var(--ctp-border); border-radius: var(--ctp-radius);
+            box-shadow: var(--ctp-shadow); padding: var(--ctp-space); display: flex; flex-direction: column; gap: 8px;
+        }
+        .ctp-feed { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 12px; }
+
+        .ctp-dl { display: grid; grid-template-columns: 1fr; gap: 2px 12px; margin: 0;
+            dt { color: var(--ctp-muted); font-size: 0.875rem; }
+            dd { margin: 0 0 6px; }
+        }
+
+        .ctp-form { display: flex; flex-direction: column; gap: 6px; }
+        .ctp-label { font-weight: 600; font-size: 0.9375rem; color: var(--ctp-text); }
+        .ctp-input {
+            width: 100%; min-height: 40px; padding: 8px 10px; border-radius: var(--ctp-radius-sm);
+            border: 1px solid var(--ctp-border); background: var(--ctp-surface); color: var(--ctp-text); font: inherit;
+            &:focus-visible { outline: 3px solid var(--ctp-focus); outline-offset: 1px; }
+        }
+        .ctp-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
+
+        .ctp-table { width: 100%; border-collapse: collapse; font-size: 0.9375rem;
+            th, td { text-align: left; padding: 8px 6px; border-bottom: 1px solid var(--ctp-border); vertical-align: middle; }
+            th { color: var(--ctp-muted); font-weight: 600; }
+            select { min-width: 140px; }
+        }
+
+        .ctp-alert {
+            padding: 12px 16px; border-radius: var(--ctp-radius-sm); border: 1px solid transparent;
+            &--danger { background: var(--ctp-danger-soft); color: var(--ctp-danger-text); border-color: var(--ctp-danger); }
+            .ctp-btn { margin-top: 8px; }
+        }
+
+        // Tablet and up: two cards per row, roster definition lists side by side
+        @media (min-width: 768px) {
+            padding: 24px;
+            .ctp-cards { grid-template-columns: 1fr 1fr; }
+            .ctp-dl { grid-template-columns: 160px 1fr; }
+        }
+        // Desktop
+        @media (min-width: 1200px) {
+            .ctp-cards { grid-template-columns: 1fr 1fr 1fr; }
+        }
+    }
+}

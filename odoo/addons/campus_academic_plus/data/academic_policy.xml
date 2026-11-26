@@ -1,0 +1,39 @@
+<odoo noupdate="1">
+    <!-- Configurable assumptions, NOT official university policy. Registrar edits them in the policy menu. -->
+    <record id="academic_policy_default" model="campus.academic.policy">
+        <field name="name">Үндсэн академик бодлого (таамаглал)</field>
+        <field name="pass_score">60</field>
+        <field name="max_credits_per_term">21</field>
+        <field name="min_graduation_gpa">0</field>
+    </record>
+    <record id="grade_scale_a" model="campus.grade.scale.line">
+        <field name="policy_id" ref="academic_policy_default"/>
+        <field name="min_score">90</field>
+        <field name="letter">A</field>
+        <field name="grade_point">4.0</field>
+    </record>
+    <record id="grade_scale_b" model="campus.grade.scale.line">
+        <field name="policy_id" ref="academic_policy_default"/>
+        <field name="min_score">80</field>
+        <field name="letter">B</field>
+        <field name="grade_point">3.0</field>
+    </record>
+    <record id="grade_scale_c" model="campus.grade.scale.line">
+        <field name="policy_id" ref="academic_policy_default"/>
+        <field name="min_score">70</field>
+        <field name="letter">C</field>
+        <field name="grade_point">2.0</field>
+    </record>
+    <record id="grade_scale_d" model="campus.grade.scale.line">
+        <field name="policy_id" ref="academic_policy_default"/>
+        <field name="min_score">60</field>
+        <field name="letter">D</field>
+        <field name="grade_point">1.0</field>
+    </record>
+    <record id="grade_scale_f" model="campus.grade.scale.line">
+        <field name="policy_id" ref="academic_policy_default"/>
+        <field name="min_score">0</field>
+        <field name="letter">F</field>
+        <field name="grade_point">0.0</field>
+    </record>
+</odoo>

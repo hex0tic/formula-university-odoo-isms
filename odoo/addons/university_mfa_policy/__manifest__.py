@@ -10,7 +10,7 @@
 Огноо тохируулаагүй үед зөвхөн сануулга харуулна.
 """,
     'author': 'Formula5 баг (ШУТИС МХТС)',
-    'license': 'LGPL-3',
+    'license': 'AGPL-3',
     'depends': ['auth_totp', 'university_isms', 'campus_university', 'university_access_review'],
     'data': ['data/ir_config_parameter_data.xml'],
     'assets': {

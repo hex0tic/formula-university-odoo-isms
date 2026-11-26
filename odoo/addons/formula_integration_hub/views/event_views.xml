@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_formula_integration_event_list" model="ir.ui.view">
+        <field name="name">formula.integration.event.list</field>
+        <field name="model">formula.integration.event</field>
+        <field name="arch" type="xml">
+            <list string="Гаралтын дараалал" decoration-danger="state == 'dead'" decoration-warning="state == 'failed'">
+                <field name="create_date" string="Үүсгэсэн"/>
+                <field name="endpoint_id"/>
+                <field name="event_type"/>
+                <field name="state"/>
+                <field name="attempts"/>
+                <field name="next_attempt_at"/>
+                <field name="http_status"/>
+                <field name="last_error"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_formula_integration_event_form" model="ir.ui.view">
+        <field name="name">formula.integration.event.form</field>
+        <field name="model">formula.integration.event</field>
+        <field name="arch" type="xml">
+            <form string="Гаралтын дараалал" create="0" edit="0">
+                <header>
+                    <button name="action_requeue" type="object" string="Дахин дараалалд оруулах"
+                            invisible="state not in ('failed', 'dead')"/>
+                    <field name="state" widget="statusbar" statusbar_visible="pending,failed,sent,dead"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="endpoint_id"/>
+                            <field name="kind"/>
+                            <field name="event_type"/>
+                            <field name="idempotency_key"/>
+                        </group>
+                        <group>
+                            <field name="attempts"/>
+                            <field name="max_attempts"/>
+                            <field name="next_attempt_at"/>
+                            <field name="http_status"/>
+                            <field name="sent_at"/>
+                        </group>
+                    </group>
+                    <field name="last_error"/>
+                    <group string="Payload (зөвхөн админ харна)">
+                        <field name="payload_json" nolabel="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_formula_integration_event" model="ir.actions.act_window">
+        <field name="name">Гаралтын дараалал (outbox)</field>
+        <field name="res_model">formula.integration.event</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>
