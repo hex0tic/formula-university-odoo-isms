@@ -1,6 +1,7 @@
 // Surfaces that retain light colors in Odoo Community's dark bundle.
 // The shared backend rules handle buttons, form sheets and list tables.
 .o_web_client {
+    --fds-workspace-art: none;
     .o_content,
     .o_kanban_renderer {
         background-color: var(--fds-bg);

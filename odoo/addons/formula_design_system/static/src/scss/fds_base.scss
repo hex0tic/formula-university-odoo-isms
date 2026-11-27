@@ -2,9 +2,17 @@
 // Scoped to body.o_web_client (Odoo sets this class on the backend body).
 
 .o_web_client {
+    --fds-workspace-art: url("/formula_design_system/static/src/img/formula-workspace-v2.webp");
     background-color: var(--fds-bg);
     color: var(--fds-text);
     font-family: var(--fds-font-family);
+
+    :is(.o_action_manager, .o_form_view .o_form_sheet_bg) {
+        background-image: var(--fds-workspace-art);
+        background-repeat: no-repeat;
+        background-position: right bottom;
+        background-size: cover;
+    }
 
     // Native button and input rules can otherwise reset the keyboard outline.
     :focus-visible,

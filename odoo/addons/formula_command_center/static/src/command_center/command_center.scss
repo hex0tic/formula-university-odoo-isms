@@ -575,6 +575,10 @@
     .fcc {
         padding: clamp(12px, 2.5vw, 36px);
         font-family: var(--fds-font-family, system-ui, sans-serif);
+        background-image: var(--fds-workspace-art, none);
+        background-repeat: no-repeat;
+        background-position: right -46px;
+        background-size: 100% auto;
     }
 
     .fcc > * { width: 100%; max-width: 1520px; margin-inline: auto; }
@@ -590,6 +594,7 @@
         padding: clamp(20px, 3.2vw, 48px);
         border-radius: 18px;
         background: var(--fds-brand-navy, #101c32);
+        min-height: clamp(175px, 23vw, 320px);
         color: var(--fcc-ink-on-dark);
         margin-bottom: 18px;
     }
@@ -598,13 +603,10 @@
         content: "";
         position: absolute;
         z-index: -1;
-        width: #{"min(68vw, 610px)"};
-        aspect-ratio: 1;
-        top: -110%;
-        right: -50px;
-        border-radius: 50%;
-        background: repeating-radial-gradient(circle at center, transparent 0 28px, rgba(214, 241, 122, .16) 29px 30px, transparent 31px 48px);
-        mask-image: linear-gradient(135deg, transparent 8%, #000 75%);
+        inset: 0;
+        // The panel keeps its own accessible wordmark. Show the artwork to the right.
+        background: url("/formula_command_center/static/src/img/formula-isms-banner-v2.webp") right 65% / auto 175% no-repeat;
+        mask-image: linear-gradient(90deg, transparent 28%, #000 74%);
         pointer-events: none;
     }
 
@@ -750,5 +752,12 @@
         .fcc-title-break { display: initial; }
         .fcc-hero-controls { padding: 11px; border-radius: 12px; background: rgba(16, 28, 50, .88); }
         .fcc-brief { grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr); }
+    }
+
+    @media (max-width: 849px) {
+        .fcc-header::before {
+            opacity: .65;
+            mask-image: linear-gradient(90deg, transparent 38%, #000 100%);
+        }
     }
 }

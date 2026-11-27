@@ -12,6 +12,9 @@
     "application": False,
     "auto_install": False,
     "assets": {
+        "web.assets_frontend": [
+            "formula_design_system/static/src/scss/fds_login.scss",
+        ],
         "web.assets_backend": [
             # Light tokens are always loaded; dark overrides only ship with web.assets_web_dark.
             "formula_design_system/static/src/scss/fds_tokens.scss",
