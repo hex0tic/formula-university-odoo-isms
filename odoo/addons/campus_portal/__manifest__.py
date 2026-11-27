@@ -10,13 +10,17 @@
     "depends": ["campus_university", "campus_academic_plus", "portal", "web"],
     "data": [
         "views/portal_templates.xml",
+        "views/teacher_templates.xml",
         "views/teacher_menu.xml",
     ],
     "assets": {
         "web.assets_frontend": [
+            "campus_portal/static/src/scss/portal_theme.scss",
             "campus_portal/static/src/scss/campus_portal.scss",
+            "campus_portal/static/src/scss/teacher_web.scss",
         ],
         "web.assets_backend": [
+            "campus_portal/static/src/scss/portal_theme.scss",
             "campus_portal/static/src/teacher/teacher_portal.scss",
             "campus_portal/static/src/teacher/teacher_portal.js",
             "campus_portal/static/src/teacher/teacher_portal.xml",

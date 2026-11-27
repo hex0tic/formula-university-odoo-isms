@@ -115,6 +115,7 @@ class FormulaSsoAdapter(models.AbstractModel):
         return rules.mapped('group_id')
 
     @api.model
+    @api.private
     def provision_user(self, endpoint, claims):
         """Login үед хэрэглэгч үүсгэх/шинэчлэх. Нууц үг үүсгэхгүй (SSO-р нэвтэрнэ).
 
@@ -154,11 +155,18 @@ class FormulaSsoAdapter(models.AbstractModel):
             'group_id')
         preserved = _group_ids(self.env, PRESERVED_GROUP_XMLIDS)
         forbidden = _group_ids(self.env, FORBIDDEN_GROUP_XMLIDS)
-        if forbidden & set(rule_groups.ids):
+        effective_rules = rule_groups | rule_groups.trans_implied_ids
+        if forbidden & set(effective_rules.ids):
             raise ValidationError(_('Дүрэмд админ бүлэг байна; SSO-д зөвшөөрөгдөхгүй.'))
 
+        user_types = self.env['res.groups'].browse(list(preserved))
+        internal = self.env.ref('base.group_user')
+        incoming_type = effective_rules & user_types
+        if len(incoming_type) > 1:
+            raise AccessError(_('Оюутны болон ажилтны эрхийг нэг бүртгэлд тохируулах боломжгүй.'))
+
         if not user:
-            default_group = self.env.ref('base.group_user')
+            default_group = incoming_type or internal
             user = Users.create({
                 'name': str(claims.get('name') or email)[:128],
                 'login': email,
@@ -170,6 +178,8 @@ class FormulaSsoAdapter(models.AbstractModel):
             # Rule-ээр удирдагддаг бүлгээс зөвхөн rule-д байхгүй болсныг хасна; preserved бүлэг хэзээ ч хасагдахгүй.
             removable = managed - rule_groups - self.env['res.groups'].browse(list(preserved))
             new_groups = (user.groups_id - removable) | rule_groups
+            if len((new_groups | new_groups.trans_implied_ids) & user_types) > 1:
+                raise AccessError(_('Энэ хэрэглэгчийн төрлийг солихын тулд системийн админд хандана уу.'))
             if set(new_groups.ids) != set(user.groups_id.ids):
                 user.write({'groups_id': [(6, 0, new_groups.ids)]})
             if claims.get('name') and user.name != str(claims['name'])[:128]:

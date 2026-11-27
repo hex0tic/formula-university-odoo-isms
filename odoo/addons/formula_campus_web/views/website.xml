@@ -1,0 +1,189 @@
+<odoo>
+    <template id="layout" name="Formula University website">
+        <t t-call="web.layout">
+            <t t-set="html_data" t-value="{'lang': 'mn'}"/>
+            <t t-set="x_icon" t-value="'/formula_campus_web/static/src/mark.svg'"/>
+            <t t-set="head">
+                <meta name="viewport" content="width=device-width, initial-scale=1"/>
+                <meta name="description" content="Formula University. Сургалтын хөтөлбөр, кампусын амьдрал, элсэлтийн лавлагаа."/>
+                <link rel="stylesheet" href="/formula_campus_web/static/src/campus.css"/>
+                <script src="/formula_campus_web/static/src/campus.js" defer="defer"></script>
+            </t>
+            <a class="fu-skip" href="#fu-main">Агуулга руу алгасах</a>
+            <header class="fu-top" id="fu-top">
+                <div class="fu-wrap fu-top-inner">
+                    <a class="fu-brand" href="/university" aria-label="Formula University нүүр">
+                        <img src="/formula_campus_web/static/src/mark.svg" width="43" height="43" alt=""/>
+                        <span>FORMULA<span> UNIVERSITY</span></span>
+                    </a>
+                    <nav class="fu-navigation" aria-label="Сургуулийн үндсэн цэс">
+                        <a href="/university/programs">Хөтөлбөр</a>
+                        <a href="/university#campus">Кампус</a>
+                        <a href="/university/admissions">Элсэлт</a>
+                    </nav>
+                    <details class="fu-portal-picker">
+                        <summary class="fu-button fu-button--outline">Портал <span aria-hidden="true" class="fu-chevron"></span></summary>
+                        <div class="fu-portal-links">
+                            <a href="/my/campus">Оюутны портал</a>
+                            <a href="/campus/teacher">Багшийн портал</a>
+                            <a t-if="show_staff_erp" href="/odoo">Ажилтны ERP</a>
+                        </div>
+                    </details>
+                </div>
+            </header>
+            <main id="fu-main"><t t-out="0"/></main>
+            <footer class="fu-footer">
+                <div class="fu-wrap fu-footer-inner">
+                    <a class="fu-brand" href="/university"><img src="/formula_campus_web/static/src/mark.svg" width="40" height="40" alt=""/><span>FORMULA<span> UNIVERSITY</span></span></a>
+                    <p>Сургалтын зориулалттай зохиомол их сургуулийн веб.</p>
+                    <a href="#fu-top">Дээш буцах</a>
+                </div>
+            </footer>
+        </t>
+    </template>
+
+    <template id="program_card" name="Published programme card">
+        <article t-att-class="'fu-program fu-program--' + item['area']">
+            <div class="fu-program-icon" aria-hidden="true">
+                <svg t-if="item['area'] == 'technology'" viewBox="0 0 32 32" fill="none"><path d="M16 3 27 8v8c0 6-5 10-11 13C10 26 5 22 5 16V8l11-5zM11 16l3 3 7-7" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <svg t-elif="item['area'] == 'business'" viewBox="0 0 32 32" fill="none"><path d="M6 25h21M9 22V15m7 7V10m7 12V6M7 10l6 1 7-7" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+                <svg t-else="" viewBox="0 0 32 32" fill="none"><path d="M16 3v26M3 16h26M7 7l18 18M25 7 7 25" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><circle cx="16" cy="16" r="10" stroke="currentColor" stroke-width="1.5"/></svg>
+            </div>
+            <p class="fu-label"><t t-esc="item['school']"/></p>
+            <h3><a t-att-href="'/university/programs/' + item['slug']"><t t-esc="item['name']"/></a></h3>
+            <p class="fu-program-summary"><t t-esc="item['summary']"/></p>
+            <p class="fu-label"><t t-if="item['accepting']">Өргөдөл авч байна</t><t t-else="">Элсэлт нээгдээгүй</t></p>
+            <div class="fu-program-meta"><span><t t-esc="item['degree']"/> · <t t-esc="item['duration']"/></span><a t-att-href="'/university/programs/' + item['slug']" t-att-aria-label="item['name'] + ': дэлгэрэнгүй'">Дэлгэрэнгүй</a></div>
+        </article>
+    </template>
+
+    <template id="home" name="Formula University home">
+        <t t-call="formula_campus_web.layout">
+            <section class="fu-hero">
+                <div class="fu-wrap fu-hero-grid">
+                    <div class="fu-hero-copy">
+                        <p class="fu-kicker"><span></span> Сур. Бүтээ. Нөлөөл.</p>
+                        <h1>Маргаашийг<br/> <em>бүтээх</em> газар.</h1>
+                        <p>Технологи, бизнес, дизайны мэдлэгийг бодит төсөлд хэрэгжүүлэх их сургуулийн орчин.</p>
+                        <div class="fu-actions">
+                            <a class="fu-button fu-button--mint" href="/university/programs">Хөтөлбөр сонгох</a>
+                            <a class="fu-button fu-button--inverse" href="/university/admissions">Элсэлтийн мэдээлэл</a>
+                        </div>
+                    </div>
+                    <figure class="fu-hero-figure">
+                        <img src="/formula_campus_web/static/src/campus.svg" width="1100" height="790" alt="Шилэн фасад, модтой талбай бүхий Formula University кампусын дүрслэл"/>
+                        <figcaption>FORMULA CAMPUS <span>Кампусын дүрслэл</span></figcaption>
+                    </figure>
+                </div>
+            </section>
+            <div class="fu-facts" aria-label="Сургалтын орчин">
+                <div class="fu-wrap fu-facts-grid"><span><strong>3</strong> сургалтын чиглэл</span><span><strong>4 жил</strong> бакалаврын хөтөлбөр</span><span><strong>Төсөл</strong> судлах ба бүтээх арга</span></div>
+            </div>
+
+            <section class="fu-wrap fu-section" id="programs">
+                <div class="fu-section-heading">
+                    <div><p class="fu-kicker">Сургалтын хөтөлбөрүүд</p><h2>Өөрийн чиглэлээ ол.</h2></div>
+                    <a class="fu-button fu-button--outline" href="/university/programs">Бүх хөтөлбөр</a>
+                </div>
+                <div class="fu-program-grid"><t t-foreach="programs" t-as="item"><t t-call="formula_campus_web.program_card"/></t></div>
+            </section>
+
+            <section class="fu-campus" id="campus">
+                <div class="fu-wrap fu-campus-grid">
+                    <div>
+                        <p class="fu-kicker">Кампусын амьдрал</p>
+                        <h2>Хичээлээс <em>цааш.</em></h2>
+                        <p>Суралцах орон зай нь багийн төсөл, дадлага, өөр өөр чиглэлийн хүмүүстэй хамтран ажиллах боломжоор үргэлжилнэ.</p>
+                        <a class="fu-button fu-button--mint" href="/my/campus">Оюутны портал</a>
+                    </div>
+                    <div class="fu-campus-list">
+                        <article><span aria-hidden="true">◈</span><div><h3>Кибер лаборатори</h3><p>Зохиомол орчинд сүлжээ, хамгаалалтын дадлага хийнэ.</p></div></article>
+                        <article><span aria-hidden="true">◎</span><div><h3>Төслийн студи</h3><p>Санаагаа загварчилж, хэрэглэгчээр туршуулна.</p></div></article>
+                        <article><span aria-hidden="true">⊞</span><div><h3>Дижитал кампус</h3><p>Хуваарь, дүн, ирц, хичээл сонголтоо порталаас удирдана.</p></div></article>
+                    </div>
+                </div>
+            </section>
+
+            <section class="fu-wrap fu-section fu-admission-banner">
+                <div><p class="fu-kicker">Дараагийн алхам</p><h2>Элсэх өргөдлөө илгээгээрэй.</h2></div>
+                <a class="fu-button fu-button--teal" href="/university/admissions">Элсэлт</a>
+            </section>
+        </t>
+    </template>
+
+    <template id="programs" name="Public catalogue">
+        <t t-call="formula_campus_web.layout">
+            <section class="fu-page-title"><div class="fu-wrap"><p class="fu-kicker">Сургалтын каталог</p><h1>Хөтөлбөрүүд</h1><p>Өөрийн сонирхол, сурах арга барилд тохирсон чиглэлээ сонгоорой.</p></div></section>
+            <section class="fu-wrap fu-section">
+                <form class="fu-filter" method="get" action="/university/programs">
+                    <label>Хөтөлбөр хайх <input type="search" name="q" t-att-value="q" maxlength="80" placeholder="Жишээ: кибер"/></label>
+                    <label>Чиглэл
+                        <select name="area"><option value="">Бүх чиглэл</option><option t-foreach="areas" t-as="entry" t-att-value="entry[0]" t-att-selected="'selected' if area == entry[0] else None"><t t-esc="entry[1]"/></option></select>
+                    </label>
+                    <button class="fu-button fu-button--teal" type="submit">Хайх</button>
+                    <a t-if="q or area" href="/university/programs">Арилгах</a>
+                </form>
+                <p class="fu-result-count">Илэрц: <t t-esc="len(programs)"/></p>
+                <p t-if="not programs" class="fu-empty">Энэ нөхцөлд тохирох хөтөлбөр олдсонгүй. Хайлтын үг эсвэл чиглэлээ өөрчилнө үү.</p>
+                <div class="fu-program-grid" t-else=""><t t-foreach="programs" t-as="item"><t t-call="formula_campus_web.program_card"/></t></div>
+            </section>
+        </t>
+    </template>
+
+    <template id="program" name="Public programme details">
+        <t t-call="formula_campus_web.layout">
+            <section class="fu-page-title"><div class="fu-wrap">
+                <a href="/university/programs">Бүх хөтөлбөр</a>
+                <p class="fu-kicker"><t t-esc="program['school']"/></p>
+                <h1><t t-esc="program['name']"/></h1><p><t t-esc="program['summary']"/></p>
+            </div></section>
+            <section class="fu-wrap fu-section fu-detail-grid">
+                <div class="fu-prose"><h2>Юу судлах вэ?</h2><p><t t-esc="program['curriculum']"/></p><h2>Хаана ажиллах боломжтой вэ?</h2><p><t t-esc="program['outcome']"/></p></div>
+                <aside class="fu-aside">
+                    <p class="fu-kicker">Хөтөлбөрийн мэдээлэл</p>
+                    <dl><dt>Зэрэг</dt><dd><t t-esc="program['degree']"/></dd><dt>Хугацаа</dt><dd><t t-esc="program['duration']"/></dd></dl>
+                    <a t-if="program['accepting']" class="fu-button fu-button--teal" t-att-href="'/university/admissions/apply?program=' + program['slug']">Элсэх өргөдөл</a>
+                    <t t-else="">
+                        <p>Элсэлт нээгдээгүй</p>
+                        <a class="fu-button fu-button--outline" t-att-href="'/university/admissions?program=' + program['slug']">Элсэлтийн талаар асуух</a>
+                    </t>
+                </aside>
+            </section>
+        </t>
+    </template>
+
+    <template id="admissions" name="Admissions information">
+        <t t-call="formula_campus_web.layout">
+            <section class="fu-page-title"><div class="fu-wrap"><p class="fu-kicker">Ирээдүйн оюутнуудад</p><h1>Элсэлт</h1><p>Хөтөлбөрөө сонгож өргөдлөө илгээнэ үү. Шийдвэрийг өргөдлийн дугаар, шалгах кодоор харна.</p>
+                <div class="fu-hero-actions"><a class="fu-button fu-button--mint" href="/university/admissions/apply">Өргөдөл илгээх</a>
+                <a class="fu-button fu-button--outline" href="/university/admissions/status">Төлөв шалгах</a></div></div></section>
+            <section class="fu-wrap fu-section fu-detail-grid">
+                <div class="fu-prose">
+                    <h2>Эхлэхийн өмнө</h2>
+                    <ol><li><a href="/university/programs">Хөтөлбөрүүдээс</a> сонирхсон чиглэлээ сонгоно.</li><li>Юу судлах, ямар мэргэжлээр ажиллах боломжтойг уншина.</li><li>Хугацаа, шаардлагын талаар асуултаа илгээнэ.</li></ol>
+                    <h2>Түгээмэл асуулт</h2>
+                    <details><summary>Энэ маягт нь элсэлтийн өргөдөл үү?</summary><p>Үгүй. Маягт нь сургалтын жишээ орчинд лавлагаа бүртгэнэ. Элсэлтийн шийдвэр гаргахгүй.</p></details>
+                    <details><summary>Оюутан хичээлээ хаана сонгох вэ?</summary><p>Идэвхтэй бүртгэлтэй оюутан <a href="/my/campus/register">порталын хичээл сонголт</a> хэсгээр бүртгүүлнэ.</p></details>
+                    <details><summary>Ямар мэдээлэл оруулах вэ?</summary><p>Сонирхсон хөтөлбөр болон асуултаа бичнэ. Сургалтын орчин тул хувийн нууц мэдээлэл оруулахгүй.</p></details>
+                </div>
+                <form class="fu-aside fu-inquiry" method="post" action="/university/admissions/inquiry">
+                    <h2>Лавлагаа илгээх</h2>
+                    <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                    <div class="fu-honeypot" inert="inert"><label>Website <input name="website" tabindex="-1" autocomplete="off"/></label></div>
+                    <p t-if="error" class="fu-form-error" role="alert"><t t-esc="error"/></p>
+                    <label>Нэр<input name="name" required="required" maxlength="100" t-att-value="form.get('name','')" autocomplete="name"/></label>
+                    <label>Цахим шуудан<input type="email" name="email" required="required" maxlength="160" t-att-value="form.get('email','')" autocomplete="email"/></label>
+                    <label>Хөтөлбөр<select name="program" required="required"><option value="">Сонгох</option><option t-foreach="programs" t-as="item" t-att-value="item['slug']" t-att-selected="'selected' if item['slug'] == selected else None"><t t-esc="item['name']"/></option></select></label>
+                    <label>Асуулт<textarea name="message" required="required" minlength="12" maxlength="1200" rows="4"><t t-esc="form.get('message','')"/></textarea></label>
+                    <button type="submit" class="fu-button fu-button--teal">Лавлагаа бүртгүүлэх</button>
+                </form>
+            </section>
+        </t>
+    </template>
+
+    <template id="received" name="Inquiry confirmation">
+        <t t-call="formula_campus_web.layout">
+            <section class="fu-page-title"><div class="fu-wrap"><p class="fu-kicker">Элсэлтийн лавлагаа</p><h1>Лавлагаа бүртгэгдлээ.</h1><p>Таны асуулт сургалтын орчны лавлагааны жагсаалтад нэмэгдлээ.</p><a class="fu-button fu-button--mint" href="/university/programs">Хөтөлбөрүүд рүү буцах</a></div></section>
+        </t>
+    </template>
+</odoo>

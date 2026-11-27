@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="teacher_web_layout" name="Teacher web portal layout">
+        <t t-call="portal.portal_layout">
+            <t t-set="additional_title">Багшийн портал</t>
+            <div class="o_campus_portal formula-portal-theme campus-teacher-web">
+                <a class="campus-skip campus-btn" href="#campus-teacher-content">Агуулга руу шилжих</a>
+                <div class="campus-masthead">
+                    <a class="fp-brand" href="/university">Formula University <span aria-hidden="true">↗</span></a>
+                    <a class="campus-teacher-legacy" href="/odoo/action-campus_portal.action_campus_teacher_portal">Odoo дахь өмнөх портал <span aria-hidden="true">↗</span></a>
+                </div>
+                <nav class="campus-teacher-nav" aria-label="Багшийн портал">
+                    <ul class="campus-nav__list">
+                        <li><a href="/campus/teacher"
+                               t-att-class="'campus-nav__link' + (' is-active' if teacher_page != 'notifications' else '')"
+                               t-att-aria-current="'page' if teacher_page == 'dashboard' else None">Миний хичээл</a></li>
+                        <li><a href="/campus/teacher/notifications"
+                               t-att-class="'campus-nav__link' + (' is-active' if teacher_page == 'notifications' else '')"
+                               t-att-aria-current="'page' if teacher_page == 'notifications' else None">Мэдэгдэл</a></li>
+                    </ul>
+                </nav>
+                <div id="campus-teacher-content" class="campus-content" tabindex="-1">
+                    <p t-if="teacher_flash" class="campus-alert campus-alert--success" role="status" t-out="teacher_flash"/>
+                    <t t-out="0"/>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <template id="teacher_dashboard" name="Teacher web dashboard">
+        <t t-call="campus_portal.teacher_web_layout">
+            <header class="fp-hero campus-hero">
+                <div class="fp-hero__content">
+                    <p class="fp-kicker">Багшийн портал</p>
+                    <h1 class="campus-title">Миний хичээлүүд</h1>
+                    <p class="campus-profile">
+                        <span t-out="dashboard['lecturer']"/>
+                        <span t-if="dashboard['term']" t-out="dashboard['term']['name']"/>
+                    </p>
+                </div>
+            </header>
+            <dl class="campus-stats campus-teacher-stats" aria-label="Сургалтын үзүүлэлт">
+                <div class="campus-stat"><dt>Оноогдсон хичээл</dt><dd t-out="len(dashboard['offerings'])"/></div>
+                <div class="campus-stat"><dt>Хичээлийн бүртгэл</dt><dd t-out="seat_count"/></div>
+                <div class="campus-stat"><dt>Хянуулж буй дүнгийн хүсэлт</dt><dd t-out="dashboard['pending_count']"/></div>
+            </dl>
+            <p t-if="not dashboard['offerings']" class="campus-empty campus-muted">Танд оноогдсон хичээл алга.</p>
+            <ul t-else="" class="campus-cards campus-teacher-cards">
+                <li class="campus-card campus-teacher-course" t-foreach="dashboard['offerings']" t-as="offering">
+                    <div class="campus-teacher-titleline">
+                        <p class="fp-kicker" t-out="offering['course_code']"/>
+                        <span class="campus-badge campus-badge--success" t-out="offering['state_label']"/>
+                    </div>
+                    <h2 class="campus-h2" t-out="offering['name']"/>
+                    <p class="campus-muted"><t t-out="offering['seats_taken']"/> / <t t-out="offering['capacity']"/> суудал</p>
+                    <a class="campus-btn campus-btn--primary campus-teacher-course-link"
+                       t-attf-href="/campus/teacher/offerings/#{offering['id']}"
+                       t-att-aria-label="'Жагсаалт, ирц, дүн: ' + offering['name']">
+                        Жагсаалт, ирц, дүн <span aria-hidden="true">→</span>
+                    </a>
+                </li>
+            </ul>
+        </t>
+    </template>
+
+    <template id="teacher_offering" name="Teacher web roster and sessions">
+        <t t-call="campus_portal.teacher_web_layout">
+            <header class="campus-head campus-teacher-head">
+                <a class="campus-text-link" href="/campus/teacher">← Миний хичээлүүд</a>
+                <h1 class="campus-title" t-out="roster['offering']['name']"/>
+                <div class="campus-teacher-actions">
+                    <a href="#sessions" class="campus-btn campus-btn--primary">Ирц бүртгэх <span aria-hidden="true">↓</span></a>
+                    <a href="#roster" class="campus-btn">Оюутны жагсаалт <span aria-hidden="true">↓</span></a>
+                </div>
+            </header>
+            <div class="campus-teacher-offering">
+                <section id="sessions" class="campus-card" aria-labelledby="teacher-sessions-title" tabindex="-1">
+                    <div class="campus-section-head">
+                        <h2 class="campus-h2" id="teacher-sessions-title">Хичээлийн цаг</h2>
+                        <span class="campus-badge campus-badge--success"><t t-out="len(sessions)"/> цаг</span>
+                    </div>
+                    <p t-if="not sessions" class="campus-muted">Хичээлийн хуваарь алга.</p>
+                    <ul t-else="" class="campus-teacher-list">
+                        <li t-foreach="sessions" t-as="session" class="campus-teacher-session">
+                            <div>
+                                <h3 class="campus-h3" t-out="session['start']"/>
+                                <p class="campus-muted"><t t-out="session['kind']"/><t t-if="session['room']"> · <t t-out="session['room']"/></t></p>
+                            </div>
+                            <a class="campus-btn" t-attf-href="/campus/teacher/sessions/#{session['id']}"
+                               t-att-aria-label="'Ирц бүртгэх: ' + session['start']">Ирц бүртгэх <span aria-hidden="true">→</span></a>
+                        </li>
+                    </ul>
+                </section>
+                <section id="roster" class="campus-card" aria-labelledby="teacher-roster-title" tabindex="-1">
+                    <div class="campus-section-head">
+                        <h2 class="campus-h2" id="teacher-roster-title">Оюутны жагсаалт</h2>
+                        <span class="campus-badge campus-badge--success"><t t-out="len(roster['rows'])"/> оюутан</span>
+                    </div>
+                    <p t-if="not roster['rows']" class="campus-muted">Бүртгэлтэй оюутан алга.</p>
+                    <ul t-else="" class="campus-teacher-list">
+                        <li class="campus-teacher-roster-row" t-foreach="roster['rows']" t-as="row">
+                            <div>
+                                <p class="fp-kicker" t-out="row['student_code']"/>
+                                <h3 class="campus-h3" t-out="row['student_name']"/>
+                                <p class="campus-muted" t-out="row['reg_state_label']"/>
+                            </div>
+                            <dl class="campus-teacher-row-meta">
+                                <div><dt>Баталгаат дүн</dt><dd><strong t-out="row['score']"/> · хувилбар <t t-out="row['grade_revision']"/></dd></div>
+                                <div t-if="row['request_name']"><dt>Сүүлийн хүсэлт</dt><dd><t t-out="row['request_name']"/> · <t t-out="row['request_state_label']"/></dd></div>
+                            </dl>
+                            <a class="campus-btn" t-attf-href="/campus/teacher/grades/#{row['enrollment_id']}"
+                               t-att-aria-label="'Дүн өөрчлөх хүсэлт: ' + row['student_name']">Дүн өөрчлөх хүсэлт</a>
+                        </li>
+                    </ul>
+                </section>
+            </div>
+        </t>
+    </template>
+
+    <template id="teacher_attendance" name="Teacher web attendance form">
+        <t t-call="campus_portal.teacher_web_layout">
+            <t t-set="session" t-value="sheet['session']"/>
+            <header class="campus-head campus-teacher-head">
+                <a class="campus-text-link" t-attf-href="/campus/teacher/offerings/#{sheet['offering']['id']}#sessions">← <t t-out="sheet['offering']['name']"/></a>
+                <h1 class="campus-title">Ирц бүртгэх</h1>
+                <p class="campus-subtitle">
+                    <t t-out="session['start']"/> – <t t-out="session['end']"/> · <t t-out="session['kind']"/><t t-if="session['room']"> · <t t-out="session['room']"/></t>
+                </p>
+            </header>
+            <p t-if="teacher_error" class="campus-alert campus-alert--danger" role="alert" t-out="teacher_error"/>
+            <p t-if="not sheet['rows']" class="campus-empty campus-muted">Идэвхтэй бүртгэлтэй оюутан алга.</p>
+            <form t-else="" class="campus-card campus-teacher-form" method="post" t-attf-action="/campus/teacher/sessions/#{session['id']}">
+                <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                <fieldset>
+                    <legend class="campus-h2">Оюутны ирц</legend>
+                    <p class="campus-muted">Бүртгээгүй мөрд «Ирсэн» төлөвийг урьдчилан сонгосон. Хадгалахын өмнө төлөв бүрийг шалгана уу.</p>
+                    <ul class="campus-teacher-list">
+                        <li class="campus-teacher-attendance-row" t-foreach="sheet['rows']" t-as="row">
+                            <label t-attf-for="campus-attendance-#{row['enrollment_id']}">
+                                <strong t-out="row['student_name']"/>
+                                <span class="campus-muted" t-out="row['student_code']"/>
+                            </label>
+                            <div>
+                                <select class="form-select" t-attf-id="campus-attendance-#{row['enrollment_id']}"
+                                        t-attf-name="attendance_#{row['enrollment_id']}">
+                                    <option t-foreach="sheet['statuses']" t-as="status" t-att-value="status['key']"
+                                            t-att-selected="status['key'] == row['status']" t-out="status['label']"/>
+                                </select>
+                                <small t-if="not row['recorded']" class="campus-muted">Бүртгээгүй</small>
+                            </div>
+                        </li>
+                    </ul>
+                </fieldset>
+                <button class="campus-btn campus-btn--primary" type="submit">Ирц хадгалах</button>
+            </form>
+        </t>
+    </template>
+
+    <template id="teacher_grade_request" name="Teacher web grade request form">
+        <t t-call="campus_portal.teacher_web_layout">
+            <header class="campus-head campus-teacher-head">
+                <a class="campus-text-link" t-attf-href="/campus/teacher/offerings/#{enrollment['offering_id']}#roster">← <t t-out="enrollment['offering']"/></a>
+                <h1 class="campus-title">Дүн өөрчлөх хүсэлт</h1>
+                <p class="campus-subtitle"><t t-out="enrollment['student']"/> · <t t-out="enrollment['student_code']"/></p>
+            </header>
+            <p t-if="teacher_error" class="campus-alert campus-alert--danger" role="alert" t-out="teacher_error"/>
+            <form class="campus-card campus-teacher-form campus-teacher-grade"
+                  method="post" t-attf-action="/campus/teacher/grades/#{enrollment['id']}">
+                <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                <p class="campus-muted">Одоогийн баталгаат дүн <strong t-out="enrollment['score']"/>. Хүсэлтийг сургалтын алба шийдвэрлэнэ.</p>
+                <div>
+                    <label class="form-label" for="campus-teacher-score">Шинэ дүн (0–100)</label>
+                    <input class="form-control" type="number" inputmode="decimal" id="campus-teacher-score" name="score"
+                           min="0" max="100" step="0.01" required="required" t-att-value="form.get('score', enrollment['score'])"/>
+                </div>
+                <div>
+                    <label class="form-label" for="campus-teacher-reason">Үндэслэл (дор хаяж 10 тэмдэгт)</label>
+                    <textarea class="form-control" id="campus-teacher-reason" name="reason" rows="4" required="required"
+                              minlength="10"><t t-out="form.get('reason', '')"/></textarea>
+                </div>
+                <div>
+                    <label class="form-label" for="campus-teacher-evidence">Нотолгооны лавлагаа (заавал биш)</label>
+                    <input class="form-control" id="campus-teacher-evidence" name="evidence" t-att-value="form.get('evidence', '')"/>
+                </div>
+                <div class="campus-teacher-actions">
+                    <button class="campus-btn campus-btn--primary" type="submit">Хүсэлт хянуулахаар илгээх</button>
+                    <a class="campus-btn" t-attf-href="/campus/teacher/offerings/#{enrollment['offering_id']}#roster">Болих</a>
+                </div>
+            </form>
+        </t>
+    </template>
+
+    <template id="teacher_notifications" name="Teacher web notifications">
+        <t t-call="campus_portal.teacher_web_layout">
+            <header class="campus-head">
+                <h1 class="campus-title">Мэдэгдэл</h1>
+                <p class="campus-subtitle">Хичээл, дүнгийн хүсэлттэй холбоотой шинэчлэлтүүд.</p>
+            </header>
+            <p t-if="not notifications" class="campus-empty campus-muted">Мэдэгдэл алга.</p>
+            <ol t-else="" class="campus-list--feed">
+                <li class="campus-card" t-foreach="notifications" t-as="note">
+                    <time class="campus-muted" t-out="note['date']"/>
+                    <h2 class="campus-h2" t-out="note['subject'] or 'Шинэчлэлт'"/>
+                    <p t-if="note['body']" t-out="note['body']"/>
+                </li>
+            </ol>
+        </t>
+    </template>
+</odoo>

@@ -4,9 +4,8 @@
         <field name="implied_ids" eval="[(4, ref('campus_university.group_campus_auditor')), (4, ref('university_isms.group_isms_auditor'))]"/>
         <field name="comment">Read academic records and ISMS evidence without modifying either.</field>
     </record>
-    <!-- A.6.8: оюутан, багш, сургалтын албаны бүх хэрэглэгч МАБ-ын үйл явдлыг мэдээлэх ба батлагдсан
-         бодлоготой танилцах боломжтой. Reporter нь хөрөнгө/эрсдэлийн бүртгэлийг харахгүй (university_isms 1.1). -->
+    <!-- Incident intake is provided by the portal; the academic role gives no ISMS group. -->
     <record id="campus_university.group_campus_user" model="res.groups">
-        <field name="implied_ids" eval="[(4, ref('university_isms.group_isms_reporter'))]"/>
+        <field name="implied_ids" eval="[(3, ref('university_isms.group_isms_reporter'))]"/>
     </record>
 </odoo>

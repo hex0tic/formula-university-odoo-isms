@@ -1,123 +1,274 @@
-// Formula Campus Portal - student self-service pages (portal layout).
-// Colours and spacing come from the Formula design-system tokens (--fds-*) when that addon is
-// loaded; the values after each var() are fallbacks so the pages render without it.
-// No min()/max()/clamp() on purpose: libsass mixes units in those functions badly.
-
+// Student portal. Keep styling inside the portal shell so the surrounding Odoo site stays intact.
 .o_campus_portal {
-    --cp-bg: var(--fds-bg, #F8FAFC);
-    --cp-surface: var(--fds-surface, #FFFFFF);
-    --cp-border: var(--fds-border, #E2E8F0);
-    --cp-text: var(--fds-text, #0F172A);
-    --cp-muted: var(--fds-text-muted, #475569);
-    --cp-primary: var(--fds-primary-fill, #4C44D9);
-    --cp-primary-text: #FFFFFF;
-    --cp-primary-soft: var(--fds-primary-soft, #EEF0FF);
-    --cp-danger: var(--fds-danger-fill, #DC2626);
-    --cp-danger-text: var(--fds-danger-text, #B91C1C);
-    --cp-danger-soft: var(--fds-danger-soft, #FEE2E2);
-    --cp-success-text: var(--fds-success-text, #0F766E);
-    --cp-success-soft: var(--fds-success-soft, #CCFBF1);
-    --cp-warning-text: var(--fds-warning-text, #92400E);
-    --cp-warning-soft: var(--fds-warning-soft, #FEF3C7);
-    --cp-focus: var(--fds-focus, #635BFF);
-    --cp-radius: var(--fds-radius-md, 10px);
-    --cp-radius-sm: var(--fds-radius-sm, 6px);
-    --cp-space: var(--fds-space-4, 16px);
-    --cp-shadow: var(--fds-shadow-card, 0 1px 2px rgba(15, 23, 42, .06), 0 1px 3px rgba(15, 23, 42, .08));
-    font-family: var(--fds-font-family, inherit);
-    color: var(--cp-text);
-    padding: 0 16px 32px;
+    position: relative;
+    max-width: 78rem;
+    margin: 0 auto 2rem;
+    padding: 1rem;
+    border-radius: 18px;
+    background: var(--fp-cream);
 
-    &, * { box-sizing: border-box; }
-    .campus-title, .campus-h2, .campus-h3 { color: var(--cp-text); font-weight: 600; margin: 0; }
-    .campus-title { font-size: 1.5rem; margin-top: 16px; }
-    .campus-h2 { font-size: 1.125rem; margin-bottom: 8px; }
-    .campus-h3 { font-size: 1rem; margin-bottom: 8px; }
-    .campus-subtitle, .campus-muted { color: var(--cp-muted); margin: 4px 0 0; }
-    .campus-strong { font-weight: 600; color: var(--cp-text); margin: 0 0 4px; }
-    .campus-empty { padding: 24px 0; }
+    .campus-skip {
+        position: absolute;
+        z-index: 2;
+        top: .5rem;
+        left: .5rem;
+        clip-path: inset(50%);
+        &:focus { clip-path: none; }
+    }
+
+    .campus-masthead, .campus-section-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: .5rem 1rem;
+    }
+
+    .campus-masthead { padding: .3rem 0 .8rem; border-bottom: 1px solid var(--fp-line); }
 
     .campus-nav__list {
-        list-style: none; padding: 0; margin: 16px 0; display: flex; flex-wrap: wrap; gap: 8px;
-    }
-    .campus-nav__link {
-        display: inline-block; padding: 8px 12px; border-radius: var(--cp-radius-sm);
-        border: 1px solid var(--cp-border); background: var(--cp-surface); color: var(--cp-primary-text-link, #4C44D9);
-        text-decoration: none; font-size: 0.9375rem;
-        &:hover { background: var(--cp-primary-soft); }
-        &:focus-visible { outline: 3px solid var(--cp-focus); outline-offset: 2px; }
-        &.is-active { background: var(--cp-primary); color: var(--cp-primary-text); border-color: var(--cp-primary); }
+        display: flex;
+        flex-wrap: wrap;
+        gap: .4rem;
+        padding: 0;
+        margin: .8rem 0 1.15rem;
+        list-style: none;
     }
 
-    .campus-card {
-        background: var(--cp-surface); border: 1px solid var(--cp-border); border-radius: var(--cp-radius);
-        box-shadow: var(--cp-shadow); padding: var(--cp-space); margin-bottom: 16px; list-style: none;
+    .campus-nav__link { background: transparent; border-color: transparent; }
+    .campus-content { animation: campus-portal-enter 240ms ease-out; }
+    .campus-title, .campus-h2, .campus-h3 {
+        color: var(--fp-navy);
+        margin: 0;
+        line-height: 1.14;
+        font-weight: 760;
     }
-    .campus-cards { list-style: none; padding: 0; margin: 0; }
-    .campus-list { padding-left: 20px; }
-    .campus-list--feed { padding-left: 0; list-style: none; }
 
-    .campus-grid { display: grid; gap: 16px; grid-template-columns: 1fr; margin-bottom: 16px; }
+    .campus-title { font-size: 2.35rem; letter-spacing: -.04em; }
+    .campus-h2 { font-size: 1.3rem; letter-spacing: -.02em; }
+    .campus-h3 { font-size: 1.05rem; }
+    .campus-muted, .campus-subtitle { color: var(--fp-muted); margin: 0; }
+    .campus-subtitle { margin-top: .45rem; }
+    .campus-head { padding: .6rem 0 1.25rem; }
+
+    .campus-hero {
+        padding: 1.6rem 1.25rem;
+        margin-bottom: .8rem;
+
+        .campus-title { color: var(--fp-paper); margin: .6rem 0; }
+        .campus-btn { margin-top: 1.2rem; }
+    }
+
+    .campus-profile {
+        display: flex;
+        flex-wrap: wrap;
+        gap: .3rem .75rem;
+        margin: 0;
+        color: #dde6e8;
+
+        span + span { padding-left: .75rem; border-left: 1px solid #80918a; }
+    }
+
+    .campus-btn--mint {
+        color: var(--fp-navy);
+        border-color: var(--fp-mint);
+        background: var(--fp-mint);
+
+        &:hover { color: var(--fp-navy); background: #e7f6b9; }
+    }
+
+    .campus-btn--danger {
+        color: var(--fp-danger);
+        border-color: #dfb9b0;
+        &:hover { background: var(--fp-danger-soft); color: var(--fp-danger); }
+    }
+
+    .campus-stats {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 1px;
+        margin: 0 0 1rem;
+        overflow: hidden;
+        background: var(--fp-line);
+        border: 1px solid var(--fp-line);
+        border-radius: var(--fp-radius);
+    }
+
     .campus-stat {
-        background: var(--cp-surface); border: 1px solid var(--cp-border); border-radius: var(--cp-radius);
-        padding: var(--cp-space); display: flex; flex-direction: column; gap: 4px;
+        display: flex;
+        flex-direction: column-reverse;
+        justify-content: flex-end;
+        gap: .2rem;
+        padding: .8rem;
+        background: var(--fp-paper);
+
+        dt { color: var(--fp-muted); font-weight: 650; font-size: .875rem; }
+        dd {
+            margin: 0;
+            font-size: 1.8rem;
+            font-weight: 780;
+            letter-spacing: -.045em;
+            line-height: 1.08;
+            font-variant-numeric: tabular-nums;
+        }
     }
-    .campus-stat__label { color: var(--cp-muted); font-size: 0.875rem; }
-    .campus-stat__value { font-size: 1.5rem; font-weight: 600; }
+
+    .campus-agenda, .campus-academic, .campus-cards, .campus-grid, .campus-list--feed, .campus-quick {
+        display: grid;
+        gap: .9rem;
+    }
+
+    .campus-agenda, .campus-quick { margin-bottom: 1rem; }
+
+    .campus-card, .campus-next, .campus-day, .campus-empty {
+        min-width: 0;
+        padding: 1.05rem;
+        border: 1px solid var(--fp-line);
+        border-radius: var(--fp-radius);
+        background: var(--fp-paper);
+    }
+
+    .campus-card > :last-child, .campus-next > :last-child { margin-bottom: 0; }
+    .campus-card > .campus-h2 { margin-bottom: .75rem; }
+    .campus-card > .fp-kicker { margin-bottom: .3rem; }
+    .campus-section-head, .campus-registration { margin-bottom: .75rem; }
+
+    .campus-cards, .campus-list--feed, .campus-agenda-list, .campus-quick {
+        padding: 0;
+        list-style: none;
+    }
+
+    .campus-cards, .campus-list--feed, .campus-agenda-list { margin: 0; }
+    .campus-list--feed time { display: block; margin-bottom: .25rem; font-size: .85rem; }
+    .campus-list { padding-left: 1.15rem; margin: .6rem 0 0; }
+    .campus-list li + li { margin-top: .25rem; }
+
+    .campus-next {
+        background: var(--fp-mint);
+        border-color: var(--fp-mint);
+
+        .fp-kicker { color: var(--fp-navy); }
+        .campus-h2 { margin-top: .65rem; font-size: 1.5rem; }
+        p { margin: .65rem 0 0; }
+        .campus-next__when {
+            display: flex;
+            flex-wrap: wrap;
+            gap: .25rem .65rem;
+            font-weight: 750;
+            font-variant-numeric: tabular-nums;
+        }
+    }
+
+    .campus-agenda-list > li + li { border-top: 1px solid var(--fp-line); }
+
+    .campus-session {
+        display: grid;
+        align-items: baseline;
+        gap: .15rem .8rem;
+        padding: .65rem 0;
+
+        .campus-session__time { margin: 0; color: var(--fp-teal); font-weight: 750; font-variant-numeric: tabular-nums; }
+        .campus-muted { font-size: .875rem; }
+    }
+
+    .campus-text-link {
+        display: inline-block;
+        margin-top: .55rem;
+        padding: .25rem 0;
+        color: var(--fp-teal);
+        font-weight: 750;
+        text-underline-offset: .2em;
+    }
+
+    .campus-quick {
+        margin-top: 0;
+
+        a {
+            display: grid;
+            height: 100%;
+            grid-template-columns: minmax(0, 1fr) auto;
+            gap: .1rem .6rem;
+            padding: .85rem 1rem;
+            background: var(--fp-soft);
+            border-radius: 10px;
+            color: var(--fp-navy);
+            text-decoration: none;
+
+            &:hover strong { text-decoration: underline; text-underline-offset: .2em; }
+        }
+
+        strong { font-size: 1rem; }
+        span { color: var(--fp-muted); font-size: .875rem; grid-column: 1; }
+        .campus-quick__arrow { grid-area: 1 / 2 / span 2; align-self: center; color: var(--fp-teal); font-size: 1.2rem; }
+    }
 
     .campus-dl {
-        display: grid; grid-template-columns: 1fr; gap: 2px 12px; margin: 0;
-        dt { color: var(--cp-muted); font-size: 0.875rem; font-weight: 400; }
-        dd { margin: 0 0 8px; }
+        display: grid;
+        grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
+        gap: .5rem .75rem;
+        margin: 0;
+        padding: .75rem 0;
+        border-top: 1px solid var(--fp-line);
+
+        dt { color: var(--fp-muted); font-size: .875rem; font-weight: 550; }
+        dd { margin: 0; font-weight: 650; }
     }
 
     .campus-badge {
-        display: inline-block; padding: 4px 10px; border-radius: var(--cp-radius-sm); font-size: 0.875rem; margin: 0 0 8px;
-        &--success { background: var(--cp-success-soft); color: var(--cp-success-text); }
-        &--warning { background: var(--cp-warning-soft); color: var(--cp-warning-text); }
+        display: inline-block;
+        margin: 0;
+        padding: .25rem .6rem;
+        border-radius: 8px;
+        font-size: .8125rem;
+        font-weight: 700;
+        &--success { color: var(--fp-teal-dark); background: var(--fp-soft); }
+        &--warning { color: #70431d; background: #f8ead6; }
     }
 
-    .campus-btn {
-        display: inline-block; padding: 8px 14px; border-radius: var(--cp-radius-sm); border: 1px solid var(--cp-border);
-        background: var(--cp-surface); color: var(--cp-primary-text-link, #4C44D9); font-size: 0.9375rem; cursor: pointer;
-        text-decoration: none; min-height: 40px;
-        &:focus-visible { outline: 3px solid var(--cp-focus); outline-offset: 2px; }
-        &--primary { background: var(--cp-primary); border-color: var(--cp-primary); color: var(--cp-primary-text); }
-        &--danger { background: var(--cp-danger); border-color: var(--cp-danger); color: #FFFFFF; }
-        &:disabled { opacity: .6; cursor: not-allowed; }
+    .campus-actions { margin-top: .4rem; }
+    .campus-week {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: .5rem;
+        margin-bottom: .9rem;
     }
-    .campus-actions { margin-top: 8px; }
 
-    .campus-week { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+    .campus-week__range { width: 100%; margin: 0; font-size: 1.125rem; font-weight: 750; font-variant-numeric: tabular-nums; }
 
     .campus-day {
-        background: var(--cp-surface); border: 1px solid var(--cp-border); border-radius: var(--cp-radius);
-        padding: 12px; display: flex; flex-direction: column; gap: 8px;
-    }
-    .campus-session {
-        border-left: 4px solid var(--cp-primary); padding: 6px 8px; background: var(--cp-bg);
-        border-radius: var(--cp-radius-sm); display: flex; flex-direction: column; gap: 2px;
+        .campus-h3 { display: flex; flex-wrap: wrap; align-items: baseline; gap: .3rem .65rem; }
+        .campus-h3 time { font-size: .875rem; color: var(--fp-muted); }
+        &.is-today { border-color: var(--fp-teal); border-left-width: 4px; }
+        > .campus-muted { margin-top: .4rem; }
     }
 
     .campus-alert {
-        padding: 12px 16px; border-radius: var(--cp-radius-sm); margin-bottom: 16px; border: 1px solid transparent;
-        &--success { background: var(--cp-success-soft); color: var(--cp-success-text); }
-        &--danger { background: var(--cp-danger-soft); color: var(--cp-danger-text); }
+        padding: .75rem 1rem;
+        border-radius: 8px;
+        margin-bottom: 1rem;
+        &--success { color: var(--fp-teal-dark); background: var(--fp-soft); }
+        &--danger { color: var(--fp-danger); background: var(--fp-danger-soft); }
     }
 
-    // Tablet and up: two columns for stats, cards and the week grid
+    @media (min-width: 480px) {
+        .campus-session { grid-template-columns: 6.4rem minmax(0, 1fr); }
+        .campus-stat { padding: 1rem; }
+    }
+
     @media (min-width: 768px) {
-        padding: 0 24px 40px;
-        .campus-grid--stats { grid-template-columns: 1fr 1fr; }
-        .campus-grid--week { grid-template-columns: repeat(4, 1fr); }
-        .campus-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-        .campus-card { margin-bottom: 0; }
-        .campus-dl { grid-template-columns: 160px 1fr; }
-    }
-
-    // Desktop: full week and stats
-    @media (min-width: 1200px) {
-        .campus-grid--stats { grid-template-columns: repeat(4, 1fr); }
-        .campus-grid--week { grid-template-columns: repeat(7, 1fr); }
+        padding: 1.4rem 1.65rem 1.65rem;
+        .campus-title { font-size: 3rem; }
+        .campus-hero { padding: 2.2rem; }
+        .campus-hero .campus-title { font-size: 3.4rem; }
+        .campus-stats { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+        .campus-stat { padding: 1rem 1.2rem; }
+        .campus-stat dd { font-size: 2.25rem; }
+        .campus-agenda { grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); }
+        .campus-academic, .campus-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        .campus-quick { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+        .campus-card, .campus-next, .campus-day { padding: 1.2rem; }
+        .campus-day { display: grid; align-items: baseline; grid-template-columns: 8rem minmax(0, 1fr); }
+        .campus-week__range { width: auto; margin-right: auto; }
     }
 }

@@ -2,63 +2,102 @@
 <templates xml:space="preserve">
     <t t-name="campus_portal.TeacherPortal">
         <Layout display="{ controlPanel: {} }" className="'o_campus_teacher'">
-            <div class="ctp" role="region" aria-label="Багшийн портал">
-                <header class="ctp-head">
-                    <h1 class="ctp-title">Багшийн портал</h1>
-                    <p class="ctp-muted">Улирал: <t t-esc="termName"/></p>
-                </header>
-
-                <nav class="ctp-tabs" role="tablist" aria-label="Багшийн портал хэсгүүд">
-                    <button type="button" role="tab" class="ctp-tab" t-att-class="state.tab === 'offerings' || state.tab === 'offering' ? 'ctp-tab is-active' : 'ctp-tab'"
-                            t-att-aria-selected="state.tab === 'offerings' || state.tab === 'offering' ? 'true' : 'false'"
-                            t-on-click="() => this.setTab('offerings')">Миний хичээл</button>
-                    <button type="button" role="tab" class="ctp-tab" t-att-class="state.tab === 'notifications' ? 'ctp-tab is-active' : 'ctp-tab'"
-                            t-att-aria-selected="state.tab === 'notifications' ? 'true' : 'false'"
+            <div class="ctp formula-portal-theme" t-ref="portal" role="region" aria-label="Багшийн портал">
+                <div class="ctp-wrap">
+                <div class="ctp-masthead">
+                    <p class="fp-kicker">Багшийн портал</p>
+                    <a class="fp-brand" href="/university">Formula University <span aria-hidden="true">↗</span></a>
+                </div>
+                <nav t-if="!state.wrongAccount" class="ctp-tabs" aria-label="Багшийн портал хэсгүүд">
+                    <button type="button" class="ctp-tab" t-att-class="{ 'is-active': state.tab !== 'notifications' }"
+                            t-att-aria-current="state.tab !== 'notifications' ? 'page' : null"
+                            t-on-click="() => this.backToOfferings()">Миний хичээл</button>
+                    <button type="button" class="ctp-tab" t-att-class="{ 'is-active': state.tab === 'notifications' }"
+                            t-att-aria-current="state.tab === 'notifications' ? 'page' : null"
                             t-on-click="() => this.setTab('notifications')">Мэдэгдэл</button>
-                    <span class="ctp-pending" aria-live="polite">Хянуулж буй хүсэлт: <t t-esc="pendingCount"/></span>
                 </nav>
 
                 <!-- Offerings list -->
-                <section t-if="state.tab === 'offerings'" class="ctp-panel" role="tabpanel" aria-label="Миний хичээлүүд">
+                <section t-if="state.tab === 'offerings'" class="ctp-panel" aria-labelledby="ctp-dashboard-title">
+                    <header class="fp-hero ctp-hero">
+                        <div class="fp-hero__content">
+                            <p class="fp-kicker" t-esc="termName"/>
+                            <h1 id="ctp-dashboard-title" class="ctp-title" tabindex="-1">Миний хичээлүүд</h1>
+                            <p t-if="state.dashboard and state.dashboard.lecturer" class="ctp-hero__name" t-esc="state.dashboard.lecturer"/>
+                        </div>
+                    </header>
+                    <dl t-if="state.dashboard" class="ctp-stats" aria-label="Хичээлийн үзүүлэлт">
+                        <div><dt>Оноогдсон хичээл</dt><dd t-esc="offerings.length"/></div>
+                        <div><dt>Хичээлийн бүртгэл</dt><dd t-esc="seatCount"/></div>
+                        <div><dt>Хянуулж буй дүнгийн хүсэлт</dt><dd t-esc="pendingCount"/></div>
+                    </dl>
                     <div t-if="state.loading" class="ctp-state" role="status">Ачаалж байна…</div>
                     <div t-elif="state.loadError" class="ctp-alert ctp-alert--danger" role="alert">
                         <p><t t-esc="state.loadError"/></p>
-                        <button type="button" class="ctp-btn" t-on-click="() => this.loadDashboard()">Дахин оролдох</button>
+                        <t t-if="state.wrongAccount">
+                            <a class="ctp-btn" href="/web/session/logout?redirect=/campus/teacher">Өөр бүртгэлээр нэвтрэх</a>
+                            <a class="ctp-btn" href="/my/campus">Оюутны портал</a>
+                        </t>
+                        <button t-else="" type="button" class="ctp-btn" t-on-click="() => this.loadDashboard()">Дахин оролдох</button>
                     </div>
                     <p t-elif="!offerings.length" class="ctp-state">Танд оноогдсон хичээл алга.</p>
                     <ul t-else="" class="ctp-cards">
                         <li t-foreach="offerings" t-as="offering" t-key="offering.id" class="ctp-card">
-                            <h2 class="ctp-h2"><t t-esc="offering.course_code"/> · <t t-esc="offering.name"/></h2>
-                            <p class="ctp-muted"><t t-esc="offering.semester"/> · <t t-esc="offering.state_label"/> · <t t-esc="offering.seats_taken"/> / <t t-esc="offering.capacity"/> оюутан</p>
-                            <button type="button" class="ctp-btn ctp-btn--primary" t-att-aria-label="'Жагсаалт нээх: ' + offering.name"
-                                    t-on-click="() => this.openOffering(offering.id)">Жагсаалт, ирц, дүн</button>
+                            <div class="ctp-card__top">
+                                <p class="fp-kicker" t-esc="offering.course_code"/>
+                                <span class="ctp-badge" t-esc="offering.state_label"/>
+                            </div>
+                            <h2 class="ctp-h2" t-esc="offering.name"/>
+                            <p t-if="offering.semester" class="ctp-muted" t-esc="offering.semester"/>
+                            <div class="ctp-capacity">
+                                <p t-att-id="'ctp-capacity-' + offering.id"><strong><t t-esc="offering.seats_taken"/> / <t t-esc="offering.capacity"/></strong> суудал</p>
+                                <meter t-if="offering.capacity > 0" t-att-max="offering.capacity" t-att-value="offering.seats_taken"
+                                       t-att-aria-labelledby="'ctp-capacity-' + offering.id"/>
+                            </div>
+                            <button type="button" class="ctp-btn ctp-btn--primary" t-att-id="'ctp-open-' + offering.id"
+                                    t-att-aria-label="'Жагсаалт, ирц, дүн: ' + offering.name"
+                                    t-on-click="() => this.openOffering(offering.id)">Жагсаалт, ирц, дүн <span aria-hidden="true">→</span></button>
                         </li>
                     </ul>
                 </section>
 
                 <!-- One offering: roster, attendance, grade requests -->
-                <section t-if="state.tab === 'offering'" class="ctp-panel" aria-label="Хичээлийн жагсаалт">
-                    <button type="button" class="ctp-btn" t-on-click="() => this.backToOfferings()">← Хичээлүүд рүү буцах</button>
-
-                    <h2 class="ctp-h2" id="ctp-roster-title">Оюутны жагсаалт</h2>
+                <section t-if="state.tab === 'offering'" class="ctp-panel" aria-labelledby="ctp-offering-title">
+                    <header class="ctp-pagehead">
+                        <button type="button" class="ctp-btn" t-on-click="() => this.backToOfferings()">← Хичээлүүд рүү буцах</button>
+                        <h1 id="ctp-offering-title" class="ctp-title" tabindex="-1" t-esc="offeringName"/>
+                        <div class="ctp-actions" aria-label="Хичээлийн хэсгүүд" role="group">
+                            <button type="button" class="ctp-btn" t-on-click="() => this.focusSection('ctp-roster-title')">Оюутны жагсаалт <span aria-hidden="true">↓</span></button>
+                            <button type="button" class="ctp-btn" t-on-click="() => this.focusSection('ctp-sessions-title')">Ирц бүртгэх <span aria-hidden="true">↓</span></button>
+                        </div>
+                    </header>
+                    <section class="ctp-detail" aria-labelledby="ctp-roster-title">
+                    <div class="ctp-section-head">
+                        <h2 class="ctp-h2" id="ctp-roster-title" tabindex="-1">Оюутны жагсаалт</h2>
+                        <span t-if="state.roster" class="ctp-badge"><t t-esc="state.roster.rows.length"/> оюутан</span>
+                    </div>
                     <div t-if="state.rosterLoading" class="ctp-state" role="status">Ачаалж байна…</div>
                     <div t-elif="state.rosterError" class="ctp-alert ctp-alert--danger" role="alert"><t t-esc="state.rosterError"/></div>
                     <p t-elif="state.roster and !state.roster.rows.length" class="ctp-state">Бүртгэлтэй оюутан алга.</p>
-                    <ul t-elif="state.roster" class="ctp-cards" aria-labelledby="ctp-roster-title">
-                        <li t-foreach="state.roster.rows" t-as="row" t-key="row.enrollment_id" class="ctp-card">
-                            <h3 class="ctp-h3"><t t-esc="row.student_code"/> · <t t-esc="row.student_name"/></h3>
+                    <ul t-elif="state.roster" class="ctp-roster">
+                        <li t-foreach="state.roster.rows" t-as="row" t-key="row.enrollment_id" class="ctp-roster__item">
+                            <div class="ctp-roster__summary">
+                            <div>
+                                <p class="fp-kicker" t-esc="row.student_code"/>
+                                <h3 class="ctp-h3" t-esc="row.student_name"/>
+                            </div>
                             <dl class="ctp-dl">
-                                <dt>Төлөв</dt><dd><t t-esc="row.reg_state_label"/></dd>
-                                <dt>Баталгаат дүн</dt><dd><t t-esc="row.score"/> (хувилбар <t t-esc="row.grade_revision"/>)</dd>
-                                <dt>Сүүлийн хүсэлт</dt><dd><t t-if="row.request_name"><t t-esc="row.request_name"/> · <t t-esc="row.request_state_label"/></t><t t-else="">Байхгүй</t></dd>
+                                <div><dt>Төлөв</dt><dd t-esc="row.reg_state_label"/></div>
+                                <div><dt>Баталгаат дүн</dt><dd><strong t-esc="row.score"/> <span class="ctp-muted">(хувилбар <t t-esc="row.grade_revision"/>)</span></dd></div>
+                                <div><dt>Сүүлийн хүсэлт</dt><dd><t t-if="row.request_name"><t t-esc="row.request_name"/> · <t t-esc="row.request_state_label"/></t><t t-else="">Байхгүй</t></dd></div>
                             </dl>
-
                             <button t-if="!isDraftOpen(row.enrollment_id)" type="button" class="ctp-btn"
+                                    t-att-id="'ctp-request-' + row.enrollment_id"
                                     t-att-aria-label="'Дүн өөрчлөх хүсэлт гаргах: ' + row.student_name"
                                     t-on-click="() => this.startRequest(row)">Дүн өөрчлөх хүсэлт</button>
-
-                            <form t-else="" class="ctp-form" t-on-submit.prevent="() => this.submitRequest(row)">
-                                <p class="ctp-muted">Хүсэлт нь сургалтын албаар батлагдана. Таны гаргасан хүсэлтийг өөрөө батлахгүй.</p>
+                            </div>
+                            <form t-if="isDraftOpen(row.enrollment_id)" class="ctp-form" t-on-submit.prevent="() => this.submitRequest(row)">
+                                <p class="ctp-muted">Дүнгийн хүсэлтийг сургалтын алба шийдвэрлэнэ.</p>
                                 <label class="ctp-label" t-att-for="'ctp-score-' + row.enrollment_id">Шинэ дүн (0–100)</label>
                                 <input type="number" min="0" max="100" step="0.01" class="ctp-input" t-att-id="'ctp-score-' + row.enrollment_id"
                                        t-model="state.drafts[row.enrollment_id].score" required="required"/>
@@ -76,30 +115,42 @@
                             </form>
                         </li>
                     </ul>
+                    </section>
 
-                    <h2 class="ctp-h2">Ирц бүртгэх</h2>
-                    <div t-if="state.sessionsLoading" class="ctp-state" role="status">Ачаалж байна…</div>
+                    <section class="ctp-detail" aria-labelledby="ctp-sessions-title">
+                    <div class="ctp-section-head">
+                        <h2 id="ctp-sessions-title" class="ctp-h2" tabindex="-1">Ирц бүртгэх</h2>
+                        <span t-if="state.sessions.length" class="ctp-badge"><t t-esc="state.sessions.length"/> хичээлийн цаг</span>
+                    </div>
+                    <div t-if="state.sessionsLoading and !state.sessions.length" class="ctp-state" role="status">Ачаалж байна…</div>
                     <div t-elif="state.sessionsError" class="ctp-alert ctp-alert--danger" role="alert"><t t-esc="state.sessionsError"/></div>
                     <p t-elif="!state.sessions.length" class="ctp-state">Энэ хичээлд цагийн хуваарь алга.</p>
                     <div t-else="" class="ctp-sessions">
                         <article t-foreach="state.sessions" t-as="session" t-key="session.id" class="ctp-card">
-                            <h3 class="ctp-h3"><t t-esc="session.start"/> – <t t-esc="session.end"/> · <t t-esc="session.kind"/><t t-if="session.room"> · <t t-esc="session.room"/></t></h3>
+                            <div class="ctp-section-head">
+                                <div>
+                                    <p class="fp-kicker"><t t-esc="session.kind"/><t t-if="session.room"> · <t t-esc="session.room"/></t></p>
+                                    <h3 class="ctp-h3" t-att-id="'ctp-session-' + session.id" tabindex="-1"><t t-esc="session.start"/> – <t t-esc="session.end"/></h3>
+                                </div>
+                                <span t-if="session.rows.length" class="ctp-badge"><t t-esc="recordedCount(session)"/> / <t t-esc="session.rows.length"/> бүртгэсэн</span>
+                            </div>
                             <p t-if="!session.rows.length" class="ctp-muted">Идэвхтэй оюутан алга.</p>
                             <table t-else="" class="ctp-table">
                                 <caption class="ctp-sr">Ирцийн бүртгэл: <t t-esc="session.start"/></caption>
-                                <thead><tr><th scope="col">Код</th><th scope="col">Оюутан</th><th scope="col">Төлөв</th></tr></thead>
+                                <thead><tr><th scope="col">Оюутан</th><th scope="col">Ирцийн төлөв</th></tr></thead>
                                 <tbody>
                                     <tr t-foreach="session.rows" t-as="arow" t-key="arow.enrollment_id">
-                                        <td><t t-esc="arow.student_code"/></td>
-                                        <td><t t-esc="arow.student_name"/></td>
+                                        <th scope="row"><span class="ctp-student-name" t-esc="arow.student_name"/><span class="ctp-muted" t-esc="arow.student_code"/></th>
                                         <td>
                                             <label class="ctp-sr" t-att-for="'ctp-att-' + session.id + '-' + arow.enrollment_id">Ирцийн төлөв: <t t-esc="arow.student_name"/></label>
                                             <select class="ctp-input" t-att-id="'ctp-att-' + session.id + '-' + arow.enrollment_id"
+                                                    t-att-disabled="isBusy('attendance-' + session.id)"
                                                     t-on-change="(ev) => this.setAttendance(session.id, arow.enrollment_id, ev.target.value)">
                                                 <option t-foreach="['present', 'late', 'absent', 'excused']" t-as="st" t-key="st" t-att-value="st" t-att-selected="state.attendance[session.id][arow.enrollment_id] === st">
                                                     <t t-esc="attendanceLabel(st)"/>
                                                 </option>
                                             </select>
+                                            <small t-if="!arow.recorded" class="ctp-muted ctp-attendance-note">Бүртгээгүй</small>
                                         </td>
                                     </tr>
                                 </tbody>
@@ -109,21 +160,27 @@
                                     t-on-click="() => this.saveAttendance(session)">Ирц хадгалах</button>
                         </article>
                     </div>
+                    </section>
                 </section>
 
                 <!-- Notifications -->
-                <section t-if="state.tab === 'notifications'" class="ctp-panel" aria-label="Мэдэгдэл">
+                <section t-if="state.tab === 'notifications'" class="ctp-panel" aria-labelledby="ctp-notifications-title">
+                    <header class="ctp-pagehead">
+                        <h1 id="ctp-notifications-title" class="ctp-title" tabindex="-1">Мэдэгдэл</h1>
+                        <p class="ctp-muted">Хичээл, дүнгийн хүсэлттэй холбоотой шинэчлэлтүүд.</p>
+                    </header>
                     <div t-if="state.notificationsLoading" class="ctp-state" role="status">Ачаалж байна…</div>
                     <div t-elif="state.notificationsError" class="ctp-alert ctp-alert--danger" role="alert"><t t-esc="state.notificationsError"/></div>
                     <p t-elif="!state.notifications.length" class="ctp-state">Мэдэгдэл алга.</p>
                     <ol t-else="" class="ctp-feed">
                         <li t-foreach="state.notifications" t-as="note" t-key="note.id" class="ctp-card">
                             <time class="ctp-muted"><t t-esc="note.date"/></time>
-                            <p class="ctp-strong"><t t-esc="note.subject || 'Шинэчлэлт'"/></p>
+                            <h2 class="ctp-h2"><t t-esc="note.subject || 'Шинэчлэлт'"/></h2>
                             <p t-if="note.body"><t t-esc="note.body"/></p>
                         </li>
                     </ol>
                 </section>
+                </div>
             </div>
         </Layout>
     </t>

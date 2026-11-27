@@ -33,9 +33,11 @@ class TestFormulaDesignSystemAssets(TransactionCase):
         self.assertLess(dark_paths.index(LIGHT_TOKENS), dark_paths.index(DARK_TOKENS))
 
     def test_bundles_compile_without_css_errors(self):
-        bundle = self.env["ir.qweb"]._get_asset_bundle("web.assets_web_dark", css=True, js=False)
-        attachment = bundle.css()
-        self.assertFalse(bundle.css_errors, "SCSS compile errors: %s" % bundle.css_errors)
-        content = attachment.raw.decode() if attachment else ""
-        self.assertIn("--fds-primary", content)
-        self.assertIn("--fds-danger-fill", content)
+        for name in ("web.assets_web", "web.assets_web_dark"):
+            with self.subTest(bundle=name):
+                bundle = self.env["ir.qweb"]._get_asset_bundle(name, css=True, js=False)
+                attachment = bundle.css()
+                self.assertFalse(bundle.css_errors, "SCSS compile errors: %s" % bundle.css_errors)
+                content = attachment.raw.decode() if attachment else ""
+                self.assertIn("--fds-action-fill", content)
+                self.assertIn("--fds-danger-fill", content)

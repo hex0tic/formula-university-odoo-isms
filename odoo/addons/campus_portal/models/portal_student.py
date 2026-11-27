@@ -8,8 +8,7 @@ Ownership model
   (campus_university and campus_academic_plus) restrict students to their own student,
   enrollments, attendance, grade requests, and sessions of enrolled offerings.
 * The only student lookup is ``campus.student`` with ``user_id = current uid``. Users
-  without the Campus Student group get no student (the campus groups imply internal
-  access, so portal-only accounts are not supported; see README.rst).
+  without the Campus Student group get no student. Campus Student is a portal role.
 * Nothing is trusted from the URL or from a client-supplied student id.
 * State changes (registration, drop) call the academic model methods
   (``campus.offering.register_student``, ``campus.enrollment.action_drop``) in the user
@@ -58,6 +57,42 @@ class CampusPortalStudent(models.AbstractModel):
         return self.env["campus.enrollment"].search(
             [("student_id", "=", student.id)], order="offering_id")
 
+    def _session_rows(self, offering_ids, extra_domain, limit=None):
+        if not offering_ids:
+            return self.env["campus.session"]
+        return self.env["campus.session"].search(
+            [("offering_id", "in", offering_ids)] + extra_domain,
+            order="start, id", limit=limit,
+        )
+
+    def _session_card(self, session):
+        return {
+            "date": local_date(self, session.start).isoformat(),
+            "start": local_time_label(self, session.start),
+            "end": local_time_label(self, session.end) if session.end else "",
+            "course_code": session.offering_id.course_id.code,
+            "title": session.offering_id.course_id.name,
+            "room": session.room or "",
+            "kind": selection_label(session, "kind"),
+        }
+
+    def _student_agenda(self, enrolled):
+        now = fields.Datetime.now()
+        today = local_date(self, now)
+        offering_ids = enrolled.mapped("offering_id").ids
+        # Pad the UTC query for all timezones, then compare exact local calendar dates.
+        start = datetime.combine(today - timedelta(days=1), time.min)
+        end = datetime.combine(today + timedelta(days=2), time.min)
+        sessions = self._session_rows(offering_ids, [("start", ">=", start), ("start", "<", end)])
+        todays_sessions = sessions.filtered(lambda session: local_date(self, session.start) == today)
+        next_session = self._session_rows(offering_ids, [("start", ">=", now)], limit=1)
+        return {
+            "today": today.isoformat(),
+            "today_count": len(todays_sessions),
+            "today_sessions": [self._session_card(session) for session in todays_sessions[:3]],
+            "next_session": self._session_card(next_session) if next_session else False,
+        }
+
     # ------------------------------------------------------------ overview
     @api.model
     def get_overview(self):
@@ -68,7 +103,11 @@ class CampusPortalStudent(models.AbstractModel):
         if isinstance(missing, str):
             missing = [line.strip() for line in missing.splitlines() if line.strip()]
         enrollments = self._own_enrollments(student)
+        enrolled = enrollments.filtered(lambda e: e.reg_state == "enrolled")
         completed = enrollments.filtered(lambda e: e.reg_state == COMPLETED)
+        pending_count = self.env["campus.grade.change"].search_count([
+            ("enrollment_id", "in", enrollments.ids), ("state", "=", "submitted"),
+        ]) if enrollments else 0
         return {
             "has_student": True,
             "student": {
@@ -81,9 +120,11 @@ class CampusPortalStudent(models.AbstractModel):
             "credits_earned": student.credits_earned,
             "graduation_eligible": bool(student.graduation_eligible),
             "graduation_missing": list(missing or []),
-            "enrolled_count": len(enrollments.filtered(lambda e: e.reg_state == "enrolled")),
+            "enrolled_count": len(enrolled),
             "completed_count": len(completed),
             "transcript_ready": bool(completed),
+            "pending_count": pending_count,
+            "agenda": self._student_agenda(enrolled),
         }
 
     # ------------------------------------------------------------ enrollments
@@ -123,10 +164,13 @@ class CampusPortalStudent(models.AbstractModel):
         days = [{
             "date": (start_day + timedelta(days=i)).isoformat(),
             "label": (start_day + timedelta(days=i)).strftime("%d.%m"),
+            "is_today": start_day + timedelta(days=i) == today,
             "sessions": [],
         } for i in range(7)]
         result = {
             "week_start": start_day.isoformat(),
+            "week_end": end_day.isoformat(),
+            "is_current_week": start_day == week_monday(today),
             "prev_week": (start_day - timedelta(days=7)).isoformat(),
             "next_week": (start_day + timedelta(days=7)).isoformat(),
             "days": days,
@@ -136,28 +180,18 @@ class CampusPortalStudent(models.AbstractModel):
             return result
         offering_ids = self._own_enrollments(student).filtered(
             lambda e: e.reg_state == "enrolled").mapped("offering_id").ids
-        if not offering_ids:
-            return result
         # UTC window padded by one day on each side; the exact local-date filter follows.
         lo = datetime.combine(start_day - timedelta(days=1), time.min)
         hi = datetime.combine(end_day + timedelta(days=2), time.min)
-        sessions = self.env["campus.session"].search([
-            ("offering_id", "in", offering_ids),
+        sessions = self._session_rows(offering_ids, [
             ("start", ">=", lo),
             ("start", "<", hi),
-        ], order="start", limit=MAX_ROWS)
+        ], limit=MAX_ROWS)
         for session in sessions:
             day = local_date(self, session.start)
             if day < start_day or day > end_day:
                 continue
-            days[(day - start_day).days]["sessions"].append({
-                "start": local_time_label(self, session.start),
-                "end": local_time_label(self, session.end) if session.end else "",
-                "course_code": session.offering_id.course_id.code,
-                "title": session.offering_id.name,
-                "room": session.room or "",
-                "kind": selection_label(session, "kind"),
-            })
+            days[(day - start_day).days]["sessions"].append(self._session_card(session))
         return result
 
     # ------------------------------------------------------------ attendance
@@ -194,11 +228,13 @@ class CampusPortalStudent(models.AbstractModel):
     def get_registration_catalog(self):
         """Open offerings of the open term (readable by students through rule_offering_open_student)."""
         student = self._own_student()
-        term = open_term(self.env)
-        today = fields.Date.context_today(self)
         result = {"has_student": bool(student), "term": False, "window_open": False, "offerings": []}
+        if not student:
+            return result
+        term = open_term(self.env)
         if not term:
             return result
+        today = fields.Date.context_today(self)
         window_open = in_window(today, term.registration_start, term.registration_end)
         result["term"] = {
             "id": term.id,
@@ -206,8 +242,6 @@ class CampusPortalStudent(models.AbstractModel):
             "registration_end": fields.Date.to_string(term.registration_end) if term.registration_end else "",
         }
         result["window_open"] = window_open
-        if not student:
-            return result
         taken = set(self._own_enrollments(student).filtered(
             lambda e: e.reg_state in ("enrolled", COMPLETED)).mapped("offering_id").ids)
         offerings = self.env["campus.offering"].search(

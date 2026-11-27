@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 790" role="img" aria-labelledby="title">
+<title id="title">Formula University кампусын архитектурын дүрслэл</title>
+<defs>
+ <linearGradient id="sky" x2="0" y2="1"><stop stop-color="#9cbac0"/><stop offset="1" stop-color="#e3e1bc"/></linearGradient>
+ <linearGradient id="glass" x2="0" y2="1"><stop stop-color="#6d9a9c"/><stop offset="1" stop-color="#324f55"/></linearGradient>
+ <linearGradient id="shade" x2="1" y2="1"><stop stop-color="#538483"/><stop offset="1" stop-color="#253d44"/></linearGradient>
+ <linearGradient id="fore" x2="0" y2="1"><stop stop-color="#c7b59b"/><stop offset="1" stop-color="#aa9678"/></linearGradient>
+ <pattern id="grain" width="13" height="11" patternUnits="userSpaceOnUse"><path d="M1 1h1m5 5h1m-5 3h1m8-7h1" stroke="#fff" opacity=".14"/></pattern>
+ <g id="tree"><path d="M0 4v105m1-38-24-27m24 24 29-32" stroke="#34463d" stroke-width="5" fill="none"/><path d="M-48 18C-53-3-19-22-9-16 5-37 39-24 40-4 63 9 56 39 32 42 20 57-8 51-16 42-34 52-60 37-48 18Z" fill="#45715f"/><path d="M-46 12C-39-7-21-13-9-12 6-32 32-19 35-8 49 2 39 16 18 14 3 26-33 28-46 12Z" fill="#659376"/><path d="M-36 31 1 33l23-12M-14-6 12 0" stroke="#a7b58a" stroke-opacity=".55" fill="none"/></g>
+ <g id="person"><circle r="5.2" fill="#74544c"/><path d="M-6 5q6-2 12 0l2 17h-16Z" fill="currentColor"/><path d="m-4 22-2 14m10-14 2 14" stroke="#283740" stroke-width="3" stroke-linecap="round"/></g>
+</defs>
+<path fill="url(#sky)" d="M0 0h1100v790H0z"/>
+<circle cx="895" cy="139" r="74" fill="#f0e5ad" opacity=".84"/>
+<path d="M0 198q178-74 326-25T705 153Q895 79 1100 146M0 237q210-81 411-26t428-31q127-36 261-5" stroke="#e7ead5" stroke-width="2" opacity=".38" fill="none"/>
+<path d="M0 434 110 396l68 21 103-53 161 5 69 67 245-52 147 15 197-66v193H0Z" fill="#729a8a" opacity=".67"/>
+<path d="M0 499 220 470l188 22 242-31 450 22v307H0Z" fill="url(#fore)"/>
+<path d="m0 620 315-67 252 25 254-39 279 17v46l-420 19-201 119L0 775Z" fill="#d1bfa1"/>
+<path d="m0 735 468-145 147 5L245 790H0ZM712 590l179-8 209 111v97H851Z" fill="#d8cfb5"/>
+<path d="M23 775 503 597M227 789l344-188m344 188L762 611m338 111L862 612m-544 80 417 4m-598 54 673 8" stroke="#a99779" stroke-opacity=".55" stroke-width="1.6" fill="none"/>
+<path d="m113 270 391-118 412 99-401 123Z" fill="#ded5b3"/>
+<path d="m113 280 391-118v360L113 619Z" fill="#bca070"/>
+<path d="m504 162 412 99v287L504 522Z" fill="#dcc499"/>
+<path d="m134 291 349-101v298l-349 92Z" fill="url(#glass)"/>
+<path d="m528 194 369 88v241l-369-28Z" fill="url(#shade)"/>
+<g fill="none" stroke="#dcd4b6" stroke-width="3"><path d="M134 291v298"/><path d="M160.84615384615384 283.2307692307692v298"/><path d="M187.69230769230768 275.46153846153845v298"/><path d="M214.53846153846155 267.6923076923077v298"/><path d="M241.3846153846154 259.9230769230769v298"/><path d="M268.2307692307692 252.15384615384616v298"/><path d="M295.0769230769231 244.3846153846154v298"/><path d="M321.9230769230769 236.6153846153846v298"/><path d="M348.7692307692308 228.84615384615384v298"/><path d="M375.61538461538464 221.0769230769231v298"/><path d="M402.46153846153845 213.30769230769232v298"/><path d="M429.3076923076923 205.53846153846155v298"/><path d="M456.15384615384613 197.76923076923077v298"/><path d="M134 291l349 -101"/><path d="M134 328.25l349 -101"/><path d="M134 365.5l349 -101"/><path d="M134 402.75l349 -101"/><path d="M134 440l349 -101"/><path d="M134 477.25l349 -101"/><path d="M134 514.5l349 -101"/><path d="M134 551.75l349 -101"/><path d="M528 194v246"/><path d="M552.6 199.86666666666667v246"/><path d="M577.2 205.73333333333332v246"/><path d="M601.8 211.6v246"/><path d="M626.4 217.46666666666667v246"/><path d="M651 223.33333333333334v246"/><path d="M675.6 229.2v246"/><path d="M700.2 235.06666666666666v246"/><path d="M724.8 240.93333333333334v246"/><path d="M749.4 246.8v246"/><path d="M774 252.66666666666666v246"/><path d="M798.6 258.5333333333333v246"/><path d="M823.2 264.4v246"/><path d="M847.8 270.26666666666665v246"/><path d="M872.4 276.1333333333333v246"/><path d="M528 194l369 88"/><path d="M528 224.75l369 88"/><path d="M528 255.5l369 88"/><path d="M528 286.25l369 88"/><path d="M528 317l369 88"/><path d="M528 347.75l369 88"/><path d="M528 378.5l369 88"/><path d="M528 409.25l369 88"/></g>
+<path d="m134 365 349-94m-349 181 349-94m-349 176 349-94m45-177 369 74m-369 4 369 55m-369 17 369 46" fill="none" stroke="#dfd4af" stroke-width="7"/>
+<path d="m113 276 391-116 412 98-2 18-410-95-393 114Z" fill="#eaddb7"/>
+<path d="m239 468 276-69 304 63-296 82Z" fill="#d4be94"/>
+<path d="m239 468 284 62v76l-284-62Z" fill="#e6c99c"/>
+<path d="m523 530 296-68v74l-296 70Z" fill="#927954"/>
+<path d="m257 485 243 55v50l-243-53Z" fill="#29474d"/>
+<path d="m549 544 247-56v38l-247 59Z" fill="#233d44"/>
+<path d="m500 536 23-6 26 13v43l-26 20-23-16Z" fill="#f4dca8"/>
+<path d="M249 552v53m110-32v51m107-30v44m94-43v26m106-50v38m102-63v39" stroke="#544f41" stroke-width="5"/>
+<text x="604" y="410" transform="skewY(9)" fill="#f0e5c4" font-family="system-ui,sans-serif" font-size="17" font-weight="700" letter-spacing="4">FORMULA UNIVERSITY</text>
+<path d="M21 647q138 23 251 8l-87 39-159 23ZM892 593l208 12v50l-119 3Z" fill="#698374"/>
+<path d="M0 650q151 40 331 7m560-63 209 13" stroke="#e4d9bb" stroke-width="8" fill="none"/>
+<use href="#tree" transform="translate(30 520) scale(1.25)"/><use href="#tree" transform="translate(108 552) scale(0.95)"/><use href="#tree" transform="translate(162 582) scale(1.08)"/><use href="#tree" transform="translate(209 601) scale(0.65)"/><use href="#tree" transform="translate(280 553) scale(0.55)"/><use href="#tree" transform="translate(953 582) scale(1.08)"/><use href="#tree" transform="translate(1045 571) scale(1.35)"/><use href="#tree" transform="translate(1114 533) scale(1.58)"/><use href="#tree" transform="translate(1023 646) scale(0.66)"/><use href="#tree" transform="translate(720 481) scale(0.75)"/>
+<use href="#person" transform="translate(404 635) scale(1.4)" color="#c07059"/><use href="#person" transform="translate(426 635) scale(1.35)" color="#e5bc6d"/><use href="#person" transform="translate(683 586)" color="#d9cc95"/><use href="#person" transform="translate(782 661) scale(1.6)" color="#55776b"/><use href="#person" transform="translate(808 667) scale(1.56)" color="#bc6a53"/><use href="#person" transform="translate(514 604) scale(.92)" color="#e7a66a"/>
+<path fill="url(#grain)" d="M0 0h1100v790H0z"/>
+</svg>

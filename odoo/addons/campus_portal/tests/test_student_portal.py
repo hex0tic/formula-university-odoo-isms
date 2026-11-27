@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 # Part of Formula University ERP. See LICENSE file for full copyright and licensing details.
+import json
 from datetime import timedelta
+from urllib.parse import urlsplit
 
 from odoo import fields, http
 from odoo.tests import HttpCase, tagged
@@ -150,3 +152,38 @@ class TestStudentPortal(CampusPortalFixtures, HttpCase):
         self.assertIn("/my/campus", self.url_open("/my").text)
         self.authenticate(self.plain_user.login, self.plain_user.login)
         self.assertNotIn("/my/campus", self.url_open("/my").text)
+
+    def test_campus_home_flag_is_not_a_counter(self):
+        self._login(self.student_a_user)
+        response = self.url_open(
+            "/my/counters",
+            data=json.dumps({"jsonrpc": "2.0", "method": "call", "params": {"counters": []}}),
+            headers={"Content-Type": "application/json"},
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertNotIn("campus_has_student", response.json()["result"])
+
+    def test_registration_page_without_academic_access_shows_account_hint(self):
+        self._login(self.plain_user)
+        response = self.url_open("/my/campus/register")
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("Оюутны бүртгэл холбогдоогүй", response.text)
+
+    def test_teacher_entry_requires_teacher_account(self):
+        self._login(self.student_a_user)
+        denied = self.url_open("/campus/teacher", allow_redirects=False)
+        self.assertEqual(denied.status_code, 403)
+        self.assertIn("/web/session/logout?redirect=/campus/teacher", denied.text)
+        self._login(self.lecturer_a)
+        allowed = self.url_open("/campus/teacher", allow_redirects=False)
+        self.assertEqual(allowed.status_code, 200)
+        self.assertIn("Миний хичээлүүд", allowed.text)
+        self.assertIn("/odoo/action-campus_portal.action_campus_teacher_portal", allowed.text)
+
+    def test_student_is_portal_user_and_cannot_open_backend(self):
+        self.assertTrue(self.student_a_user.has_group("base.group_portal"))
+        self.assertFalse(self.student_a_user.has_group("base.group_user"))
+        self._login(self.student_a_user)
+        response = self.url_open("/odoo", allow_redirects=False)
+        self.assertEqual(response.status_code, 303)
+        self.assertIn(urlsplit(response.headers["Location"]).path, {"/my", "/web/login_successful"})

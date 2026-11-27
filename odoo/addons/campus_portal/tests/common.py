@@ -6,7 +6,7 @@ from datetime import timedelta
 from odoo import fields
 from odoo.tests.common import new_test_user
 
-STUDENT_GROUPS = "base.group_user,campus_university.group_campus_student"
+STUDENT_GROUPS = "campus_university.group_campus_student"
 LECTURER_GROUPS = "base.group_user,campus_university.group_campus_lecturer"
 REGISTRAR_GROUPS = "base.group_user,campus_university.group_campus_registrar"
 PLAIN_GROUPS = "base.group_user"
@@ -25,7 +25,7 @@ class CampusPortalFixtures:
         cls.lecturer_a = new_test_user(env, login="cp_lecturer_a", groups=LECTURER_GROUPS)
         cls.lecturer_b = new_test_user(env, login="cp_lecturer_b", groups=LECTURER_GROUPS)
         cls.registrar = new_test_user(env, login="cp_registrar", groups=REGISTRAR_GROUPS)
-        cls.plain_user = new_test_user(env, login="cp_plain", groups=PLAIN_GROUPS)
+        cls.plain_user = new_test_user(env, login="cp_plain_user", groups=PLAIN_GROUPS)
 
         Sudo = env(su=True)
         cls.program = Sudo["campus.program"].create({
@@ -38,7 +38,11 @@ class CampusPortalFixtures:
         cls.course_y = Sudo["campus.course"].create({
             "code": "CP-102", "name": "Portal course Y", "credits": 3, "program_id": cls.program.id,
         })
-        cls.term = Sudo["campus.academic.term"].create({
+        Term = Sudo["campus.academic.term"]
+        # Keep the fixture current even when testing against a populated campus.
+        # The surrounding test transaction rolls back these state changes.
+        Term.search([("state", "=", "open")]).write({"state": "closed"})
+        cls.term = Term.create({
             "name": "Portal test term", "code": "CP-2026-A",
             "date_start": today - timedelta(days=30), "date_end": today + timedelta(days=90),
             "registration_start": today - timedelta(days=10), "registration_end": today + timedelta(days=10),

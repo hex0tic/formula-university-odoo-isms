@@ -1,0 +1,84 @@
+.campus-teacher-web {
+    .campus-teacher-legacy {
+        color: var(--fp-teal);
+        font-weight: 650;
+        text-underline-offset: .2em;
+    }
+
+    .campus-teacher-stats { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .campus-teacher-course { display: flex; flex-direction: column; gap: .65rem; }
+    .campus-teacher-course > .campus-h2 { margin: 0; }
+    .campus-teacher-course-link { align-self: flex-start; margin-top: auto; }
+
+    .campus-teacher-titleline, .campus-teacher-actions {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: .5rem .75rem;
+    }
+
+    .campus-teacher-titleline { justify-content: space-between; }
+    .campus-teacher-head > .campus-text-link { margin: 0 0 .6rem; }
+    .campus-teacher-head > .campus-teacher-actions { margin-top: .9rem; }
+
+    .campus-teacher-offering {
+        display: grid;
+        align-items: start;
+        gap: .9rem;
+    }
+
+    .campus-teacher-list { margin: 0; padding: 0; list-style: none; }
+    .campus-teacher-list > li {
+        display: grid;
+        align-items: center;
+        gap: .65rem;
+        padding: .8rem 0;
+        border-top: 1px solid var(--fp-line);
+    }
+    .campus-teacher-list > li:last-child { padding-bottom: .15rem; }
+    .campus-teacher-list .campus-btn { justify-self: start; }
+    .campus-teacher-roster-row .campus-h3 { margin: .15rem 0; }
+    .campus-teacher-row-meta {
+        display: grid;
+        gap: .4rem;
+        margin: 0;
+        dt { color: var(--fp-muted); font-size: .8125rem; }
+        dd { margin: 0; }
+    }
+
+    .campus-teacher-form {
+        display: grid;
+        justify-items: start;
+        gap: 1rem;
+        max-width: 48rem;
+
+        > div, fieldset { width: 100%; min-width: 0; }
+        legend { float: none; margin-bottom: .6rem; }
+        fieldset > p { margin-bottom: .8rem; }
+        label { font-weight: 650; }
+        label > .campus-muted { display: block; font-size: .875rem; font-weight: 500; }
+        .form-control, .form-select {
+            min-height: 44px;
+            color: var(--fp-navy);
+            background-color: var(--fp-paper);
+            border-color: #798681;
+        }
+    }
+
+    .campus-teacher-grade { max-width: 42rem; }
+
+    @media (min-width: 540px) {
+        .campus-teacher-list > .campus-teacher-attendance-row {
+            grid-template-columns: minmax(0, 1fr) minmax(10rem, 13rem);
+        }
+        .campus-teacher-list > .campus-teacher-session {
+            grid-template-columns: minmax(0, 1fr) auto;
+        }
+    }
+
+    @media (min-width: 1000px) {
+        .campus-teacher-cards { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+        .campus-teacher-offering { grid-template-columns: minmax(0, 2fr) minmax(0, 3fr); }
+        .campus-teacher-list > .campus-teacher-roster-row { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto; }
+    }
+}

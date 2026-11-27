@@ -94,3 +94,24 @@ class TestSso(IntegrationCase):
             'name': 'sso-incomplete', 'kind': 'sso', 'auth_method': 'none'})
         with self.assertRaises(ValidationError):
             endpoint.enabled = True
+
+    def test_student_sso_first_and_repeat_sign_in_keep_portal_type(self):
+        endpoint = self._sso()
+        adapter = self.env["formula.sso.adapter"]
+        claims = self._claims(groups=["idp-student"])
+        student = adapter.provision_user(endpoint, claims)
+        self.assertEqual(student, adapter.provision_user(endpoint, claims))
+        self.assertTrue(student.has_group("base.group_portal"))
+        self.assertFalse(student.has_group("base.group_user"))
+        self.assertFalse(student.has_group("university_isms.group_isms_reporter"))
+
+    def test_sso_rejects_conflicting_user_types(self):
+        endpoint = self._sso()
+        adapter = self.env["formula.sso.adapter"]
+        with self.assertRaises(AccessError):
+            adapter.provision_user(endpoint, self._claims(groups=["idp-student", "idp-analyst"]))
+        student = adapter.provision_user(endpoint, self._claims(groups=["idp-student"]))
+        with self.assertRaises(AccessError):
+            adapter.provision_user(endpoint, self._claims(groups=["idp-analyst"]))
+        self.assertTrue(student.has_group("base.group_portal"))
+        self.assertFalse(student.has_group("university_isms.group_isms_analyst"))

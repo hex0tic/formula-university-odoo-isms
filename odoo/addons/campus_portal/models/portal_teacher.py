@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # Part of Formula University ERP. See LICENSE file for full copyright and licensing details.
-"""Lecturer (teacher) portal service layer, called from the backend Owl client action.
+"""Lecturer portal service layer for the website and backend Owl client action.
 
 Every method runs in the caller's own environment (no sudo). Record rules already limit
 offerings, enrollments and grade requests to the lecturer's own teaching assignments; the
@@ -20,7 +20,7 @@ LECTURER_GROUP = "campus_university.group_campus_lecturer"
 
 class CampusPortalTeacher(models.AbstractModel):
     _name = "campus.portal.teacher"
-    _description = "Багшийн портал (backend client action-д зориулсан сервис)"
+    _description = "Багшийн портал"
 
     @api.model
     def _require_lecturer(self):
@@ -44,6 +44,13 @@ class CampusPortalTeacher(models.AbstractModel):
         if not session or session.offering_id.lecturer_id != self.env.user:
             raise AccessError(_("Энэ хичээлийн цагт ирц бүртгэх эрхгүй."))
         return session
+
+    def _own_enrollment(self, enrollment_id):
+        self._require_lecturer()
+        enrollment = self.env["campus.enrollment"].search([("id", "=", enrollment_id)], limit=1)
+        if not enrollment or enrollment.offering_id.lecturer_id != self.env.user:
+            raise AccessError(_("Зөвхөн өөрийн заадаг хичээлийн дүнд хүсэлт гаргана."))
+        return enrollment
 
     def _local_text(self, value):
         if not value:
@@ -108,31 +115,67 @@ class CampusPortalTeacher(models.AbstractModel):
         }
 
     # ------------------------------------------------------------ attendance
+    def _sessions(self, offering):
+        return self.env["campus.session"].search(
+            [("offering_id", "=", offering.id)], order="start, id", limit=MAX_ROWS)
+
+    def _session_summary(self, session):
+        return {
+            "id": session.id,
+            "start": self._local_text(session.start),
+            "end": self._local_text(session.end),
+            "room": session.room or "",
+            "kind": selection_label(session, "kind"),
+        }
+
+    def _attendance_rows(self, session, enrollments, statuses):
+        return [{
+            "enrollment_id": enrollment.id,
+            "student_code": enrollment.student_id.student_code,
+            "student_name": enrollment.student_id.name,
+            "status": statuses.get((session.id, enrollment.id), "present"),
+            "recorded": (session.id, enrollment.id) in statuses,
+        } for enrollment in enrollments]
+
+    def _attendance_statuses(self):
+        return [{"key": key, "label": ATTENDANCE_LABELS[key]} for key in ATTENDANCE_STATUSES]
+
+    def _attendance_enrollments(self, offering):
+        return offering.enrollment_ids.filtered(lambda e: e.reg_state == "enrolled").sorted(
+            lambda e: e.student_id.name or "")
+
+    def _session_list(self, offering_id):
+        offering = self._own_offering(offering_id)
+        return [self._session_summary(session) for session in self._sessions(offering)]
+
+    def _attendance_sheet(self, session_id):
+        session = self._own_session(session_id)
+        offering = session.offering_id
+        enrollments = self._attendance_enrollments(offering)
+        records = self.env["campus.attendance"].search([
+            ("session_id", "=", session.id), ("enrollment_id", "in", enrollments.ids),
+        ])
+        statuses = {(record.session_id.id, record.enrollment_id.id): record.status for record in records}
+        return {
+            "offering": {"id": offering.id, "name": offering.name},
+            "session": self._session_summary(session),
+            "rows": self._attendance_rows(session, enrollments, statuses),
+            "statuses": self._attendance_statuses(),
+        }
+
     @api.model
     def get_sessions(self, offering_id):
         offering = self._own_offering(offering_id)
-        sessions = self.env["campus.session"].search(
-            [("offering_id", "=", offering.id)], order="start", limit=MAX_ROWS)
+        sessions = self._sessions(offering)
         records = self.env["campus.attendance"].search(
             [("session_id", "in", sessions.ids)], limit=MAX_ROWS * 50)
-        status_by_pair = {(rec.session_id.id, rec.enrollment_id.id): rec.status for rec in records}
+        statuses = {(record.session_id.id, record.enrollment_id.id): record.status for record in records}
+        enrollments = self._attendance_enrollments(offering)
         return {
-            "sessions": [{
-                "id": session.id,
-                "start": self._local_text(session.start),
-                "end": self._local_text(session.end),
-                "room": session.room or "",
-                "kind": selection_label(session, "kind"),
-                "rows": [{
-                    "enrollment_id": enrollment.id,
-                    "student_code": enrollment.student_id.student_code,
-                    "student_name": enrollment.student_id.name,
-                    "status": status_by_pair.get((session.id, enrollment.id), "present"),
-                    "recorded": (session.id, enrollment.id) in status_by_pair,
-                } for enrollment in offering.enrollment_ids.filtered(lambda e: e.reg_state == "enrolled")
-                  .sorted(lambda e: e.student_id.name or "")],
-            } for session in sessions],
-            "statuses": [{"key": key, "label": ATTENDANCE_LABELS[key]} for key in ATTENDANCE_STATUSES],
+            "sessions": [dict(self._session_summary(session),
+                              rows=self._attendance_rows(session, enrollments, statuses))
+                         for session in sessions],
+            "statuses": self._attendance_statuses(),
         }
 
     @api.model
@@ -163,13 +206,21 @@ class CampusPortalTeacher(models.AbstractModel):
         return {"session_id": session.id, "saved": len(clean)}
 
     # ------------------------------------------------------------ grade entry
+    def _grade_request_details(self, enrollment_id):
+        enrollment = self._own_enrollment(enrollment_id)
+        return {
+            "id": enrollment.id,
+            "offering_id": enrollment.offering_id.id,
+            "offering": enrollment.offering_id.name,
+            "student": enrollment.student_id.name,
+            "student_code": enrollment.student_id.student_code,
+            "score": enrollment.score,
+        }
+
     @api.model
     def request_grade_change(self, enrollment_id, proposed_score, reason, evidence_ref=False):
         """Create and submit a grade-change request. The registrar approves; the score stays unchanged."""
-        self._require_lecturer()
-        enrollment = self.env["campus.enrollment"].search([("id", "=", enrollment_id)], limit=1)
-        if not enrollment or enrollment.offering_id.lecturer_id != self.env.user:
-            raise AccessError(_("Зөвхөн өөрийн заадаг хичээлийн дүнд хүсэлт гаргана."))
+        enrollment = self._own_enrollment(enrollment_id)
         try:
             score = float(proposed_score)
         except (TypeError, ValueError):

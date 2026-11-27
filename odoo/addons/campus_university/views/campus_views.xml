@@ -71,7 +71,7 @@
     </record>
     <record id="action_grade_change" model="ir.actions.act_window"><field name="name">Дүн өөрчлөх хүсэлт</field><field name="res_model">campus.grade.change</field><field name="view_mode">list,form,graph</field></record>
 
-    <menuitem id="menu_campus_root" name="Formula Campus" sequence="5" groups="group_campus_user"/>
+    <menuitem id="menu_campus_root" name="Formula Campus" sequence="5" groups="group_campus_lecturer,group_campus_registrar,group_campus_auditor,-group_campus_user"/>
     <menuitem id="menu_grade_change" name="Дүн өөрчлөх хүсэлт" parent="menu_campus_root" action="action_grade_change" sequence="10"/>
     <menuitem id="menu_enrollment" name="Хичээл ба дүн" parent="menu_campus_root" action="action_enrollment" sequence="20"/>
     <menuitem id="menu_student" name="Оюутны бүртгэл" parent="menu_campus_root" action="action_student" sequence="30"/>

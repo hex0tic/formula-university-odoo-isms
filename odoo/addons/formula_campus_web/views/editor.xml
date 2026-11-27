@@ -1,0 +1,27 @@
+<odoo>
+    <record id="action_program" model="ir.actions.act_window">
+        <field name="name">Нийтлэх хөтөлбөр</field><field name="res_model">formula.public.program</field><field name="view_mode">list,form</field>
+    </record>
+    <record id="view_program_list" model="ir.ui.view">
+        <field name="name">formula.public.program.list</field><field name="model">formula.public.program</field>
+        <field name="arch" type="xml"><list><field name="sequence" widget="handle"/><field name="name"/><field name="school"/><field name="published"/></list></field>
+    </record>
+    <record id="view_program_form" model="ir.ui.view">
+        <field name="name">formula.public.program.form</field><field name="model">formula.public.program</field>
+        <field name="arch" type="xml"><form><sheet><group><group><field name="name"/><field name="slug"/><field name="area"/><field name="school"/></group><group><field name="published"/><field name="academic_program_id"/><field name="degree"/><field name="duration"/></group></group><group><field name="summary"/><field name="curriculum"/><field name="outcome"/></group></sheet></form></field>
+    </record>
+    <record id="action_inquiry" model="ir.actions.act_window">
+        <field name="name">Элсэлтийн лавлагаа</field><field name="res_model">formula.campus.inquiry</field><field name="view_mode">list,form</field>
+    </record>
+    <record id="view_inquiry_list" model="ir.ui.view">
+        <field name="name">formula.campus.inquiry.list</field><field name="model">formula.campus.inquiry</field>
+        <field name="arch" type="xml"><list create="false" delete="false"><field name="create_date"/><field name="name"/><field name="program_id"/><field name="state" widget="badge"/></list></field>
+    </record>
+    <record id="view_inquiry_form" model="ir.ui.view">
+        <field name="name">formula.campus.inquiry.form</field><field name="model">formula.campus.inquiry</field>
+        <field name="arch" type="xml"><form create="false" delete="false"><header><field name="state" widget="statusbar" options="{'clickable': 1}"/></header><sheet><group><field name="name" readonly="1"/><field name="email" readonly="1"/><field name="program_id" readonly="1"/><field name="create_date" readonly="1"/><field name="message" readonly="1"/></group></sheet></form></field>
+    </record>
+    <menuitem id="menu_public" name="Кампусын веб" sequence="38" groups="base.group_system" action="action_program"/>
+    <menuitem id="menu_program" name="Хөтөлбөр" parent="menu_public" action="action_program"/>
+    <menuitem id="menu_inquiry" name="Элсэлтийн лавлагаа" parent="menu_public" action="action_inquiry"/>
+</odoo>

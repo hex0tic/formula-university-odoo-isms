@@ -1,0 +1,16 @@
+<odoo noupdate="1">
+    <record id="sequence_admission" model="ir.sequence">
+        <field name="name">Элсэх өргөдөл</field>
+        <field name="code">formula.campus.admission</field>
+        <field name="prefix">ADM-%(year)s-</field>
+        <field name="padding">5</field>
+        <field name="company_id" eval="False"/>
+    </record>
+    <record id="sequence_admitted_student" model="ir.sequence">
+        <field name="name">Элссэн оюутны код</field>
+        <field name="code">formula.campus.admitted_student</field>
+        <field name="prefix">FU-%(year)s-</field>
+        <field name="padding">6</field>
+        <field name="company_id" eval="False"/>
+    </record>
+</odoo>

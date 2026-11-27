@@ -6,7 +6,7 @@ from odoo import Command, _, api, fields, models, tools
 from odoo.exceptions import AccessError, UserError, ValidationError
 
 from .governance_common import (
-    ACTION_CONTEXT, NON_REVIEWABLE_GROUPS, SYSTEM_GROUP, is_manager, is_system,
+    NON_REVIEWABLE_GROUPS, SYSTEM_GROUP, has_privileged_groups, is_manager, is_system,
     effective_groups, new_sod_conflicts, privileged_groups, soft_groups, unlink_groups,
 )
 
@@ -20,7 +20,8 @@ SCOPE = [
 ]
 DECISION = [('pending', 'Хүлээгдэж буй'), ('keep', 'Баталсан (хадгална)'), ('revoke', 'Эрх хассан')]
 ESCALATION_SUMMARY = 'Эрхийн тойм хугацаандаа дуусаагүй (эскалац)'
-PROTECTED_LINE_FIELDS = {'decision', 'decided_at', 'decided_by_id', 'outcome', 'escalated', 'escalated_at'}
+LINE_AUDIT_FIELDS = {'decided_at', 'decided_by_id', 'outcome', 'escalated', 'escalated_at'}
+PROTECTED_LINE_FIELDS = LINE_AUDIT_FIELDS | {'decision'}
 REVIEWER_EDITABLE_FIELDS = {'revoke_group_ids', 'note'}
 MAX_ESCALATION_TARGETS = 5
 
@@ -79,22 +80,36 @@ class AccessRecertCampaign(models.Model):
                 raise ValidationError(_('"Сонгосон эрхийн бүлгүүд" хамрах хүрээнд бүлгүүдийг сонгоно уу.'))
 
     # ------------------------------------------------------------ lifecycle
+    @api.model_create_multi
+    def create(self, vals_list):
+        return super().create([dict(vals, state='draft') for vals in vals_list])
+
+    def write(self, vals):
+        if not self.env.su and 'state' in vals:
+            raise AccessError(_('Кампанит ажлын төлвийг зөвхөн эхлүүлэх, хаах үйлдлээр өөрчилнө (GOV-05).'))
+        return super().write(vals)
+
+    def _set_state(self, state):
+        return super().write({'state': state})
+
     def action_start(self):
+        self.check_access('write')
         for rec in self:
             if rec.state != 'draft':
                 raise UserError(_('Зөвхөн ноорог кампанитыг эхлүүлнэ.'))
-            rec.state = 'running'
+            rec._set_state('running')
             rec._generate_lines()
         return True
 
     def action_close(self):
+        self.check_access('write')
         for rec in self:
             if rec.state != 'running':
                 raise UserError(_('Зөвхөн явагдаж буй кампанитыг хаана.'))
             pending = rec.line_ids.filtered(lambda l: l.decision == 'pending')
             if pending:
                 raise UserError(_('Бүх мөрийг шийдвэрлэсний дараа хаана уу. Үлдсэн: %s', len(pending)))
-            rec.state = 'done'
+            rec._set_state('done')
         return True
 
     def _resolve_reviewer(self, user):
@@ -225,9 +240,8 @@ class AccessRecertLine(models.Model):
 
     @api.depends('group_ids')
     def _compute_is_privileged(self):
-        priv = privileged_groups(self.env)
         for line in self:
-            line.is_privileged = bool(line.group_ids & priv)
+            line.is_privileged = has_privileged_groups(line.group_ids)
 
     @api.constrains('revoke_group_ids', 'group_ids')
     def _check_revoke_subset(self):
@@ -236,8 +250,13 @@ class AccessRecertLine(models.Model):
                 raise ValidationError(_('Хасах бүлэг нь хамрагдсан бүлгүүдийн дотор байх ёстой.'))
 
     # ------------------------------------------------------------ guards
+    @api.model_create_multi
+    def create(self, vals_list):
+        initial_values = dict(dict.fromkeys(LINE_AUDIT_FIELDS, False), decision='pending')
+        return super().create([dict(vals, **initial_values) for vals in vals_list])
+
     def write(self, vals):
-        if not self.env.su and not self.env.context.get(ACTION_CONTEXT):
+        if not self.env.su:
             if set(vals) & PROTECTED_LINE_FIELDS:
                 raise AccessError(_('Шийдвэрийг зөвхөн "Баталгаажуулах" / "Хасах" үйлдлээр гаргана (GOV-05).'))
             if not is_manager(self.env.user):
@@ -249,6 +268,7 @@ class AccessRecertLine(models.Model):
 
     def _check_can_decide(self):
         self.ensure_one()
+        self.check_access('write')
         actor = self.env.user
         if self.user_id == actor:
             raise AccessError(_('Өөрийн эрхийг өөрөө баталгаажуулахгүй (GOV-05).'))
@@ -261,7 +281,7 @@ class AccessRecertLine(models.Model):
 
     def _record_decision(self, decision, outcome):
         actor = self.env.user
-        self.sudo().with_context(**{ACTION_CONTEXT: True}).write({
+        super().write({
             'decision': decision,
             'decided_at': fields.Datetime.now(),
             'decided_by_id': actor.id,
@@ -283,7 +303,7 @@ class AccessRecertLine(models.Model):
             groups = line.revoke_group_ids
             if not groups:
                 raise UserError(_('Хасах бүлгээ сонгоно уу.'))
-            if groups & privileged_groups(self.env) and not is_system(actor):
+            if has_privileged_groups(groups) and not is_system(actor):
                 raise AccessError(_('Давуу эрхийн бүлгийг (%s) зөвхөн системийн администратор хасна (A.8.2).',
                                     ', '.join(groups.mapped('name'))))
             target = line.user_id.sudo()
@@ -338,7 +358,7 @@ class AccessRecertLine(models.Model):
             line.activity_schedule('mail.mail_activity_data_todo', date_deadline=today,
                                    summary=ESCALATION_SUMMARY, user_id=user.id)
         now = fields.Datetime.now()
-        line.with_context(**{ACTION_CONTEXT: True}).write({'escalated': True, 'escalated_at': now})
+        line.write({'escalated': True, 'escalated_at': now})
         line.message_post(body=_('Хугацаа хэтэрсэн: эрхийн тойм %s хийгдээгүй.', line.user_id.name))
         if 'isms.finding' in self.env:
             self.env['isms.finding'].sudo()._upsert_from_source(

@@ -98,3 +98,86 @@
         }
     }
 }
+
+// University workspace layer; preserve the native Odoo control panel and dialogs.
+.o_campus_teacher .ctp {
+    min-height: 100%;
+    background: var(--fds-bg, #f7f5ee);
+    padding-block: 1.25rem 3rem;
+
+    .ctp-wrap { max-width: 82rem; margin-inline: auto; }
+    .ctp-masthead, .ctp-section-head {
+        display: flex; align-items: center; justify-content: space-between;
+        flex-wrap: wrap; gap: .75rem; padding-bottom: .65rem;
+    }
+    .ctp-masthead { border-bottom: 1px solid var(--ctp-border); }
+    .ctp-masthead .fp-kicker, .ctp-card .fp-kicker, .ctp-roster .fp-kicker { color: var(--ctp-link); }
+    .ctp-masthead .fp-brand { color: var(--ctp-text); }
+    .ctp-tab.is-active, .ctp-btn--primary { color: var(--fds-on-primary, #fff); }
+    .ctp-tab.is-active:hover, .ctp-btn--primary:hover { color: var(--fds-on-primary, #fff); }
+    .ctp-card__top { display: flex; justify-content: space-between; align-items: center; gap: .5rem; }
+    .ctp-capacity { margin-bottom: .7rem; }
+    .ctp-capacity p { margin: 0; }
+    .ctp-capacity meter { display: block; width: 100%; height: .75rem; }
+    .ctp-hero { padding: 2rem; margin: .7rem 0 1rem; }
+    .ctp-hero .ctp-title { color: #fff; font-size: 2.65rem; font-weight: 750; letter-spacing: -.035em; }
+    .ctp-hero__name { color: #dce8e8; margin: .55rem 0 0; }
+    .ctp-stats {
+        display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1px;
+        margin: 0 0 1.25rem; border-radius: 13px; overflow: hidden;
+        border: 1px solid var(--ctp-border); background: var(--ctp-border);
+        > div { padding: .8rem 1rem; background: var(--ctp-surface); }
+        dt { color: var(--ctp-muted); font-weight: 600; }
+        dd { margin: .15rem 0 0; font-size: 1.8rem; font-weight: 760; line-height: 1.1; }
+    }
+    .ctp-panel { animation: ctp-enter 220ms ease-out both; }
+    .ctp-card { padding: 1.2rem; transition: border-color 180ms ease, transform 180ms ease, box-shadow 180ms ease; }
+    .ctp-cards .ctp-card:hover { border-color: var(--ctp-focus); transform: translateY(-2px); }
+    .ctp-card > .ctp-btn { align-self: flex-start; margin-top: auto; }
+    .ctp-badge { color: var(--ctp-link); background: var(--fds-primary-soft, #ddefe6); padding: .28rem .67rem; border-radius: 7px; font-weight: 680; }
+    .ctp-roster { list-style: none; margin: 0; padding: 0; }
+    .ctp-roster__item { padding: 1rem; border-bottom: 1px solid var(--ctp-border); }
+    .ctp-roster__item:last-child { border-bottom: 0; }
+    .ctp-roster__summary {
+        display: grid; grid-template-columns: minmax(9rem, 1fr) minmax(16rem, 2fr) auto;
+        gap: .85rem; align-items: center;
+        .ctp-dl { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+        .ctp-h3 { margin: .15rem 0 0; }
+    }
+    .ctp-detail {
+        padding: 1rem; margin: 1rem 0; border: 1px solid var(--ctp-border);
+        background: var(--ctp-surface); border-radius: 14px; min-width: 0;
+        .ctp-h2 { margin: 0; }
+    }
+    .ctp-detail-head { margin: 1rem 0; }
+    .ctp-roster .ctp-form { margin-top: .8rem; padding: 1rem; background: var(--ctp-bg); border-radius: 9px; }
+    .ctp-sessions { display: grid; gap: 1rem; }
+    .ctp-table-wrap { overflow-x: auto; }
+    .ctp-btn, .ctp-tab {
+        border-radius: 10px; font-weight: 690;
+        transition: background 180ms ease, color 180ms ease, transform 160ms ease;
+        &:not(:disabled):active { transform: translateY(1px); }
+    }
+    @media (max-width: 960px) {
+        .ctp-roster__summary { grid-template-columns: 1fr; }
+        .ctp-hero .ctp-title { font-size: 2rem; }
+    }
+    @media (max-width: 600px) {
+        .ctp-stats { grid-template-columns: 1fr; }
+        .ctp-roster__summary .ctp-dl { grid-template-columns: 1fr; }
+        .ctp-hero { padding: 1.1rem; }
+    }
+}
+
+@keyframes ctp-enter {
+    from { opacity: .5; transform: translateY(5px); }
+    to { opacity: 1; transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .o_campus_teacher .ctp .ctp-panel,
+    .o_campus_teacher .ctp .ctp-btn,
+    .o_campus_teacher .ctp .ctp-tab,
+    .o_campus_teacher .ctp .ctp-card { animation: none; transition: none; }
+    .o_campus_teacher .ctp .ctp-cards .ctp-card:hover { transform: none; }
+}

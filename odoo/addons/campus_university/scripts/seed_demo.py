@@ -35,7 +35,7 @@ def seed(env, credentials):
         users[role] = upsert("res.users", "campus_demo_" + role, {
             "name": label, "login": account["login"], "password": account["password"],
             "email": account["login"], "lang": "mn_MN", "tz": "Asia/Ulaanbaatar",
-            "notification_type": "inbox",
+            "notification_type": "email" if group_role == "student" else "inbox",
             "groups_id": [Command.set([env.ref("campus_university.group_campus_" + group_role).id])],
         })
     program = upsert("campus.program", "case_program_sec", {

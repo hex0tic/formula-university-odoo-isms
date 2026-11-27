@@ -21,10 +21,13 @@ class CampusPortalStudent(CustomerPortal):
     """
 
     # ------------------------------------------------------------ home tile
-    def _prepare_home_portal_values(self, counters):
-        values = super()._prepare_home_portal_values(counters)
-        values["campus_has_student"] = bool(request.env[SERVICE]._own_student())
-        return values
+    @http.route()
+    def home(self, **kw):
+        response = super().home(**kw)
+        if response.is_qweb:
+            # /my/counters must only return keys with a counter element.
+            response.qcontext["campus_has_student"] = bool(request.env[SERVICE]._own_student())
+        return response
 
     # ------------------------------------------------------------ rendering helpers
     def _campus_render(self, template, page, **values):
