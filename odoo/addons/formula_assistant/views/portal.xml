@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="form_on_portal" inherit_id="portal.portal_layout" name="Form on signed-in portals">
+        <xpath expr="//t[@t-call='portal.frontend_layout']" position="inside">
+            <owl-component t-if="request.session.uid and not request.env.user._is_public()"
+                           name="formula_assistant.Form"/>
+        </xpath>
+    </template>
+</odoo>

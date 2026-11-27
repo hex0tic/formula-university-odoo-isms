@@ -4,6 +4,11 @@ Design tokens, surgical backend restyling and a light/dark theme toggle for
 Odoo 18 Community. Depends only on `web`. No external JS or CSS frameworks and
 no web fonts loaded from external hosts.
 
+The login page uses the supplied campus illustration while keeping Odoo's
+sign-in and recovery forms. The cream illustration is used only in the light
+ERP workspace. Command Center has a separate banner for both themes. The
+illustrations are decorative and stored as local WebP assets.
+
 ## Theme toggle
 
 - A moon/sun button sits in the systray (top navbar, next to the chat/activity icons).
