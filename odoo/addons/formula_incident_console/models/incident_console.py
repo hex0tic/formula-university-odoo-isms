@@ -27,14 +27,13 @@ EDITABLE_NOTE_FIELDS = ('containment', 'root_cause', 'resolution', 'lessons_lear
 OPEN_STATES = ('incident', 'report', 'investigate')
 CLOSED_STATES = ('resolve', 'close')
 STATE_LABELS = {
-    'incident': 'Incident (илэрсэн)',
-    'report': 'Report (бүртгэсэн)',
-    'investigate': 'Investigate (шалгаж буй)',
-    'resolve': 'Resolve (шийдвэрлэсэн)',
-    'close': 'Close (хаасан)',
+    'incident': 'Илэрсэн',
+    'report': 'Бүртгэсэн',
+    'investigate': 'Шалгаж буй',
+    'resolve': 'Шийдвэрлэсэн',
+    'close': 'Хаасан',
 }
 SEVERITY_LABELS = {'low': 'Бага', 'medium': 'Дунд', 'high': 'Өндөр', 'critical': 'Ноцтой'}
-SEVERITY_RANK = {'critical': 0, 'high': 1, 'medium': 2, 'low': 3}
 LIST_LIMIT = 200
 TIMELINE_LIMIT = 40
 AUDIT_LIMIT = 30
@@ -42,13 +41,13 @@ AUDIT_LIMIT = 30
 # Үе шилжилтийн жагсаалт. ``group`` нь моделийн _require_group-тэй адил; ``role`` нь хэрэглэгчид
 # харуулах тайлбар. Бүх шалгалтыг моделийн метод өөрөө дахин хийнэ.
 TRANSITIONS = (
-    {'action': 'action_report', 'label': 'Бүртгэх (Report)', 'sources': ('incident',),
+    {'action': 'action_report', 'label': 'Бүртгэх', 'sources': ('incident',),
      'target': 'report', 'group': None, 'role': None},
-    {'action': 'action_investigate', 'label': 'Шалгаж эхлэх (Investigate)', 'sources': ('report',),
+    {'action': 'action_investigate', 'label': 'Шалгаж эхлэх', 'sources': ('report',),
      'target': 'investigate', 'group': ANALYST_GROUP, 'role': 'МАБ шинжээч'},
-    {'action': 'action_resolve', 'label': 'Шийдвэрлэсэн (Resolve)', 'sources': ('investigate',),
+    {'action': 'action_resolve', 'label': 'Шийдвэрлэснээр тэмдэглэх', 'sources': ('investigate',),
      'target': 'resolve', 'group': ANALYST_GROUP, 'role': 'МАБ шинжээч'},
-    {'action': 'action_close', 'label': 'Хаах (Close)', 'sources': ('resolve',),
+    {'action': 'action_close', 'label': 'Зөрчил хаах', 'sources': ('resolve',),
      'target': 'close', 'group': MANAGER_GROUP, 'role': 'МАБ менежер (CISO)'},
     {'action': 'action_reopen', 'label': 'Дахин нээх', 'sources': ('resolve', 'close'),
      'target': 'investigate', 'group': MANAGER_GROUP, 'role': 'МАБ менежер (CISO)'},
@@ -66,14 +65,24 @@ class FormulaIncidentConsole(models.AbstractModel):
         """Хэрэглэгчид харагдах инцидентүүд, SLA-гийн яаралтай байдлаар эрэмбэлсэн."""
         Incident = self.env['isms.incident']
         Incident.check_access('read')
-        domain = self._build_domain(filters)
         now = fields.Datetime.now()
-        records = Incident.search(domain, limit=LIST_LIMIT, order='sla_deadline asc, id desc')
+        domain = self._build_domain(filters, now)
+        active = [('state', 'in', OPEN_STATES)]
+        overdue = [('sla_deadline', '<', now)]
+        unassigned = [('assignee_id', '=', False)]
+        records = Incident.search(domain + active, limit=LIST_LIMIT, order='sla_deadline asc, id desc')
+        if len(records) < LIST_LIMIT:
+            records |= Incident.search(domain + [('state', 'in', CLOSED_STATES)],
+                                       limit=LIST_LIMIT - len(records), order='detected_at desc, id desc')
         total = Incident.search_count(domain)
-        rows = [self._row(rec, now) for rec in records]
-        rows.sort(key=self._urgency_key)
         return {
-            'rows': rows,
+            'rows': [self._row(rec, now) for rec in records],
+            'summary': {
+                'all': Incident.search_count([]) if domain else total,
+                'open': Incident.search_count(active),
+                'overdue': Incident.search_count(active + overdue),
+                'unassigned': Incident.search_count(active + unassigned),
+            },
             'total': total,
             'limit': LIST_LIMIT,
             'truncated': total > LIST_LIMIT,
@@ -153,15 +162,19 @@ class FormulaIncidentConsole(models.AbstractModel):
         severities = set(SEVERITY_LABELS)
         state = filters.get('state') or ''
         severity = filters.get('severity') or ''
+        query = filters.get('query')
         return {
-            'state': state if state in states else '',
-            'severity': severity if severity in severities else '',
+            'state': state if isinstance(state, str) and state in states else '',
+            'severity': severity if isinstance(severity, str) and severity in severities else '',
             'overdue': bool(filters.get('overdue')),
             'mine': bool(filters.get('mine')),
+            'unassigned': filters.get('unassigned') is True,
+            'open': filters.get('open') is True,
+            'query': query.strip()[:100] if isinstance(query, str) else '',
         }
 
     @api.model
-    def _build_domain(self, filters):
+    def _build_domain(self, filters, now):
         clean = self._sanitize_filters(filters)
         domain = []
         if clean['state']:
@@ -169,9 +182,16 @@ class FormulaIncidentConsole(models.AbstractModel):
         if clean['severity']:
             domain.append(('severity', '=', clean['severity']))
         if clean['overdue']:
-            domain += [('sla_deadline', '<', fields.Datetime.now()), ('state', 'not in', CLOSED_STATES)]
+            domain += [('sla_deadline', '<', now)]
+        if clean['unassigned']:
+            domain += [('assignee_id', '=', False)]
+        if clean['open'] or clean['overdue'] or clean['unassigned']:
+            domain += [('state', 'in', OPEN_STATES)]
         if clean['mine']:
             domain += ['|', ('assignee_id', '=', self.env.uid), ('reporter_id', '=', self.env.uid)]
+        if clean['query']:
+            query = clean['query'].replace('\\', '\\\\').replace('%', '\\%').replace('_', '\\_')
+            domain += ['|', ('code', 'ilike', query), ('name', 'ilike', query)]
         return domain
 
     # ------------------------------------------------------------------ row helpers
@@ -200,17 +220,6 @@ class FormulaIncidentConsole(models.AbstractModel):
             'reporter': self._user(rec.reporter_id),
             'is_open': is_open,
         }
-
-    @api.model
-    def _urgency_key(self, row):
-        """Нээлттэйг эхэнд, дараа нь SLA-ийн үлдсэн хугацаа богинохоор, дараа нь ноцтой байдлаар."""
-        remaining = row['sla_remaining_seconds']
-        return (
-            0 if row['is_open'] else 1,
-            remaining if remaining is not None else 10 ** 9,
-            SEVERITY_RANK.get(row['severity'], 9),
-            row['id'],
-        )
 
     @api.model
     def _dt(self, value):

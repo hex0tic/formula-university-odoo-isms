@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_formula_program_admin,formula program editor,model_formula_public_program,base.group_system,1,1,1,1
+access_formula_inquiry_admin,formula inquiry desk,model_formula_campus_inquiry,base.group_system,1,1,0,0
+access_formula_program_registrar,formula published program registrar,model_formula_public_program,campus_university.group_campus_registrar,1,0,0,0
+access_formula_admission_registrar,formula admission registrar,model_formula_campus_admission,campus_university.group_campus_registrar,1,1,0,0

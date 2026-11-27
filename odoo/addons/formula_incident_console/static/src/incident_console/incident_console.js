@@ -4,7 +4,7 @@
 // методуудаас ирнэ (хэрэглэгчийн ORM эрхээр). Шилжилтийг isms.incident-ийн action_* методууд
 // гүйцэтгэнэ; клиентийн шалгалт нь зөвхөн UX-ийн мэдээлэл юм.
 
-import { Component, onWillStart, onWillUnmount, onMounted, useRef, useState } from "@odoo/owl";
+import { Component, onWillStart, onWillUnmount, onMounted, useEffect, useRef, useState } from "@odoo/owl";
 import { deserializeDateTime, formatDateTime } from "@web/core/l10n/dates";
 import { _t } from "@web/core/l10n/translation";
 import { registry } from "@web/core/registry";
@@ -18,14 +18,20 @@ const INCIDENT_MODEL = "isms.incident";
 const TICK_MS = 60 * 1000;
 const NOTE_FIELDS = ["containment", "root_cause", "resolution", "lessons_learned", "notification_note"];
 const ACCESS_ERROR = "odoo.exceptions.AccessError";
-const EMPTY_FILTERS = { state: "", severity: "", overdue: false, mine: false };
+const EMPTY_FILTERS = { state: "", severity: "", overdue: false, mine: false, open: false, unassigned: false, query: "" };
+const QUEUES = [
+    { key: "all", label: _t("Бүх зөрчил"), icon: "list-ul" },
+    { key: "open", label: _t("Шийдвэрлэж буй"), icon: "folder-open-o" },
+    { key: "overdue", label: _t("Хугацаа хэтэрсэн"), icon: "clock-o" },
+    { key: "unassigned", label: _t("Хариуцагчгүй"), icon: "user-o" },
+];
 
 const STATE_OPTIONS = [
-    { key: "incident", label: _t("Incident (илэрсэн)") },
-    { key: "report", label: _t("Report (бүртгэсэн)") },
-    { key: "investigate", label: _t("Investigate (шалгаж буй)") },
-    { key: "resolve", label: _t("Resolve (шийдвэрлэсэн)") },
-    { key: "close", label: _t("Close (хаасан)") },
+    { key: "incident", label: _t("Илэрсэн") },
+    { key: "report", label: _t("Бүртгэсэн") },
+    { key: "investigate", label: _t("Шалгаж буй") },
+    { key: "resolve", label: _t("Шийдвэрлэсэн") },
+    { key: "close", label: _t("Хаасан") },
 ];
 const SEVERITY_OPTIONS = [
     { key: "critical", label: _t("Ноцтой") },
@@ -72,6 +78,8 @@ export class FormulaIncidentConsole extends Component {
         this.stateOptions = STATE_OPTIONS;
         this.severityOptions = SEVERITY_OPTIONS;
         this.drawerTitle = useRef("drawerTitle");
+        this.drawerClose = useRef("drawerClose");
+        this.listTitle = useRef("listTitle");
         this.state = useState({
             loading: true,
             error: false,
@@ -80,6 +88,8 @@ export class FormulaIncidentConsole extends Component {
             total: 0,
             truncated: false,
             filters: { ...EMPTY_FILTERS },
+            search: "",
+            summary: null,
             loadedAt: Date.now(),
             now: Date.now(),
             selectedId: null,
@@ -91,9 +101,26 @@ export class FormulaIncidentConsole extends Component {
             notes: {},
         });
         this.requestSeq = 0;
+        this.detailSeq = 0;
         this.timer = null;
+        useEffect(
+            (selectedId, loading, detail) => {
+                if (selectedId === null || this.focusIncident !== selectedId) {
+                    return;
+                }
+                if (loading) {
+                    this.drawerClose.el?.focus();
+                    return;
+                }
+                this.focusIncident = null;
+                if (detail) {
+                    this.drawerTitle.el?.focus();
+                }
+            },
+            () => [this.state.selectedId, this.state.detailLoading, Boolean(this.state.detail)]
+        );
         useSetupAction({});
-        onWillStart(() => this.loadList());
+        onWillStart(() => { this.loadList(); });
         // Нэг л interval: SLA-ийн тоолуурыг минут тутам шинэчилнэ. Unmount дээр цэвэрлэнэ.
         onMounted(() => {
             this.timer = setInterval(() => {
@@ -121,6 +148,7 @@ export class FormulaIncidentConsole extends Component {
             }
             this.state.rows = data.rows;
             this.state.total = data.total;
+            this.state.summary = data.summary;
             this.state.truncated = data.truncated;
             this.state.loadedAt = Date.now();
             this.state.now = this.state.loadedAt;
@@ -141,7 +169,14 @@ export class FormulaIncidentConsole extends Component {
         }
     }
 
-    async openIncident(incidentId) {
+    async openIncident(incidentId, trigger) {
+        if (this.isBusy) {
+            return;
+        }
+        if (trigger) {
+            this.returnFocus = trigger;
+        }
+        this.focusIncident = incidentId;
         this.state.selectedId = incidentId;
         this.state.detail = null;
         this.state.detailError = "";
@@ -150,35 +185,28 @@ export class FormulaIncidentConsole extends Component {
     }
 
     async fetchDetail(incidentId) {
+        const seq = ++this.detailSeq;
         try {
             const detail = await this.orm.call(CONSOLE_MODEL, "get_incident_detail", [incidentId]);
-            if (this.state.selectedId !== incidentId) {
+            if (seq !== this.detailSeq || this.state.selectedId !== incidentId) {
                 return null;
             }
+            detail.row.loadedAt = Date.now();
             this.state.detail = detail;
             this.syncNotes(detail);
             this.state.detailError = "";
-            this.focusDrawer();
             return detail;
         } catch (error) {
-            if (this.state.selectedId === incidentId) {
+            if (seq === this.detailSeq && this.state.selectedId === incidentId) {
                 console.error("Incident Console: дэлгэрэнгүй ачаалж чадсангүй", error);
                 this.state.detailError = isAccessError(error) ? "denied" : "error";
             }
             return null;
         } finally {
-            if (this.state.selectedId === incidentId) {
+            if (seq === this.detailSeq && this.state.selectedId === incidentId) {
                 this.state.detailLoading = false;
             }
         }
-    }
-
-    focusDrawer() {
-        setTimeout(() => {
-            if (this.drawerTitle.el) {
-                this.drawerTitle.el.focus();
-            }
-        }, 0);
     }
 
     syncNotes(detail) {
@@ -191,14 +219,25 @@ export class FormulaIncidentConsole extends Component {
     }
 
     closeDetail() {
+        if (this.isBusy) {
+            return;
+        }
+        this.detailSeq++;
+        this.focusIncident = null;
         this.state.selectedId = null;
         this.state.detail = null;
         this.state.detailError = "";
         this.state.detailLoading = false;
+        const trigger = this.returnFocus;
+        this.returnFocus = null;
+        requestAnimationFrame(() => {
+            (trigger?.isConnected ? trigger : this.listTitle.el)?.focus();
+        });
     }
 
     onRootKeydown(ev) {
-        if (ev.key === "Escape" && this.state.selectedId !== null && !this.state.pendingAction) {
+        if (ev.key === "Escape" && this.state.selectedId !== null && !this.isBusy) {
+            ev.preventDefault();
             this.closeDetail();
         }
     }
@@ -206,50 +245,60 @@ export class FormulaIncidentConsole extends Component {
     // ------------------------------------------------------------ filters
     onFilterChange(key, value) {
         this.state.filters[key] = value;
+        if (key === "state" && value) {
+            Object.assign(this.state.filters, { open: false, overdue: false, unassigned: false });
+        }
         this.loadList();
     }
 
     get hasActiveFilters() {
         const f = this.state.filters;
-        return Boolean(f.state || f.severity || f.overdue || f.mine);
+        return Object.values(f).some(Boolean) || Boolean(this.state.search);
     }
 
     clearFilters() {
         this.state.filters = { ...EMPTY_FILTERS };
+        this.state.search = "";
         this.loadList();
     }
 
-    // ------------------------------------------------------------ SLA countdown
-    elapsedSeconds() {
-        return (this.state.now - this.state.loadedAt) / 1000;
+    get queues() {
+        return QUEUES.map((queue) => ({ ...queue, count: this.state.summary?.[queue.key] }));
     }
 
+    get currentQueue() {
+        const { overdue, unassigned, open } = this.state.filters;
+        return overdue ? "overdue" : unassigned ? "unassigned" : open ? "open" : "all";
+    }
+
+    selectQueue(key) {
+        Object.assign(this.state.filters, { state: "", overdue: key === "overdue", unassigned: key === "unassigned", open: key === "open" });
+        this.loadList();
+    }
+
+    applySearch(ev) {
+        ev.preventDefault();
+        if (this.state.loading) {
+            return;
+        }
+        this.state.filters.query = this.state.search.trim();
+        this.state.search = this.state.filters.query;
+        this.loadList();
+    }
+
+    get stageSteps() {
+        const current = STATE_OPTIONS.findIndex((step) => step.key === this.state.detail?.row.state);
+        return STATE_OPTIONS.map((step, index) => ({
+            ...step, current: index === current, done: index < current, number: index + 1,
+        }));
+    }
+
+    // ------------------------------------------------------------ SLA countdown
     liveRemaining(row) {
         if (row.sla_remaining_seconds === null || row.sla_remaining_seconds === undefined) {
             return null;
         }
-        return row.sla_remaining_seconds - this.elapsedSeconds();
-    }
-
-    // Нээлттэйг эхэнд, SLA-ийн үлдсэн хугацаа богинохоор (хэтэрсэн нь хамгийн эхэнд). Хаагдсаныг доор.
-    get sortedRows() {
-        return this.state.rows
-            .map((row) => ({ ...row, live: this.liveRemaining(row) }))
-            .sort((a, b) => {
-                if (a.is_open !== b.is_open) {
-                    return a.is_open ? -1 : 1;
-                }
-                if (a.live === null && b.live === null) {
-                    return a.id - b.id;
-                }
-                if (a.live === null) {
-                    return 1;
-                }
-                if (b.live === null) {
-                    return -1;
-                }
-                return a.live - b.live || a.id - b.id;
-            });
+        return row.sla_remaining_seconds - Math.max(0, this.state.now - (row.loadedAt || this.state.loadedAt)) / 1000;
     }
 
     slaLabel(row) {
@@ -295,31 +344,33 @@ export class FormulaIncidentConsole extends Component {
 
     async runTransition(action) {
         const detail = this.state.detail;
-        if (!detail || this.state.pendingAction) {
+        if (!detail || this.isBusy) {
             return;
         }
         const incidentId = detail.row.id;
         const fromState = detail.row.state;
         this.state.pendingAction = action;
         try {
-            await this.orm.call(INCIDENT_MODEL, action, [[incidentId]]);
-        } catch (error) {
-            this.notification.add(
-                errorText(error, _t("Шилжилт амжилтгүй боллоо. Эрх болон шаардлагатай талбараа шалгана уу.")),
-                { type: "danger" }
-            );
+            try {
+                await this.orm.call(INCIDENT_MODEL, action, [[incidentId]]);
+            } catch (error) {
+                this.notification.add(
+                    errorText(error, _t("Шилжилт амжилтгүй боллоо. Эрх болон шаардлагатай талбараа шалгана уу.")),
+                    { type: "danger" }
+                );
+                await this.refreshAfterChange(incidentId);
+                return;
+            }
+            const refreshed = await this.refreshAfterChange(incidentId);
+            if (refreshed && refreshed.row.state !== fromState) {
+                this.notification.add(_t("Төлөв шинэчлэгдлээ: %s", refreshed.row.state_label), { type: "success" });
+            } else if (refreshed) {
+                this.notification.add(_t("Төлөв өөрчлөгдсөнгүй. Өөр хэрэглэгч аль хэдийн шилжүүлсэн байж магадгүй."), {
+                    type: "warning",
+                });
+            }
+        } finally {
             this.state.pendingAction = null;
-            await this.refreshAfterChange(incidentId);
-            return;
-        }
-        this.state.pendingAction = null;
-        const refreshed = await this.refreshAfterChange(incidentId);
-        if (refreshed && refreshed.row.state !== fromState) {
-            this.notification.add(_t("Төлөв шинэчлэгдлээ: %s", refreshed.row.state_label), { type: "success" });
-        } else if (refreshed) {
-            this.notification.add(_t("Төлөв өөрчлөгдсөнгүй. Өөр хэрэглэгч аль хэдийн шилжүүлсэн байж магадгүй."), {
-                type: "warning",
-            });
         }
     }
 
@@ -377,6 +428,7 @@ export class FormulaIncidentConsole extends Component {
         try {
             const updated = await this.orm.call(CONSOLE_MODEL, "save_investigation", [detail.row.id, values]);
             if (this.state.selectedId === detail.row.id) {
+                updated.row.loadedAt = Date.now();
                 this.state.detail = updated;
                 this.syncNotes(updated);
             }

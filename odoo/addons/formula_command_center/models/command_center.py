@@ -8,7 +8,8 @@
 * Drill-down: KPI бүр ``{model, domain, name}`` тодорхойлогчтой. Domain нь серверт баригдсан
   (whitelisted) утгуудаас бүрдэнэ; клиент талаас ирсэн domain хүлээн авахгүй.
 """
-from datetime import timedelta
+from datetime import datetime, time, timedelta, timezone
+from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 from odoo import _, api, fields, models
 
@@ -45,6 +46,7 @@ class FormulaCommandCenter(models.AbstractModel):
             'heatmap': self._section_heatmap(),
             'controls': self._section_controls(),
             'incidents': self._section_incidents(ctx),
+            'incident_trend': self._section_incident_trend(),
             'policies': self._section_policies(ctx),
             'treatment': self._section_treatment(ctx),
             'audit': self._section_audit(),
@@ -220,6 +222,46 @@ class FormulaCommandCenter(models.AbstractModel):
             'drill_overdue': _drill(model, overdue_domain, _('SLA хугацаа хэтэрсэн инцидент')),
             'drill_on_track': _drill(model, on_track_domain, _('SLA хугацаандаа буй инцидент')),
         }
+
+    @api.model
+    def _section_incident_trend(self):
+        """Eight local Monday-based weeks, independent of the incident list filter."""
+        model = 'isms.incident'
+        if not self._can_read(model):
+            return self._unavailable(model)
+        tz_name = self.env.context.get('tz') or self.env.user.tz or 'UTC'
+        try:
+            tz = ZoneInfo(tz_name)
+        except (ZoneInfoNotFoundError, ValueError):
+            tz = ZoneInfo('UTC')
+        now = fields.Datetime.now()
+        today = now.replace(tzinfo=timezone.utc).astimezone(tz).date()
+        current_monday = today - timedelta(days=today.weekday())
+        first = current_monday - timedelta(weeks=7)
+
+        def utc_start(day):
+            return datetime.combine(day, time.min, tz).astimezone(timezone.utc).replace(tzinfo=None)
+
+        def period(start, end):
+            return [('detected_at', '>=', fields.Datetime.to_string(start)),
+                    ('detected_at', '<', fields.Datetime.to_string(end))]
+
+        # Group a maximum of 56 local days in one query, using the current user's record rules.
+        end = now + timedelta(seconds=1)
+        rows = self.env[model].with_context(tz=tz.key)._read_group(
+            period(utc_start(first), end), groupby=['detected_at:day'], aggregates=['__count'])
+        counts = [0] * 8
+        for day, count in rows:
+            counts[(day.date() - first).days // 7] += count
+
+        weeks = []
+        for idx, count in enumerate(counts):
+            day = first + timedelta(weeks=idx)
+            selected_end = min(utc_start(day + timedelta(weeks=1)), end)
+            title = _('Илэрсэн зөрчил: %s–%s') % (day.isoformat(), min(today, day + timedelta(days=6)).isoformat())
+            weeks.append({'start': day.isoformat(), 'label': day.strftime('%d.%m'), 'count': count,
+                          'drill': _drill(model, period(utc_start(day), selected_end), title)})
+        return {'available': True, 'total': sum(counts), 'weeks': weeks}
 
     @api.model
     def _section_policies(self, ctx):

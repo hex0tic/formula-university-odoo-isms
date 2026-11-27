@@ -36,10 +36,16 @@ Ownership and CSRF
   capacity, prerequisites, credit limit and clashes. Do not call them through ``sudo()``:
   ``is_registrar()`` treats a sudo environment as a registrar.
 
-Lecturer portal (backend)
--------------------------
+Lecturer portal
+---------------
 
-Menu "Багшийн портал" (``group_campus_lecturer``) opens the client action
+The authenticated web portal at ``/campus/teacher`` lists assigned courses and notifications.
+Each course opens a roster and session list. Teachers can open a session to record
+attendance or an enrollment to submit a grade-change request. Both forms use CSRF
+protection and the existing teacher service in the current user's environment. The
+web portal offers account switching when the signed-in user lacks the lecturer role.
+
+The legacy backend menu "Багшийн портал" (``group_campus_lecturer``) opens the client action
 ``campus_portal_teacher`` (Owl component ``CampusTeacherPortal``). It calls the AbstractModel
 ``campus.portal.teacher`` with these methods:
 
@@ -56,10 +62,9 @@ approves through ``campus.grade.change.action_approve``.
 Limitations
 -----------
 
-* Portal-only accounts (no internal access) are not supported for campus data. The campus
-  groups imply ``base.group_user``, and the campus record rules grant students nothing else.
-  Those users see the "no student record" page. Supporting them requires new access rules
-  in the academic addons, which are outside this addon.
+* Student accounts use the Odoo Portal user type. The Campus Student group and academic
+  record rules grant access to their own profile, schedule, grades, and registration.
+  Lecturer accounts keep the Odoo academic workspace with access to assigned courses.
 * The lecturer Owl UI is checked by the asset compile test only. Browser checks at
   360/768/1440 px are NOT VERIFIED.
 
@@ -67,8 +72,8 @@ Tests
 -----
 
 Tags ``campus_portal``: HTTP tests for the student portal (ownership, 404 on foreign ids,
-CSRF, registration, window and capacity rules, drop window, transcript), service tests for
-the lecturer portal, and the asset compile test. Run with the project's test helper:
+CSRF, registration, window and capacity rules, drop window, transcript), lecturer web and
+service tests, and asset compilation tests. Run with the project's test helper:
 
 .. code-block:: bash
 

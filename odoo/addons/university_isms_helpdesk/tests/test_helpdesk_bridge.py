@@ -82,6 +82,18 @@ class TestIsmsHelpdeskBridge(TransactionCase):
         with self.assertRaises(AccessError):
             ticket.with_user(self.users["auditor"]).write({"name": "tamper"})
 
+    def test_portal_submitter_cannot_read_internal_helpdesk_ticket(self):
+        portal_user = self.env["res.users"].create({
+            "name": "Portal submitter", "login": "helpdesk.portal.submitter",
+            "groups_id": [Command.set(self.env.ref("base.group_portal").ids)],
+        })
+        incident = self.env["isms.incident"].sudo().create({
+            "name": "Incident through portal form", "reporter_id": portal_user.id, "reporter_type": "student",
+        })
+        ticket = incident.helpdesk_ticket_ids.with_user(portal_user)
+        with self.assertRaises(AccessError):
+            ticket.read(["name"])
+
     def test_cannot_detach_or_destroy_incident_ticket(self):
         incident = self._incident()
         ticket = incident.sudo().helpdesk_ticket_ids.with_user(self.users["manager"])

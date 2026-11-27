@@ -1,0 +1,20 @@
+<odoo noupdate="1">
+    <record id="program_cybersecurity" model="formula.public.program">
+        <field name="slug">cybersecurity</field><field name="area">technology</field><field name="name">Кибер аюулгүй байдал</field>
+        <field name="school">Технологи ба инженерчлэл</field><field name="summary">Дижитал системийг хамгаалж, эрсдэлийг бодитоор үнэлж сурна. Сүлжээ, мэдээллийн аюулгүй байдал, дижитал мөрдөн шинжилгээний суурийг дадлагатай хослуулна.</field>
+        <field name="curriculum">Сүлжээ, үйлдлийн системийн суурь. Дараагийн шатанд хамгаалалтын загварчлал, дижитал нотлох баримт, аудит ба эрсдэлийн үнэлгээ. Төгсөх жилдээ хамгаалалтын шийдэл зохиож, багийн төслөөр хамгаална.</field><field name="outcome">Аюулгүй байдлын шинжээч, системийн хамгаалалтын инженер, эрсдэлийн шинжээч.</field>
+        <field name="sequence">10</field><field name="published" eval="True"/>
+    </record>
+    <record id="program_business_analytics" model="formula.public.program">
+        <field name="slug">business-analytics</field><field name="area">business</field><field name="name">Бизнесийн өгөгдлийн шинжилгээ</field>
+        <field name="school">Бизнес ба удирдлага</field><field name="summary">Өгөгдлөөс утга олж, байгууллагын шийдвэрийг нотолгоонд тулгуурлан гаргахад суралцана.</field>
+        <field name="curriculum">Статистик, өгөгдлийн сан, санхүү ба үйл ажиллагааны шинжилгээ. Бодитой жишээн дээр самбар зохиож, шийдвэрийн хувилбаруудыг танилцуулна.</field><field name="outcome">Бизнесийн шинжээч, өгөгдлийн шинжээч, үйл ажиллагааны төлөвлөлтийн мэргэжилтэн.</field>
+        <field name="sequence">11</field><field name="published" eval="True"/>
+    </record>
+    <record id="program_digital_design" model="formula.public.program">
+        <field name="slug">digital-design</field><field name="area">design</field><field name="name">Дижитал бүтээгдэхүүний дизайн</field>
+        <field name="school">Дизайн ба бүтээлч технологи</field><field name="summary">Хүний хэрэгцээг судалж, хэрэглэхэд ойлгомжтой дижитал үйлчилгээ зохион бүтээнэ.</field>
+        <field name="curriculum">Дизайны суурь, хэрэглэгчийн судалгаа, прототип, хүртээмж ба хэрэглээний тест. Студийн төслөөр санаагаа туршиж, багцаа бэлтгэнэ.</field><field name="outcome">Бүтээгдэхүүний дизайнер, хэрэглэгчийн туршлагын судлаач, интерфэйсийн дизайнер.</field>
+        <field name="sequence">12</field><field name="published" eval="True"/>
+    </record>
+</odoo>

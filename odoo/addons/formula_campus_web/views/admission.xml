@@ -1,0 +1,106 @@
+<odoo>
+    <record id="view_admission_list" model="ir.ui.view">
+        <field name="name">formula.campus.admission.list</field>
+        <field name="model">formula.campus.admission</field>
+        <field name="arch" type="xml">
+            <list create="0" delete="0">
+                <field name="reference"/><field name="create_date"/><field name="name"/>
+                <field name="academic_program_id"/><field name="state" widget="badge"/><field name="checked_by_id"/>
+            </list>
+        </field>
+    </record>
+    <record id="view_admission_form" model="ir.ui.view">
+        <field name="name">formula.campus.admission.form</field>
+        <field name="model">formula.campus.admission</field>
+        <field name="arch" type="xml">
+            <form create="0" delete="0">
+                <header>
+                    <button type="object" name="action_start_review" string="Хянаж эхлэх" class="oe_highlight" invisible="state != 'submitted'"/>
+                    <button type="object" name="action_decide_accept" string="Элсэх эрх олгох" invisible="state != 'review'"
+                            class="oe_highlight" confirm="Өргөдлийг баталж, оюутны порталын бүртгэл үүсгэх үү?"/>
+                    <button type="object" name="action_decide_decline" string="Татгалзах" invisible="state != 'review'"/>
+                    <button type="object" name="action_invite_portal" string="Порталын урилга илгээх" invisible="state != 'accepted' or invited_at"/>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <h1><field name="reference"/></h1>
+                    <group><group><field name="name" readonly="1"/><field name="email" readonly="1"/><field name="program_id" readonly="1"/>
+                        <field name="academic_program_id" readonly="1"/></group><group><field name="checked_by_id"/><field name="decision_at"/>
+                        <field name="student_id"/><field name="invited_at"/></group></group>
+                    <group><field name="motivation" readonly="1"/><field name="review_note" readonly="state in ('accepted', 'declined')"/>
+                        <field name="decision_message" readonly="state in ('accepted', 'declined')"/></group>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+    <record id="action_admissions" model="ir.actions.act_window">
+        <field name="name">Элсэх өргөдөл</field>
+        <field name="res_model">formula.campus.admission</field>
+        <field name="view_mode">list,form</field>
+    </record>
+    <menuitem id="menu_admissions" name="Элсэх өргөдөл" parent="campus_university.menu_campus_root"
+              action="action_admissions" sequence="9" groups="campus_university.group_campus_registrar"/>
+
+    <template id="apply" name="Admissions application form">
+        <t t-call="formula_campus_web.layout">
+            <section class="fu-page-title"><div class="fu-wrap"><p class="fu-kicker">Элсэлт</p><h1>Элсэх өргөдөл</h1>
+                <p>Хөтөлбөрөө сонгож, суралцах зорилгоо товч бичээрэй.</p></div></section>
+            <section class="fu-wrap fu-section fu-detail-grid">
+                <div class="fu-prose"><h2>Өргөдөл хэрхэн шийдэгдэх вэ?</h2>
+                    <ol><li>Өргөдлөө илгээгээд дугаар болон шалгах кодоо хадгална.</li>
+                        <li>Сургалтын алба таны өргөдлийг хянана.</li>
+                        <li><a href="/university/admissions/status">Өргөдлийн төлөв</a> хэсгээс шийдвэрээ харна.</li></ol>
+                    <p>Сургалтын жишээ орчин тул иргэний үнэмлэх, банкны мэдээлэл оруулах шаардлагагүй.</p></div>
+                <form t-if="programs" class="fu-aside fu-inquiry" method="post" action="/university/admissions/apply">
+                    <h2>Өргөдлийн мэдээлэл</h2>
+                    <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                    <div class="fu-honeypot" inert="inert"><label>Website <input name="website" tabindex="-1" autocomplete="off"/></label></div>
+                    <p t-if="error" class="fu-form-error" role="alert" t-out="error"/>
+                    <label>Овог нэр<input name="name" required="required" minlength="2" maxlength="100" t-att-value="form.get('name')" autocomplete="name"/></label>
+                    <label>Цахим шуудан<input type="email" name="email" required="required" maxlength="160" t-att-value="form.get('email')" autocomplete="email"/></label>
+                    <label>Хөтөлбөр<select name="program" required="required"><option value="">Хөтөлбөрөө сонгоно уу</option>
+                        <option t-foreach="programs" t-as="item" t-att-value="item['slug']" t-att-selected="item['slug'] == form.get('program')" t-out="item['name']"/>
+                    </select></label>
+                    <label>Суралцах зорилго<textarea name="motivation" required="required" minlength="20" maxlength="1200" rows="5"><t t-out="form.get('motivation') or ''"/></textarea></label>
+                    <button class="fu-button fu-button--teal" type="submit">Өргөдөл илгээх</button>
+                </form>
+                <div t-else="" class="fu-aside"><h2>Өргөдөл түр авахгүй байна</h2><p>Нээлттэй хөтөлбөр зарлагдахад энд харагдана.</p></div>
+            </section>
+        </t>
+    </template>
+    <template id="application_receipt" name="Admissions application receipt">
+        <t t-call="formula_campus_web.layout">
+            <section class="fu-page-title"><div class="fu-wrap"><h1>Өргөдлийг хүлээн авлаа</h1>
+                <p>Дугаар, шалгах кодоо хадгалаарай. Энэ кодыг дахин харуулахгүй.</p></div></section>
+            <section class="fu-wrap fu-section">
+                <div class="fu-aside"><dl><dt>Өргөдлийн дугаар</dt><dd id="admission-reference" t-out="reference"/>
+                    <dt>Төлөв шалгах код</dt><dd id="admission-token"><code t-out="token"/></dd></dl>
+                    <a class="fu-button fu-button--teal" href="/university/admissions/status">Төлөв шалгах</a></div>
+            </section>
+        </t>
+    </template>
+    <template id="application_status" name="Admissions application status">
+        <t t-call="formula_campus_web.layout">
+            <section class="fu-page-title"><div class="fu-wrap"><p class="fu-kicker">Элсэлт</p><h1>Өргөдлийн төлөв</h1>
+                <p>Өргөдөл илгээхэд авсан дугаар, шалгах кодоо ашиглана уу.</p></div></section>
+            <section class="fu-wrap fu-section fu-detail-grid">
+                <div class="fu-prose">
+                    <div t-if="result" class="fu-aside" role="status">
+                        <p t-out="result['reference']"/><h2 t-out="result['state']"/>
+                        <p t-if="result['decision']" t-out="result['decision']"/>
+                        <p t-if="result['accepted']">Порталд анх нэвтрэх урилгыг сургалтын албанаас авна.</p>
+                    </div>
+                    <p t-else="">Таны өргөдөл шийдэгдмэгц сургалтын албаны шийдвэр энд харагдана.</p>
+                </div>
+                <form class="fu-aside fu-inquiry" method="post" action="/university/admissions/status">
+                    <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                    <p t-if="error" class="fu-form-error" role="alert" t-out="error"/>
+                    <label>Өргөдлийн дугаар<input name="reference" required="required" maxlength="25" autocomplete="off"/></label>
+                    <label>Шалгах код<input name="code" type="password" required="required" maxlength="32" autocomplete="off"/></label>
+                    <button class="fu-button fu-button--teal" type="submit">Шалгах</button>
+                </form>
+            </section>
+        </t>
+    </template>
+</odoo>

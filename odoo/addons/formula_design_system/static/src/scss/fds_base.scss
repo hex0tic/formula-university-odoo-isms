@@ -2,23 +2,32 @@
 // Scoped to body.o_web_client (Odoo sets this class on the backend body).
 
 .o_web_client {
+    background-color: var(--fds-bg);
+    color: var(--fds-text);
     font-family: var(--fds-font-family);
 
-    // Visible keyboard focus for every native focusable control we style.
-    // Mouse users do not see it because :focus-visible is keyboard-driven.
-    :focus-visible {
-        outline: 2px solid var(--fds-focus);
+    // Native button and input rules can otherwise reset the keyboard outline.
+    :focus-visible,
+    .btn-check:focus-visible + .btn {
+        outline: 2px solid var(--fds-focus) !important;
         outline-offset: 2px;
+    }
+
+    // Editable list cells can clip positive offsets.
+    .o_list_table .o_input:focus-visible,
+    .o_statusbar_status .o_arrow_button:focus-visible {
+        outline-offset: -3px;
     }
 }
 
-// Reduced motion: remove transitions and animations introduced by this addon.
-// !important is required here to override Odoo's own transition declarations on the
-// same elements; it is limited to the reduced-motion media query.
+// Keep the controls in place when the operating system requests reduced motion.
 @media (prefers-reduced-motion: reduce) {
     .o_web_client .o_main_navbar,
     .o_web_client .o_main_navbar *,
     .o_web_client .btn,
+    .o_web_client .form-control,
+    .o_web_client .form-select,
+    .o_web_client .o_input,
     .o_web_client .o_kanban_record,
     .o_web_client .o_notification,
     .o_web_client .o_dialog .modal-content {

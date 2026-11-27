@@ -15,16 +15,31 @@
         </xpath>
     </template>
 
+    <template id="teacher_account_required" name="Teacher account required">
+        <t t-call="portal.portal_layout">
+            <main class="o_campus_portal campus-portal formula-portal-theme" aria-labelledby="teacher-account-title">
+                <section class="campus-card">
+                    <p class="fp-kicker">Багшийн портал</p>
+                    <h1 id="teacher-account-title" class="campus-title">Багшийн бүртгэлээр нэвтрэх шаардлагатай</h1>
+                    <p class="campus-muted">Одоогийн бүртгэл багшийн эрхгүй байна. Хэрэв та багш бол өөрийн багшийн бүртгэлээр нэвтэрнэ үү.</p>
+                    <div class="campus-actions">
+                        <a class="campus-btn campus-btn--primary" href="/web/session/logout?redirect=/campus/teacher">Өөр бүртгэлээр нэвтрэх</a>
+                        <a class="campus-btn campus-btn--ghost" href="/my/campus">Оюутны портал</a>
+                    </div>
+                </section>
+            </main>
+        </t>
+    </template>
+
     <!-- Shared layout for every campus page -->
     <template id="campus_layout" name="Campus portal layout">
         <t t-call="portal.portal_layout">
-            <div class="o_campus_portal campus-portal">
-                <header class="campus-head">
-                    <h1 class="campus-title">Миний хичээл</h1>
-                    <p t-if="overview and overview.get('has_student')" class="campus-subtitle">
-                        <t t-esc="overview['student']['name']"/> · <t t-esc="overview['student']['code']"/>
-                    </p>
-                </header>
+            <div class="o_campus_portal campus-portal formula-portal-theme">
+                <a class="campus-skip campus-btn" href="#campus-content">Агуулга руу шилжих</a>
+                <div class="campus-masthead">
+                    <p class="fp-kicker">Оюутны портал</p>
+                    <a class="fp-brand" href="/university">Formula University <span aria-hidden="true">↗</span></a>
+                </div>
                 <nav class="campus-nav" aria-label="Оюутны портал цэс">
                     <ul class="campus-nav__list">
                         <li><a href="/my/campus" t-att-class="'campus-nav__link' + (' is-active' if campus_page == 'overview' else '')" t-att-aria-current="'page' if campus_page == 'overview' else None">Нүүр</a></li>
@@ -36,10 +51,16 @@
                         <li><a href="/my/campus/notifications" t-att-class="'campus-nav__link' + (' is-active' if campus_page == 'notifications' else '')" t-att-aria-current="'page' if campus_page == 'notifications' else None">Мэдэгдэл</a></li>
                     </ul>
                 </nav>
-                <div t-if="campus_flash" t-att-class="'campus-alert campus-alert--' + campus_flash['type']" role="status" aria-live="polite">
-                    <t t-esc="campus_flash['text']"/>
+                <div id="campus-content" class="campus-content" tabindex="-1">
+                    <header t-if="campus_page != 'overview'" class="campus-head">
+                        <h1 class="campus-title"><t t-out="campus_heading"/></h1>
+                        <p class="campus-subtitle"><t t-out="campus_intro"/></p>
+                    </header>
+                    <div t-if="campus_flash" t-att-class="'campus-alert campus-alert--' + campus_flash['type']" role="status" aria-live="polite">
+                        <t t-esc="campus_flash['text']"/>
+                    </div>
+                    <t t-out="0"/>
                 </div>
-                <t t-out="0"/>
             </div>
         </t>
     </template>
@@ -47,47 +68,116 @@
     <template id="campus_no_student" name="No campus student record">
         <section class="campus-card" aria-labelledby="campus-no-student-title">
             <h2 id="campus-no-student-title" class="campus-h2">Оюутны бүртгэл холбогдоогүй</h2>
-            <p class="campus-muted">Таны хэрэглэгчид оюутны бүртгэл холбогдоогүй байна. Сургалтын албанд хандана уу.</p>
+            <p class="campus-muted">Оюутны бүртгэлээрээ нэвтэрнэ үү. Хэрэв зөв бүртгэлээр нэвтэрсэн бол сургалтын албанд хандана уу.</p>
+            <div class="campus-actions">
+                <a class="campus-btn campus-btn--primary" href="/web/session/logout?redirect=/my/campus">Өөр бүртгэлээр нэвтрэх</a>
+                <a class="campus-btn campus-btn--ghost" href="/campus/teacher">Багшийн портал</a>
+            </div>
         </section>
     </template>
 
     <!-- Overview -->
     <template id="page_overview" name="Campus overview">
         <t t-call="campus_portal.campus_layout">
-            <t t-if="not overview.get('has_student')"><t t-call="campus_portal.campus_no_student"/></t>
+            <t t-if="not overview.get('has_student')">
+                <header class="campus-head"><h1 class="campus-title">Миний хичээл</h1></header>
+                <t t-call="campus_portal.campus_no_student"/>
+            </t>
             <t t-else="">
-                <section class="campus-grid campus-grid--stats" aria-label="Гол үзүүлэлт">
-                    <div class="campus-stat"><span class="campus-stat__label">Дундаж оноо (GPA)</span><span class="campus-stat__value"><t t-esc="overview['gpa']"/></span></div>
-                    <div class="campus-stat"><span class="campus-stat__label">Олгосон кредит</span><span class="campus-stat__value"><t t-esc="overview['credits_earned']"/></span></div>
-                    <div class="campus-stat"><span class="campus-stat__label">Үргэлжилж буй хичээл</span><span class="campus-stat__value"><t t-esc="overview['enrolled_count']"/></span></div>
-                    <div class="campus-stat"><span class="campus-stat__label">Судалж дууссан хичээл</span><span class="campus-stat__value"><t t-esc="overview['completed_count']"/></span></div>
-                </section>
-                <section class="campus-card" aria-labelledby="campus-grad-title">
-                    <h2 id="campus-grad-title" class="campus-h2">Төгсөлтийн нөхцөл</h2>
-                    <p t-if="overview['graduation_eligible']" class="campus-badge campus-badge--success">Төгсөх нөхцөл хангагдсан</p>
-                    <p t-else="" class="campus-badge campus-badge--warning">Төгсөх нөхцөл дутуу байна</p>
-                    <ul t-if="overview['graduation_missing']" class="campus-list">
-                        <li t-foreach="overview['graduation_missing']" t-as="line"><t t-esc="line"/></li>
-                    </ul>
-                </section>
-                <section class="campus-card" aria-labelledby="campus-transcript-title">
-                    <h2 id="campus-transcript-title" class="campus-h2">Транскрипт</h2>
-                    <p class="campus-muted">Транскриптын төлөв: <t t-if="overview['transcript_ready']">татах боломжтой</t><t t-else="">одоогоор дүн баталгаажээгүй байна</t></p>
-                    <a t-if="overview['transcript_ready']" class="campus-btn campus-btn--primary" href="/my/campus/transcript.pdf" download="download">PDF татах</a>
-                </section>
+                <t t-set="agenda" t-value="overview['agenda']"/>
+                <t t-set="student" t-value="overview['student']"/>
+                <header class="campus-hero fp-hero">
+                    <div class="fp-hero__content">
+                        <p class="fp-kicker">Миний хичээл <span aria-hidden="true">/</span> <time t-att-datetime="agenda['today']" t-esc="agenda['today']"/></p>
+                        <h1 class="campus-title">Сайн байна уу, <t t-esc="student['name']"/></h1>
+                        <p class="campus-profile">
+                            <span t-if="student['program']" t-esc="student['program']"/>
+                            <span t-if="student['code']" t-esc="student['code']"/>
+                            <span t-if="student['status']" t-esc="student['status']"/>
+                        </p>
+                        <a class="campus-btn campus-btn--mint" href="/my/campus/schedule">Хуваариа харах <span aria-hidden="true">→</span></a>
+                    </div>
+                </header>
+                <dl class="campus-stats" aria-label="Сурлагын үзүүлэлт">
+                    <div class="campus-stat"><dt>Дундаж оноо (GPA)</dt><dd t-esc="overview['gpa']"/></div>
+                    <div class="campus-stat"><dt>Цуглуулсан кредит</dt><dd t-esc="overview['credits_earned']"/></div>
+                    <div class="campus-stat"><dt>Судалж буй хичээл</dt><dd t-esc="overview['enrolled_count']"/></div>
+                    <div class="campus-stat"><dt>Дууссан хичээл</dt><dd t-esc="overview['completed_count']"/></div>
+                </dl>
+                <div class="campus-agenda">
+                    <section class="campus-card campus-today" aria-labelledby="campus-today-title">
+                        <div class="campus-section-head">
+                            <h2 id="campus-today-title" class="campus-h2">Өнөөдрийн хичээл</h2>
+                            <span class="campus-badge campus-badge--success"><t t-esc="agenda['today_count']"/> хичээл</span>
+                        </div>
+                        <p t-if="not agenda['today_sessions']" class="campus-muted">Өнөөдөр хуваарьт хичээл алга.</p>
+                        <ol t-else="" class="campus-agenda-list">
+                            <li t-foreach="agenda['today_sessions']" t-as="session">
+                                <t t-call="campus_portal.campus_session_row"/>
+                            </li>
+                        </ol>
+                        <a class="campus-text-link" href="/my/campus/schedule">Долоо хоногийн хуваарь <span aria-hidden="true">→</span></a>
+                    </section>
+                    <section class="campus-next" aria-labelledby="campus-next-title">
+                        <p class="fp-kicker" id="campus-next-title">Дараагийн хичээл</p>
+                        <t t-set="session" t-value="agenda['next_session']"/>
+                        <t t-if="session">
+                            <h2 class="campus-h2" t-esc="session['title']"/>
+                            <p class="campus-next__when">
+                                <time t-att-datetime="session['date']" t-esc="session['date']"/>
+                                <span><t t-esc="session['start']"/><t t-if="session['end']"> – <t t-esc="session['end']"/></t></span>
+                            </p>
+                            <p><t t-esc="session['kind']"/><t t-if="session['room']"> · <t t-esc="session['room']"/></t></p>
+                        </t>
+                        <p t-else="">Удахгүй эхлэх хуваарьт хичээл алга.</p>
+                    </section>
+                </div>
+                <ul class="campus-quick" aria-label="Сурлагын бусад мэдээлэл">
+                    <li><a href="/my/campus/grades"><strong>Хичээл ба дүн</strong><span>Кредит, дүн, үнэлгээ</span><span class="campus-quick__arrow" aria-hidden="true">→</span></a></li>
+                    <li><a href="/my/campus/attendance"><strong>Ирцийн мэдээлэл</strong><span>Хичээл тус бүрийн ирц</span><span class="campus-quick__arrow" aria-hidden="true">→</span></a></li>
+                    <li><a href="/my/campus/requests"><strong>Дүнгийн хүсэлт</strong><span>Хянуулж буй <t t-esc="overview['pending_count']"/> хүсэлт</span><span class="campus-quick__arrow" aria-hidden="true">→</span></a></li>
+                </ul>
+                <div class="campus-academic">
+                    <section class="campus-card" aria-labelledby="campus-grad-title">
+                        <h2 id="campus-grad-title" class="campus-h2">Төгсөлтийн нөхцөл</h2>
+                        <p t-if="overview['graduation_eligible']" class="campus-badge campus-badge--success">Төгсөх нөхцөл хангагдсан</p>
+                        <p t-else="" class="campus-badge campus-badge--warning">Төгсөх нөхцөл дутуу байна</p>
+                        <ul t-if="overview['graduation_missing']" class="campus-list">
+                            <li t-foreach="overview['graduation_missing']" t-as="line" t-esc="line"/>
+                        </ul>
+                    </section>
+                    <section class="campus-card" aria-labelledby="campus-transcript-title">
+                        <h2 id="campus-transcript-title" class="campus-h2">Транскрипт</h2>
+                        <a t-if="overview['transcript_ready']" class="campus-btn campus-btn--primary" href="/my/campus/transcript.pdf" download="download">PDF татах <span aria-hidden="true">↓</span></a>
+                        <p t-else="" class="campus-muted">Транскрипт татахын тулд дүн баталгаажсан байх шаардлагатай.</p>
+                    </section>
+                </div>
             </t>
         </t>
+    </template>
+
+    <template id="campus_session_row" name="Schedule session">
+        <div class="campus-session">
+            <p class="campus-session__time"><t t-esc="session['start']"/><t t-if="session['end']"> – <t t-esc="session['end']"/></t></p>
+            <div>
+                <strong t-esc="session['title']"/>
+                <p class="campus-muted"><t t-esc="session['course_code']"/> · <t t-esc="session['kind']"/><t t-if="session['room']"> · <t t-esc="session['room']"/></t></p>
+            </div>
+        </div>
     </template>
 
     <!-- Grades -->
     <template id="page_grades" name="Campus grades">
         <t t-call="campus_portal.campus_layout">
+            <t t-set="campus_heading">Хичээл ба дүн</t>
+            <t t-set="campus_intro">Судалж буй хичээл, кредит, баталгаажсан үнэлгээгээ харна уу.</t>
             <t t-if="not has_student"><t t-call="campus_portal.campus_no_student"/></t>
             <t t-else="">
                 <p t-if="not rows" class="campus-muted campus-empty">Бүртгэлтэй хичээл алга.</p>
                 <ul class="campus-cards" t-else="">
                     <li t-foreach="rows" t-as="row" class="campus-card">
-                        <h2 class="campus-h2"><t t-esc="row['course_code']"/> · <t t-esc="row['course']"/></h2>
+                        <p class="fp-kicker" t-esc="row['course_code']"/>
+                        <h2 class="campus-h2" t-esc="row['course']"/>
                         <dl class="campus-dl">
                             <dt>Хичээлийн нээлт</dt><dd><t t-esc="row['offering']"/></dd>
                             <dt>Улирал</dt><dd><t t-esc="row['term']"/></dd>
@@ -109,22 +199,29 @@
     <!-- Schedule -->
     <template id="page_schedule" name="Campus schedule">
         <t t-call="campus_portal.campus_layout">
+            <t t-set="campus_heading">Хичээлийн хуваарь</t>
+            <t t-set="campus_intro">Хичээл орох цаг, танхимыг долоо хоногоор харна уу.</t>
             <t t-if="not has_student"><t t-call="campus_portal.campus_no_student"/></t>
             <t t-else="">
                 <nav class="campus-week" aria-label="Долоо хоногоор шилжих">
+                    <p class="campus-week__range">
+                        <time t-att-datetime="data['week_start']" t-esc="data['week_start']"/> – <time t-att-datetime="data['week_end']" t-esc="data['week_end']"/>
+                    </p>
                     <a class="campus-btn" t-attf-href="/my/campus/schedule?week=#{data['prev_week']}">← Өмнөх долоо хоног</a>
-                    <span class="campus-week__range" aria-live="polite"><t t-esc="data['week_start']"/></span>
+                    <a t-if="not data['is_current_week']" class="campus-btn" href="/my/campus/schedule">Энэ долоо хоног</a>
                     <a class="campus-btn" t-attf-href="/my/campus/schedule?week=#{data['next_week']}">Дараагийн долоо хоног →</a>
                 </nav>
                 <div class="campus-grid campus-grid--week">
-                    <section t-foreach="data['days']" t-as="day" class="campus-day" t-att-aria-label="day['label']">
-                        <h2 class="campus-h3"><t t-esc="day['label']"/></h2>
+                    <section t-foreach="data['days']" t-as="day" t-att-class="'campus-day is-today' if day['is_today'] else 'campus-day'">
+                        <h2 class="campus-h3">
+                            <t t-if="day_index == 0">Даваа</t><t t-elif="day_index == 1">Мягмар</t><t t-elif="day_index == 2">Лхагва</t>
+                            <t t-elif="day_index == 3">Пүрэв</t><t t-elif="day_index == 4">Баасан</t><t t-elif="day_index == 5">Бямба</t><t t-else="">Ням</t>
+                            <time t-att-aria-current="'date' if day['is_today'] else None" t-att-datetime="day['date']" t-esc="day['label']"/>
+                        </h2>
                         <p t-if="not day['sessions']" class="campus-muted">Хичээлгүй</p>
-                        <article t-foreach="day['sessions']" t-as="s" class="campus-session">
-                            <time><t t-esc="s['start']"/><t t-if="s['end']"> – <t t-esc="s['end']"/></t></time>
-                            <strong><t t-esc="s['course_code']"/> · <t t-esc="s['title']"/></strong>
-                            <span class="campus-muted"><t t-esc="s['kind']"/><t t-if="s['room']"> · <t t-esc="s['room']"/></t></span>
-                        </article>
+                        <ul t-else="" class="campus-agenda-list">
+                            <li t-foreach="day['sessions']" t-as="session"><t t-call="campus_portal.campus_session_row"/></li>
+                        </ul>
                     </section>
                 </div>
             </t>
@@ -134,12 +231,15 @@
     <!-- Attendance -->
     <template id="page_attendance" name="Campus attendance">
         <t t-call="campus_portal.campus_layout">
+            <t t-set="campus_heading">Ирцийн мэдээлэл</t>
+            <t t-set="campus_intro">Хичээл тус бүрийн ирц, хоцролт, таслалтыг харна уу.</t>
             <t t-if="not has_student"><t t-call="campus_portal.campus_no_student"/></t>
             <t t-else="">
                 <p t-if="not rows" class="campus-muted campus-empty">Ирцийн бүртгэл алга.</p>
                 <ul class="campus-cards" t-else="">
                     <li t-foreach="rows" t-as="row" class="campus-card">
-                        <h2 class="campus-h2"><t t-esc="row['course_code']"/> · <t t-esc="row['offering']"/></h2>
+                        <p class="fp-kicker" t-esc="row['course_code']"/>
+                        <h2 class="campus-h2" t-esc="row['offering']"/>
                         <dl class="campus-dl">
                             <dt>Нийт цаг</dt><dd><t t-esc="row['total']"/></dd>
                             <dt>Ирсэн</dt><dd><t t-esc="row['present']"/></dd>
@@ -157,10 +257,12 @@
     <!-- Registration -->
     <template id="page_register" name="Campus registration">
         <t t-call="campus_portal.campus_layout">
+            <t t-set="campus_heading">Хичээл сонголт</t>
+            <t t-set="campus_intro">Нээлттэй хичээлүүд, бүртгэлийн хугацаа, сул суудлыг харна уу.</t>
             <t t-if="not catalog['has_student']"><t t-call="campus_portal.campus_no_student"/></t>
             <t t-elif="not catalog['term']"><p class="campus-muted campus-empty">Одоогоор нээлттэй улирал алга.</p></t>
             <t t-else="">
-                <section class="campus-card">
+                <section class="campus-card campus-registration">
                     <h2 class="campus-h2"><t t-esc="catalog['term']['name']"/></h2>
                     <p t-if="catalog['window_open']" class="campus-badge campus-badge--success">Бүртгэл нээлттэй<t t-if="catalog['term']['registration_end']"> · дуусах: <t t-esc="catalog['term']['registration_end']"/></t></p>
                     <p t-else="" class="campus-badge campus-badge--warning">Бүртгэлийн хугацаа хаагдсан</p>
@@ -168,7 +270,8 @@
                 <p t-if="not catalog['offerings']" class="campus-muted campus-empty">Нээлттэй хичээл алга.</p>
                 <ul class="campus-cards" t-else="">
                     <li t-foreach="catalog['offerings']" t-as="item" class="campus-card">
-                        <h2 class="campus-h2"><t t-esc="item['course_code']"/> · <t t-esc="item['name']"/></h2>
+                        <p class="fp-kicker" t-esc="item['course_code']"/>
+                        <h2 class="campus-h2" t-esc="item['name']"/>
                         <dl class="campus-dl">
                             <dt>Багш</dt><dd><t t-esc="item['lecturer']"/></dd>
                             <dt>Кредит</dt><dd><t t-esc="item['credits']"/></dd>
@@ -189,9 +292,10 @@
     <!-- Requests (grade decisions, read only for the student) -->
     <template id="page_requests" name="Campus requests">
         <t t-call="campus_portal.campus_layout">
+            <t t-set="campus_heading">Дүнгийн хүсэлт</t>
+            <t t-set="campus_intro">Хүсэлтийг багш гаргаж, сургалтын алба шийдвэрлэнэ.</t>
             <t t-if="not has_student"><t t-call="campus_portal.campus_no_student"/></t>
             <t t-else="">
-                <p class="campus-muted">Дүнгийн өөрчлөлтийн хүсэлтийн явц. Хүсэлтийг багш гаргаж, сургалтын алба баталдаг.</p>
                 <p t-if="not rows" class="campus-muted campus-empty">Хүсэлт алга.</p>
                 <ul class="campus-cards" t-else="">
                     <li t-foreach="rows" t-as="row" class="campus-card">
@@ -211,13 +315,15 @@
     <!-- Notifications -->
     <template id="page_notifications" name="Campus notifications">
         <t t-call="campus_portal.campus_layout">
+            <t t-set="campus_heading">Мэдэгдэл</t>
+            <t t-set="campus_intro">Таны бүртгэл, хичээл, дүнгийн хүсэлттэй холбоотой шинэчлэлтүүд.</t>
             <t t-if="not has_student"><t t-call="campus_portal.campus_no_student"/></t>
             <t t-else="">
                 <p t-if="not rows" class="campus-muted campus-empty">Мэдэгдэл алга.</p>
                 <ol class="campus-list campus-list--feed" t-else="">
                     <li t-foreach="rows" t-as="row" class="campus-card">
                         <time class="campus-muted"><t t-esc="row['date']"/></time>
-                        <p class="campus-strong"><t t-esc="row['subject'] or 'Шинэчлэлт'"/></p>
+                        <h2 class="campus-h2"><t t-esc="row['subject'] or 'Шинэчлэлт'"/></h2>
                         <p t-if="row['body']"><t t-esc="row['body']"/></p>
                     </li>
                 </ol>

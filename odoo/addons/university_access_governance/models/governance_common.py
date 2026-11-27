@@ -15,7 +15,6 @@ CISO_GROUP = 'university_isms.group_isms_manager'
 EXTRA_PRIVILEGED_GROUPS = [CISO_GROUP, 'campus_university.group_campus_registrar', 'stock.group_stock_manager']
 # Хянагдах бүлгээс хасах (суурь хандалт, нийтийн хэрэглэгч).
 NON_REVIEWABLE_GROUPS = ['base.group_user', 'base.group_portal', 'base.group_public']
-ACTION_CONTEXT = 'access_gov_action'
 
 
 def soft_groups(env, xmlids):
@@ -43,6 +42,10 @@ def is_system(user):
 
 def effective_groups(groups):
     return groups | groups.trans_implied_ids
+
+
+def has_privileged_groups(groups):
+    return bool(effective_groups(groups) & privileged_groups(groups.env))
 
 
 def sod_conflicts(env, groups):

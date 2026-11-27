@@ -1,101 +1,41 @@
-// Dark theme surfaces. Odoo 18 Community ships only a partial dark bundle, so the main
-// backend surfaces (control panel, views, form sheets, lists, kanban) are mapped to the
-// dark --fds-* tokens here. Loaded only in web.assets_web_dark.
+// Surfaces that retain light colors in Odoo Community's dark bundle.
+// The shared backend rules handle buttons, form sheets and list tables.
 .o_web_client {
-    background-color: var(--fds-bg);
-    color: var(--fds-text);
-
-    .o_action_manager,
     .o_content,
-    .o_form_view .o_form_sheet_bg,
-    .o_kanban_renderer,
-    .o_list_renderer {
+    .o_kanban_renderer {
         background-color: var(--fds-bg);
         color: var(--fds-text);
     }
 
-    .o_control_panel {
-        background-color: var(--fds-surface);
-        color: var(--fds-text);
-        border-bottom-color: var(--fds-border);
-
-        .breadcrumb-item,
-        .breadcrumb-item a,
-        .o_last_breadcrumb_item {
-            color: var(--fds-text);
-        }
-    }
-
-    .o_form_view .o_form_sheet,
-    .o_kanban_record,
-    .o_list_renderer .o_list_table,
-    .modal-content,
-    .dropdown-menu,
-    .o_searchview {
+    :is(.modal-content, .dropdown-menu, .o_searchview) {
         background-color: var(--fds-surface);
         color: var(--fds-text);
         border-color: var(--fds-border);
     }
 
-    .o_list_renderer .o_list_table {
-        --table-bg: var(--fds-surface);
-        --table-color: var(--fds-text);
-        --table-striped-bg: var(--fds-surface-raised);
-        --table-hover-bg: var(--fds-surface-raised);
-
-        thead th {
-            background-color: var(--fds-surface-raised);
-            color: var(--fds-text);
-        }
-    }
-
-    .form-control,
-    .form-select,
-    .o_input {
+    :is(.form-control, .form-select) {
         background-color: var(--fds-surface-raised);
         color: var(--fds-text);
-        border-color: var(--fds-border);
+
+        &:not(:is(.is-invalid, .is-valid)) {
+            border-color: var(--fds-border-strong);
+        }
     }
 
-    .text-muted,
-    .o_form_label {
-        color: var(--fds-text-muted) !important; // Odoo sets these with !important utilities.
-    }
-
-    // List cells: Odoo paints required/readonly text in a red that is 3.8:1 on the dark surface.
-    .o_list_renderer .o_data_cell {
-        color: var(--fds-text);
-    }
-
-    // Kanban cards: Odoo's own card rule (:not() adds specificity) wins over the generic surface rule above,
-    // which left light text on white cards in dark mode.
+    // Odoo's kanban card selector has additional specificity in this bundle.
     .o_kanban_renderer .o_kanban_record {
         background-color: var(--fds-surface) !important;
         color: var(--fds-text);
     }
 
-    // Form status bar: CE keeps the light btn-secondary fill, so the state labels became unreadable.
-    .o_statusbar_status {
-        .btn.o_arrow_button {
-            background-color: var(--fds-surface-raised);
-            border-color: var(--fds-border);
-            color: var(--fds-text-muted);
-        }
-
-        .btn.o_arrow_button_current {
-            background-color: var(--fds-primary) !important;
-            border-color: var(--fds-primary) !important;
-            color: #FFFFFF !important;
-        }
+    .o_list_table .text-danger {
+        color: var(--fds-danger-text) !important;
     }
 
-    // Inline code keeps the light-theme pink (3.8:1 on the dark surface); lighten it for dark mode.
     code {
-        color: #F9A8D4;
+        color: #f9a8d4;
     }
 
-    // System notifications (e.g. the TOTP reminder) ship with a white background in the CE bundle,
-    // which left the light text unreadable in dark mode.
     .o_notification {
         background-color: var(--fds-surface-raised);
         color: var(--fds-text);
@@ -104,39 +44,5 @@
         .btn-close {
             filter: invert(1) grayscale(100%);
         }
-    }
-}
-
-// Headings, breadcrumbs and notebook tabs keep light-theme colors in the CE dark bundle.
-.o_web_client {
-    h1, h2, h3, h4, h5, h6,
-    .h1, .h2, .h3, .h4, .h5, .h6,
-    .oe_title {
-        color: var(--fds-text);
-    }
-
-    .o_control_panel .breadcrumb,
-    .o_control_panel .o_breadcrumb {
-        background-color: transparent;
-    }
-
-    .nav-tabs {
-        background-color: transparent;
-        border-bottom-color: var(--fds-border);
-
-        .nav-link {
-            color: var(--fds-text-muted);
-        }
-
-        .nav-link.active {
-            background-color: var(--fds-surface);
-            color: var(--fds-text);
-            border-color: var(--fds-border) var(--fds-border) var(--fds-surface);
-        }
-    }
-
-    .o_notebook .tab-content {
-        background-color: var(--fds-surface);
-        color: var(--fds-text);
     }
 }

@@ -80,3 +80,16 @@ flock ../management/runtime.lock docker exec -e ISMS_DEMO_APPLY=1 -i isms-odoo \
 ## LAN camera/mic-д HTTPS ашиглах
 
 Өмнөх HTTP LAN хаягийг HTTPS горим орлов: `./scripts/start-lan.sh`, дараа `https://<LAN-IP>:8443`. Төхөөрөмж бүрд CA trust import шаардлагатай. Дэлгэрэнгүй: [lan-https.md](lan-https.md).
+
+## Автомат нөөцлөлт (2026-11-27)
+
+Үндсэн Odoo өгөгдлийн сан болон файлын санг Улаанбаатарын цагаар өдөр бүр 04:30-д шифрлэж нөөцөлнө. Сар бүрийн эхний нямд 05:30-д хамгийн сүүлийн нөөцийг тусгаарласан өгөгдлийн санд сэргээн шалгана. Шалгалт дуусахад түр өгөгдлийн сан, файлын санг цэвэрлэнэ. Компьютер унтарсан бол дараа асахад хоцорсон ажлыг нөхөн ажиллуулна.
+
+```bash
+systemctl --user list-timers 'formula-isms-*'
+systemctl --user start formula-isms-backup.service
+systemctl --user start formula-isms-restore-verify.service
+journalctl --user -u formula-isms-backup.service -u formula-isms-restore-verify.service
+```
+
+Нөөц болон сэргээх шалгалтын JSON нь `~/.local/state/formula-isms-backups/` дотор байна. Шифр тайлах түлхүүрийг `~/.config/formula-isms/backup.key`-д тусад нь, зөвхөн эзэмшигчид унших эрхтэй хадгална. Нөөц болон түлхүүрийг Git-д оруулахгүй. Тусдаа төхөөрөмжид нөөцийн хуулбар хадгалах тохиргоо хийгдээгүй. Өдөр тутмын 7, долоо хоног тутмын 4 нөөц хадгалах дүрэм үйлчилнэ.

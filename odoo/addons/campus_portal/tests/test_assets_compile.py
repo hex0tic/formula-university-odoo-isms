@@ -21,6 +21,7 @@ class TestCampusPortalAssets(TransactionCase):
         compiled = bundle.preprocess_css()
         self.assertEqual(bundle.css_errors, [], "SCSS errors in web.assets_frontend: %s" % bundle.css_errors)
         self.assertIn(".o_campus_portal", compiled)
+        self.assertIn(".campus-teacher-web", compiled)
 
     def test_teacher_client_action_is_in_backend_bundle(self):
         bundle = self.env["ir.qweb"]._get_asset_bundle("web.assets_backend", debug_assets=False)

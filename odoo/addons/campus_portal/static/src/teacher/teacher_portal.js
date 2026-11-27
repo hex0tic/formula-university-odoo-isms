@@ -1,6 +1,6 @@
 /** @odoo-module **/
 
-import { Component, onWillStart, useState } from "@odoo/owl";
+import { Component, onPatched, onWillStart, useRef, useState } from "@odoo/owl";
 import { ConfirmationDialog } from "@web/core/confirmation_dialog/confirmation_dialog";
 import { _t } from "@web/core/l10n/translation";
 import { registry } from "@web/core/registry";
@@ -32,10 +32,14 @@ export class CampusTeacherPortal extends Component {
         this.orm = useService("orm");
         this.dialog = useService("dialog");
         this.notification = useService("notification");
+        this.portal = useRef("portal");
+        this.offeringView = null;
+        this.focusAfterPatch = null;
         this.state = useState({
             tab: "offerings",
             loading: true,
             loadError: false,
+            wrongAccount: false,
             dashboard: null,
             offeringId: null,
             rosterLoading: false,
@@ -53,6 +57,12 @@ export class CampusTeacherPortal extends Component {
         });
         useSetupAction({});
         onWillStart(() => this.loadDashboard());
+        onPatched(() => {
+            if (this.focusAfterPatch) {
+                this.focusSection(this.focusAfterPatch);
+                this.focusAfterPatch = null;
+            }
+        });
     }
 
     // ------------------------------------------------------------ busy guard
@@ -78,14 +88,18 @@ export class CampusTeacherPortal extends Component {
         return Boolean(this.state.busy[key]);
     }
 
-    // ------------------------------------------------------------ dashboard and tabs
+    // ------------------------------------------------------------ dashboard and navigation
     async loadDashboard() {
         this.state.loading = true;
         this.state.loadError = false;
+        this.state.wrongAccount = false;
         try {
             this.state.dashboard = await this.orm.call(SERVICE, "get_dashboard", []);
         } catch (error) {
-            console.error("Teacher portal: dashboard could not be loaded", error);
+            this.state.wrongAccount = error?.data?.name === "odoo.exceptions.AccessError";
+            if (!this.state.wrongAccount) {
+                console.error("Teacher portal: dashboard could not be loaded", error);
+            }
             this.state.loadError = errorMessage(error);
         } finally {
             this.state.loading = false;
@@ -98,19 +112,38 @@ export class CampusTeacherPortal extends Component {
         }
         this.state.tab = tab;
         if (tab === "notifications") {
+            this.offeringView = null;
+            this.focusAfterPatch = "ctp-notifications-title";
             this.loadNotifications();
         }
     }
 
+    focusSection(id) {
+        const target = this.portal.el?.querySelector(`#${id}`);
+        target?.focus();
+    }
+
     // ------------------------------------------------------------ roster and attendance
     async openOffering(offeringId) {
+        this.offeringView = Symbol();
         this.state.tab = "offering";
         this.state.offeringId = offeringId;
+        this.state.roster = null;
+        this.state.sessions = [];
+        this.state.attendance = {};
         this.state.drafts = {};
+        this.focusAfterPatch = "ctp-offering-title";
         await Promise.all([this.loadRoster(offeringId), this.loadSessions(offeringId)]);
     }
 
     backToOfferings() {
+        if (this.state.tab === "offerings") {
+            return;
+        }
+        const offeringId = this.state.tab === "offering" && this.state.offeringId;
+        this.focusAfterPatch = offeringId && !this.state.loading && !this.state.loadError
+            ? `ctp-open-${offeringId}` : "ctp-dashboard-title";
+        this.offeringView = null;
         this.state.tab = "offerings";
         this.state.offeringId = null;
         this.state.roster = null;
@@ -120,39 +153,62 @@ export class CampusTeacherPortal extends Component {
     }
 
     async loadRoster(offeringId) {
+        const view = this.offeringView;
         this.state.rosterLoading = true;
         this.state.rosterError = false;
         try {
-            this.state.roster = await this.orm.call(SERVICE, "get_roster", [offeringId]);
+            const roster = await this.orm.call(SERVICE, "get_roster", [offeringId]);
+            if (view === this.offeringView) {
+                this.state.roster = roster;
+            }
         } catch (error) {
             console.error("Teacher portal: roster could not be loaded", error);
-            this.state.roster = null;
-            this.state.rosterError = errorMessage(error);
+            if (view === this.offeringView) {
+                this.state.roster = null;
+                this.state.rosterError = errorMessage(error);
+            }
         } finally {
-            this.state.rosterLoading = false;
+            if (view === this.offeringView) {
+                this.state.rosterLoading = false;
+            }
         }
     }
 
-    async loadSessions(offeringId) {
+    async loadSessions(offeringId, savedSessionId) {
+        const view = this.offeringView;
         this.state.sessionsLoading = true;
         this.state.sessionsError = false;
         try {
             const data = await this.orm.call(SERVICE, "get_sessions", [offeringId]);
-            this.state.sessions = data.sessions;
+            if (view !== this.offeringView) {
+                return;
+            }
+            const previousSessions = new Map(this.state.sessions.map((session) => [session.id, session]));
             const attendance = {};
             for (const session of data.sessions) {
-                attendance[session.id] = {};
+                const previousRows = previousSessions.get(session.id)?.rows || [];
+                const previousStatuses = new Map(previousRows.map((row) => [row.enrollment_id, row.status]));
+                const selections = this.state.attendance[session.id] || {};
+                const values = {};
                 for (const row of session.rows) {
-                    attendance[session.id][row.enrollment_id] = row.status;
+                    const selection = selections[row.enrollment_id];
+                    const edited = selection && selection !== previousStatuses.get(row.enrollment_id);
+                    values[row.enrollment_id] = session.id !== savedSessionId && edited ? selection : row.status;
                 }
+                attendance[session.id] = values;
             }
             this.state.attendance = attendance;
+            this.state.sessions = data.sessions;
         } catch (error) {
             console.error("Teacher portal: sessions could not be loaded", error);
-            this.state.sessions = [];
-            this.state.sessionsError = errorMessage(error);
+            if (view === this.offeringView) {
+                this.state.sessions = [];
+                this.state.sessionsError = errorMessage(error);
+            }
         } finally {
-            this.state.sessionsLoading = false;
+            if (view === this.offeringView) {
+                this.state.sessionsLoading = false;
+            }
         }
     }
 
@@ -167,7 +223,12 @@ export class CampusTeacherPortal extends Component {
         return ATTENDANCE_LABELS[status] || status;
     }
 
+    recordedCount(session) {
+        return session.rows.filter((row) => row.recorded).length;
+    }
+
     saveAttendance(session) {
+        const view = this.offeringView;
         const key = `attendance-${session.id}`;
         const values = this.state.attendance[session.id] || {};
         const rows = session.rows.map((row) => ({
@@ -177,12 +238,16 @@ export class CampusTeacherPortal extends Component {
         return this.run(key, async () => {
             await this.orm.call(SERVICE, "save_attendance", [session.id, rows]);
             this.notification.add(_t("Ирцийг хадгаллаа."), { type: "success" });
-            await this.loadSessions(this.state.offeringId);
+            if (view === this.offeringView) {
+                this.focusAfterPatch = `ctp-session-${session.id}`;
+                await this.loadSessions(this.state.offeringId, session.id);
+            }
         });
     }
 
     // ------------------------------------------------------------ grade requests
     startRequest(row) {
+        this.focusAfterPatch = `ctp-score-${row.enrollment_id}`;
         this.state.drafts[row.enrollment_id] = {
             open: true,
             score: row.score,
@@ -193,6 +258,7 @@ export class CampusTeacherPortal extends Component {
     }
 
     cancelRequest(row) {
+        this.focusAfterPatch = `ctp-request-${row.enrollment_id}`;
         delete this.state.drafts[row.enrollment_id];
     }
 
@@ -235,14 +301,18 @@ export class CampusTeacherPortal extends Component {
     }
 
     sendRequest(row, score, draft) {
+        const view = this.offeringView;
         return this.run(`grade-${row.enrollment_id}`, async () => {
             draft.pending = false;
             await this.orm.call(SERVICE, "request_grade_change", [
                 row.enrollment_id, score, draft.reason.trim(), (draft.evidence || "").trim(),
             ]);
-            delete this.state.drafts[row.enrollment_id];
             this.notification.add(_t("Хүсэлтийг хянуулахаар илгээлээ."), { type: "success" });
-            await this.loadRoster(this.state.offeringId);
+            if (view === this.offeringView) {
+                delete this.state.drafts[row.enrollment_id];
+                this.focusAfterPatch = "ctp-roster-title";
+                await this.loadRoster(this.state.offeringId);
+            }
             await this.loadDashboard();
         });
     }
@@ -268,6 +338,15 @@ export class CampusTeacherPortal extends Component {
 
     get pendingCount() {
         return (this.state.dashboard && this.state.dashboard.pending_count) || 0;
+    }
+
+    get seatCount() {
+        return this.offerings.reduce((total, offering) => total + offering.seats_taken, 0);
+    }
+
+    get offeringName() {
+        const offering = this.offerings.find((item) => item.id === this.state.offeringId);
+        return offering?.name || _t("Хичээл");
     }
 
     get termName() {

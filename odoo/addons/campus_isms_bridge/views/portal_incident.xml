@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="campus_student_incident_link" inherit_id="campus_portal.campus_layout">
+        <xpath expr="//nav[hasclass('campus-nav')]/ul" position="inside">
+            <li><a class="campus-nav__link" href="/my/campus/incidents">Зөрчил мэдээлэх</a></li>
+        </xpath>
+    </template>
+
+    <template id="campus_teacher_web_incident_link" inherit_id="campus_portal.teacher_web_layout">
+        <xpath expr="//nav[hasclass('campus-teacher-nav')]/ul" position="inside">
+            <li><a class="campus-nav__link" href="/my/campus/incidents">Зөрчил мэдээлэх</a></li>
+        </xpath>
+    </template>
+
+    <template id="portal_incident" name="Campus ISMS intake">
+        <t t-call="portal.portal_layout">
+            <div class="o_campus_portal campus-portal formula-portal-theme">
+                <div class="campus-masthead">
+                    <a class="campus-btn" t-att-href="portal_url">← Миний портал</a>
+                    <a class="fp-brand" href="/university">Formula University</a>
+                </div>
+                <header class="fp-hero campus-hero">
+                    <div class="fp-hero__content">
+                        <p class="fp-kicker">Мэдээллийн аюулгүй байдал</p>
+                        <h1 class="campus-title">Зөрчил мэдээлэх</h1>
+                        <p>Таны мэдээллийг сургуулийн мэдээллийн аюулгүй байдлын баг хүлээн авна.</p>
+                    </div>
+                </header>
+                <div t-if="receipt" class="alert alert-success" role="status">
+                    Мэдээллийг хүлээн авлаа. Бүртгэлийн дугаар: <strong t-out="receipt"/>.
+                </div>
+                <div t-if="error" class="alert alert-danger" role="alert" t-out="error"/>
+                <form class="campus-card my-3" method="post" action="/my/campus/incidents">
+                    <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                    <div class="mb-3">
+                        <label class="form-label" for="campus-incident-name">Гарчиг</label>
+                        <input class="form-control" id="campus-incident-name" name="name" required="required"
+                               minlength="4" maxlength="120" t-att-value="values.get('name', '')"/>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="campus-incident-category">Юутай холбоотой вэ?</label>
+                        <select class="form-select" id="campus-incident-category" name="category" required="required">
+                            <option value="">Ангилал сонгоно уу</option>
+                            <option t-foreach="categories" t-as="category" t-att-value="category[0]"
+                                    t-att-selected="category[0] == values.get('category')" t-out="category[1]"/>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="campus-incident-description">Юу болсон бэ?</label>
+                        <textarea class="form-control" id="campus-incident-description" name="description" rows="5"
+                                  required="required" minlength="12" maxlength="4000"
+                                  aria-describedby="campus-incident-hint"><t t-out="values.get('description', '')"/></textarea>
+                        <div class="form-text" id="campus-incident-hint">Хэзээ, хаана юу анзаарснаа бичнэ үү. Нууц үг, баталгаажуулах код бүү оруулаарай.</div>
+                    </div>
+                    <button class="campus-btn campus-btn--primary" type="submit">Мэдээлэл илгээх</button>
+                </form>
+                <section class="campus-card" aria-labelledby="campus-incident-history">
+                    <h2 class="campus-h2" id="campus-incident-history">Миний илгээсэн мэдээлэл</h2>
+                    <p t-if="not reports" class="campus-muted">Та одоогоор зөрчил мэдээлээгүй байна.</p>
+                    <ul t-else="" class="list-unstyled mb-0">
+                        <li t-foreach="reports" t-as="report" class="border-bottom py-2">
+                            <strong t-out="report['code']"/> · <span t-out="report['name']"/>
+                            <span class="badge text-bg-light" t-out="states.get(report['state'], '')"/>
+                        </li>
+                    </ul>
+                </section>
+            </div>
+        </t>
+    </template>
+</odoo>

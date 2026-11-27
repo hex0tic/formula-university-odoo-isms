@@ -1,33 +1,44 @@
 // Formula Design System - light design tokens.
 // Every token is a CSS custom property prefixed with --fds-. Other addons should
-// consume them with a fallback, e.g. var(--fds-primary, #635BFF).
+// consume them with a fallback, e.g. var(--fds-primary, #006b61).
 // Dark values live in fds_tokens.dark.scss (loaded only by web.assets_web_dark).
 // Text-bearing colors are AA (>= 4.5:1) against their background; brand colors
 // used only for icons, borders or large fills are documented as such in README.md.
 
 :root {
+    --fds-brand-navy: #101c32;
+    --fds-brand-cream: #f7f5ee;
+    --fds-brand-teal: #006b61;
+    --fds-brand-mint: #d6f17a;
+
     // Surfaces
-    --fds-bg: #F8FAFC;
-    --fds-bg-muted: #F1F5F9;
-    --fds-surface: #FFFFFF;
-    --fds-surface-raised: #FFFFFF;
-    --fds-border: #E2E8F0;
-    --fds-border-strong: #CBD5E1;
+    --fds-bg: var(--fds-brand-cream);
+    --fds-bg-muted: #eeeee5;
+    --fds-surface: #fffefa;
+    --fds-surface-raised: #ffffff;
+    --fds-border: #d8dcd2;
+    --fds-border-strong: #7c887e;
+    --fds-list-stripe: #f4f6f0;
 
     // Text
-    --fds-text: #0F172A;          // 17.9:1 on --fds-surface
-    --fds-text-muted: #475569;    // 7.2:1 on --fds-bg
+    --fds-text: var(--fds-brand-navy);
+    --fds-text-muted: #495951;
+    --fds-info-text: #075e79;
 
     // Navigation
-    --fds-navbar-bg: #0F172A;
-    --fds-navbar-text: #E2E8F0;   // 14.5:1 on --fds-navbar-bg
+    --fds-navbar-bg: var(--fds-brand-navy);
+    --fds-navbar-text: var(--fds-brand-cream);
 
     // Brand and semantic (brand value first; "-text" variants are AA text colors)
-    --fds-primary: #635BFF;       // button fill, white text 4.7:1
-    --fds-primary-hover: #4C44D9; // white text 6.7:1
-    --fds-primary-active: #3F38B8;
-    --fds-primary-text: #4C44D9;  // links and outline buttons on white, 6.7:1
-    --fds-primary-soft: #EEF0FF;
+    --fds-primary: var(--fds-brand-teal);
+    --fds-primary-hover: #00564e;
+    --fds-primary-active: #00473f;
+    --fds-primary-text: var(--fds-brand-teal);
+    --fds-primary-soft: #e3f0ea;
+    --fds-action-fill: var(--fds-primary);
+    --fds-action-hover: var(--fds-primary-hover);
+    --fds-action-active: var(--fds-primary-active);
+    --fds-on-action: #ffffff;
 
     --fds-success: #0D9488;       // icons, borders, accents
     --fds-success-fill: #0F766E;  // button/badge fill with white text 5.5:1
@@ -45,7 +56,7 @@
     --fds-danger-text: #B91C1C;   // text on white, 6.5:1
     --fds-danger-soft: #FEE2E2;
 
-    --fds-focus: #635BFF;         // focus ring, 4.7:1 against white surfaces
+    --fds-focus: var(--fds-brand-teal);
 
     // Shape
     --fds-radius-sm: 6px;
@@ -62,9 +73,9 @@
     --fds-space-8: 32px;
 
     // Elevation
-    --fds-shadow-card: 0 1px 2px rgba(15, 23, 42, .06), 0 1px 3px rgba(15, 23, 42, .08);
-    --fds-shadow-hover: 0 4px 12px rgba(15, 23, 42, .10);
-    --fds-shadow-overlay: 0 12px 32px rgba(15, 23, 42, .18);
+    --fds-shadow-card: 0 1px 2px rgba(16, 28, 50, .06), 0 1px 3px rgba(16, 28, 50, .08);
+    --fds-shadow-hover: 0 4px 12px rgba(16, 28, 50, .10);
+    --fds-shadow-overlay: 0 12px 32px rgba(16, 28, 50, .18);
 
     // Motion (keep within 150-250ms; disabled under prefers-reduced-motion)
     --fds-duration-fast: 150ms;

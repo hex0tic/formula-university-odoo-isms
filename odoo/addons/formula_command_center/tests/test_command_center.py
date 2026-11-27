@@ -4,6 +4,7 @@
 ``with_user()``-ээр бодсон ``search_count``-тай харьцуулагдана.
 """
 import json
+from secrets import token_urlsafe
 from datetime import timedelta
 
 from odoo import fields
@@ -29,13 +30,15 @@ class TestCommandCenter(TransactionCase):
         super().setUpClass()
         env = cls.env
         cls.users = {
-            role: new_test_user(env, login='fcc_%s' % role, groups=group)
+            role: new_test_user(env, login='fcc_%s' % role, groups=group,
+                                password=token_urlsafe(24))
             for role, group in ROLE_GROUPS.items()
         }
-        cls.plain_user = new_test_user(env, login='fcc_plain', groups='base.group_user')
+        cls.plain_user = new_test_user(env, login='fcc_plain', groups='base.group_user',
+                                       password=token_urlsafe(24))
         # Энэ мэдээлэгч ямар ч инцидент мэдээлээгүй: шүүлтүүрийн дараа хоосон өгөгдөл
         cls.fresh_reporter = new_test_user(env, login='fcc_fresh_reporter',
-                                           groups=ROLE_GROUPS['reporter'])
+                                           groups=ROLE_GROUPS['reporter'], password=token_urlsafe(24))
         cls.center = env['formula.command.center']
 
         Asset = env['isms.asset']
@@ -265,6 +268,24 @@ class TestCommandCenter(TransactionCase):
         for section in ('assets', 'risks', 'heatmap', 'audit', 'incidents', 'policies'):
             self.assertFalse(plain['sections'][section]['available'], section)
         json.dumps(plain)
+
+    def test_incident_trend_weekly_drills_respect_record_rules(self):
+        for user in (self.users['manager'], self.users['reporter'], self.fresh_reporter):
+            dash = self.center.with_user(user).with_context(tz='Asia/Ulaanbaatar').get_dashboard_data()
+            trend = dash['sections']['incident_trend']
+            self.assertTrue(trend['available'])
+            self.assertEqual(len(trend['weeks']), 8)
+            self.assertEqual(trend['total'], sum(week['count'] for week in trend['weeks']))
+            for week in trend['weeks']:
+                self.assertEqual(fields.Date.to_date(week['start']).weekday(), 0)
+                self.assertEqual(self._count(user, 'isms.incident', week['drill']['domain']), week['count'])
+            if user == self.users['reporter']:
+                self.assertEqual(trend['total'], 1)
+            if user == self.fresh_reporter:
+                self.assertEqual(trend['total'], 0)
+        denied = self._dash(self.plain_user)['sections']['incident_trend']
+        self.assertFalse(denied['available'])
+        self.assertNotIn('weeks', denied)
 
     def test_dashboard_is_read_only_and_uses_user_rights(self):
         """Dashboard нь ORM-д бичихгүй; хэрэглэгчийн эрхээр унших боломжтой эсэхийг шалгана."""

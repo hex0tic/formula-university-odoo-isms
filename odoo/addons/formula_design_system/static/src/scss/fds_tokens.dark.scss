@@ -3,24 +3,27 @@
 // color_scheme cookie is "dark". Keep the same token names as fds_tokens.scss.
 
 :root {
-    --fds-bg: #0B1120;
-    --fds-bg-muted: #111827;
-    --fds-surface: #111827;
-    --fds-surface-raised: #1E293B;
-    --fds-border: #334155;
-    --fds-border-strong: #475569;
+    --fds-bg: var(--fds-brand-navy);
+    --fds-bg-muted: #202f47;
+    --fds-surface: #18253b;
+    --fds-surface-raised: #22324c;
+    --fds-border: #3d5067;
+    --fds-border-strong: #7a8da3;
+    --fds-list-stripe: #1c2a41;
 
-    --fds-text: #E2E8F0;          // 14.4:1 on --fds-surface
-    --fds-text-muted: #94A3B8;    // 6.9:1 on --fds-surface
+    --fds-text: var(--fds-brand-cream);
+    --fds-text-muted: #b9c6d6;
+    --fds-info-text: #91d9ef;
 
-    --fds-navbar-bg: #020617;
-    --fds-navbar-text: #E2E8F0;
+    --fds-navbar-bg: #0b1527;
 
-    --fds-primary: #635BFF;       // button fill keeps white text 4.7:1
-    --fds-primary-hover: #7A73FF;
-    --fds-primary-active: #5148E6;
-    --fds-primary-text: #A5A0FF;  // links on dark surfaces, 7.7:1
-    --fds-primary-soft: rgba(99, 91, 255, .18);
+    --fds-primary: #007c70;
+    --fds-primary-text: #9ce0cf;
+    --fds-primary-soft: #1d3b40;
+    --fds-action-fill: var(--fds-brand-mint);
+    --fds-action-hover: #e3f69f;
+    --fds-action-active: #bbd768;
+    --fds-on-action: var(--fds-brand-navy);
 
     --fds-success-fill: #0F766E;
     --fds-success-text: #5EEAD4;
@@ -30,12 +33,12 @@
     --fds-warning-soft: rgba(245, 158, 11, .18);
 
     --fds-danger-fill: #DC2626;
-    --fds-danger-hover: #EF4444;
-    --fds-danger-active: #B91C1C;
+    --fds-danger-hover: #B91C1C;
+    --fds-danger-active: #991B1B;
     --fds-danger-text: #FCA5A5;
     --fds-danger-soft: rgba(239, 68, 68, .18);
 
-    --fds-focus: #A5A0FF;
+    --fds-focus: var(--fds-brand-mint);
 
     --fds-shadow-card: 0 1px 2px rgba(0, 0, 0, .4);
     --fds-shadow-hover: 0 4px 14px rgba(0, 0, 0, .5);

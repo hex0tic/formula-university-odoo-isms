@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<templates xml:space="preserve">
+    <t t-inherit="campus_portal.TeacherPortal" t-inherit-mode="extension">
+        <xpath expr="//nav[hasclass('ctp-tabs')]" position="inside">
+            <a class="ctp-tab" href="/my/campus/incidents">Зөрчил мэдээлэх</a>
+        </xpath>
+    </t>
+</templates>

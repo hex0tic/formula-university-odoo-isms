@@ -1,0 +1,132 @@
+// Shared visual language for the student website and lecturer client action.
+.formula-portal-theme {
+    --fp-navy: #101c32;
+    --fp-cream: #f7f5ee;
+    --fp-teal: #006b61;
+    --fp-mint: #d6f17a;
+    --fp-paper: #fffefa;
+    --fp-line: #d9ded5;
+    --fp-muted: #50616a;
+    --fp-soft: #e3f0e9;
+    --fp-teal-dark: #00574f;
+    --fp-danger: #8a302a;
+    --fp-danger-soft: #fae8e3;
+    --fp-radius: 14px;
+    --fp-motion: 160ms ease-out;
+
+    color: var(--fp-navy);
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+
+    :focus-visible {
+        outline: 2px solid var(--fp-teal);
+        outline-offset: 3px;
+        box-shadow: 0 0 0 3px var(--fp-paper);
+    }
+
+    [tabindex="-1"] { scroll-margin-top: 1rem; }
+
+    .fp-kicker {
+        color: var(--fp-teal);
+        font-size: .8125rem;
+        font-weight: 750;
+        letter-spacing: .08em;
+        margin: 0;
+        text-transform: uppercase;
+    }
+
+    .fp-brand {
+        display: inline-flex;
+        flex-wrap: wrap;
+        align-items: baseline;
+        gap: .5rem;
+        color: var(--fp-navy);
+        font-size: .9375rem;
+        font-weight: 750;
+        text-decoration: none;
+
+        span { color: var(--fp-teal); }
+        &:hover { text-decoration: underline; text-underline-offset: .24em; }
+    }
+
+    .fp-hero {
+        position: relative;
+        isolation: isolate;
+        overflow: hidden;
+        background: var(--fp-navy);
+        color: var(--fp-paper);
+        border-radius: var(--fp-radius);
+
+        // Offset curved lines pick up the Formula identity without competing with the text.
+        &::after {
+            content: "";
+            position: absolute;
+            z-index: -1;
+            right: -8rem;
+            bottom: -15rem;
+            width: 27rem;
+            height: 23rem;
+            border: 1px solid rgba(214, 241, 122, .36);
+            border-radius: 48%;
+            box-shadow: 0 0 0 22px rgba(214, 241, 122, .09),
+                0 0 0 45px rgba(214, 241, 122, .07),
+                0 0 0 70px rgba(214, 241, 122, .045);
+            transform: rotate(-26deg);
+            pointer-events: none;
+        }
+
+        .fp-kicker { color: var(--fp-mint); }
+        .fp-hero__content { max-width: 48rem; }
+    }
+
+    .campus-btn, .campus-nav__link, .ctp-btn, .ctp-tab {
+        display: inline-flex;
+        min-height: 44px;
+        align-items: center;
+        justify-content: center;
+        gap: .55rem;
+        padding: .5rem .9rem;
+        border: 1px solid var(--fp-line);
+        border-radius: 8px;
+        background: var(--fp-paper);
+        color: var(--fp-teal);
+        font: inherit;
+        font-size: .925rem;
+        font-weight: 700;
+        line-height: 1.25;
+        text-decoration: none;
+        cursor: pointer;
+        transition: background-color var(--fp-motion), border-color var(--fp-motion), color var(--fp-motion);
+
+        &:hover { background: var(--fp-soft); color: var(--fp-teal-dark); }
+        &:disabled { opacity: .62; cursor: not-allowed; }
+    }
+
+    .campus-btn--primary, .ctp-btn--primary {
+        background: var(--fp-teal);
+        border-color: var(--fp-teal);
+        color: white;
+
+        &:hover { background: var(--fp-teal-dark); color: white; }
+    }
+
+    .campus-nav__link.is-active, .ctp-tab.is-active {
+        background: var(--fp-navy);
+        border-color: var(--fp-navy);
+        color: var(--fp-paper);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        &, *, *::before, *::after {
+            animation: none !important;
+            transition: none !important;
+            scroll-behavior: auto !important;
+        }
+    }
+}
+
+@keyframes campus-portal-enter {
+    from { opacity: .65; transform: translateY(5px); }
+    to { opacity: 1; transform: translateY(0); }
+}

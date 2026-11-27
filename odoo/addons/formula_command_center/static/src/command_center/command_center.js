@@ -20,6 +20,18 @@ const PERIOD_OPTIONS = [
     { value: 365, label: _t("Сүүлийн 365 хоног") },
 ];
 const DENIED = _t("Энэ хэсгийг харах эрх байхгүй.");
+const PRIMARY_CARDS = [
+    ["incidents_open", "bell", _t("Шийдвэрлэх шатанд байгаа")],
+    ["risks_total", "crosshairs", _t("Эрсдэлийн бүртгэл")],
+    ["controls_implemented", "shield", _t("Сонгосон хяналтын хэрэгжилт")],
+    ["assets_total", "cubes", _t("Мэдээллийн хөрөнгийн бүртгэл")],
+];
+const PRIORITIES = [
+    ["incidents_sla_overdue", "clock-o", _t("Зөрчлийн хариу өгөх хугацаа хэтэрсэн")],
+    ["risks_high", "exclamation-triangle", _t("Өндөр түвшний анхдагч эрсдэл")],
+    ["treatment_overdue", "tasks", _t("Эрсдэлийн арга хэмжээ хоцорсон")],
+    ["policies_review_overdue", "file-text-o", _t("Бодлого дахин хянах хугацаа хэтэрсэн")],
+];
 
 export class FormulaCommandCenter extends Component {
     static template = "formula_command_center.Dashboard";
@@ -39,10 +51,14 @@ export class FormulaCommandCenter extends Component {
             incidentDays: 0,
         });
         useSetupAction({});
-        onWillStart(() => this.load());
+        onWillStart(() => { this.load(); });
     }
 
     async load() {
+        if (this._requestInFlight) {
+            return;
+        }
+        this._requestInFlight = true;
         this.state.loading = true;
         this.state.error = false;
         try {
@@ -54,6 +70,7 @@ export class FormulaCommandCenter extends Component {
             this.state.error = true;
         } finally {
             this.state.loading = false;
+            this._requestInFlight = false;
         }
     }
 
@@ -64,6 +81,44 @@ export class FormulaCommandCenter extends Component {
 
     get kpis() {
         return (this.state.data && this.state.data.kpis) || [];
+    }
+
+    get primaryKpis() {
+        const cards = new Map(this.kpis.map((card) => [card.key, card]));
+        return PRIMARY_CARDS.flatMap(([key, icon, hint]) => {
+            const card = cards.get(key);
+            return card?.available ? [{ ...card, icon, hint }] : [];
+        });
+    }
+
+    get secondaryKpis() {
+        const primary = new Set(PRIMARY_CARDS.map(([key]) => key));
+        return this.kpis.filter((card) => card.available && !primary.has(card.key));
+    }
+
+    get priorities() {
+        const cards = new Map(this.kpis.map((card) => [card.key, card]));
+        return PRIORITIES.flatMap(([key, icon, title]) => {
+            const card = cards.get(key);
+            return card?.available ? [{ ...card, icon, title }] : [];
+        });
+    }
+
+    get trend() {
+        return this.sections.incident_trend || { available: false };
+    }
+
+    get trendWeeks() {
+        if (!this.trend.available) {
+            return [];
+        }
+        const peak = Math.max(1, ...this.trend.weeks.map((week) => week.count));
+        return this.trend.weeks.map((week, index) => ({
+            ...week,
+            current: index === this.trend.weeks.length - 1,
+            height: Math.round(week.count * 100 / peak),
+            ariaLabel: _t("%s: %s зөрчил", week.start, week.count),
+        }));
     }
 
     get generatedAt() {

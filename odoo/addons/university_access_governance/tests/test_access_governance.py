@@ -1,7 +1,7 @@
 """university_access_governance: GOV-01, GOV-03, GOV-04, GOV-05 серверийн шалгалтууд."""
 from datetime import timedelta
 
-from odoo import fields
+from odoo import Command, fields
 from odoo.exceptions import AccessError, UserError, ValidationError
 from odoo.addons.university_access_governance.models.recert import ESCALATION_SUMMARY
 from odoo.tests import TransactionCase, new_test_user, tagged
@@ -109,6 +109,39 @@ class TestAccessGovernance(TransactionCase):
             staff_line.with_user(self.manager).write({'decision': 'keep'})
         with self.assertRaises(AccessError):
             staff_line.with_user(self.staff).action_keep()
+
+    def test_recertification_ignores_workflow_context(self):
+        campaign = self.Campaign.with_user(self.erp).with_context(default_state='done').create({
+            'name': 'Тойм',
+            'scope': 'groups',
+            'group_ids': [Command.set(self.analyst.ids)],
+        })
+        self.assertEqual(campaign.state, 'draft')
+        with self.assertRaises(AccessError):
+            campaign.write({'state': 'running'})
+        campaign.action_start()
+
+        reviewer_line = self._line(campaign, self.staff).with_user(self.manager)
+        with self.assertRaises(AccessError):
+            reviewer_line.with_context(access_gov_action=True).write({'outcome': 'Unverified'})
+        self.assertFalse(reviewer_line.outcome)
+        reviewer_line.write({'note': 'Reviewed'})
+        reviewer_line.action_keep()
+        self.assertEqual(reviewer_line.decision, 'keep')
+        self.assertEqual(reviewer_line.decided_by_id, self.manager)
+
+        line = self.Line.with_user(self.erp).with_context(
+            default_decision='keep', default_decided_by_id=self.erp.id, default_escalated=True,
+        ).create({
+            'campaign_id': campaign.id,
+            'user_id': self.plain.id,
+            'reviewer_id': self.manager.id,
+        })
+        self.assertEqual(line.decision, 'pending')
+        self.assertFalse(line.decided_by_id)
+        self.assertFalse(line.escalated)
+        with self.assertRaises(UserError):
+            campaign.action_close()
 
     def test_revoke_removes_group_and_is_audited(self):
         campaign = self._campaign()
@@ -250,10 +283,44 @@ class TestAccessGovernance(TransactionCase):
         self.assertFalse(self.Request.with_user(self.plain).search([]).ids)
         self.assertNotIn(mine.id, self.Request.with_user(self.orphan).search([]).ids)
 
-    def test_requester_cannot_grant_for_self_via_write(self):
-        req = self._request(self.plain, self.plain, [self.analyst])
+    def test_request_workflow_fields_remain_protected_with_context(self):
+        req = self._request(self.plain, self.plain, [self.analyst]).with_context(access_gov_action=True)
         with self.assertRaises(AccessError):
-            req.with_user(self.plain).write({'state': 'active', 'group_ids': [(6, 0, [self.erp_group.id])]})
+            req.write({'outcome': 'Unverified'})
+        req.action_submit()
+        with self.assertRaises(AccessError):
+            req.write({'justification': 'New justification after submission.'})
+        self.assertEqual(req.state, 'submitted')
+        self.assertFalse(req.outcome)
+
+    def test_request_privilege_and_creation_metadata_are_server_derived(self):
+        delegated_group = self.env['res.groups'].sudo().create({
+            'name': 'Governance test role',
+            'implied_ids': [Command.link(self.erp_group.id)],
+        })
+        start = fields.Datetime.now()
+        Request = self.Request.with_user(self.requester).with_context(
+            default_requester_id=self.plain.id, default_state='approved',
+            default_approver_id=self.erp.id, default_is_privileged=False,
+        )
+        req = Request.create({
+            'target_user_id': self.staff.id,
+            'group_ids': [Command.set(delegated_group.ids)],
+            'justification': JUSTIFICATION,
+            'start_date': start,
+            'end_date': start + timedelta(days=2),
+        })
+        self.assertEqual(req.requester_id, self.requester)
+        self.assertEqual(req.state, 'draft')
+        self.assertFalse(req.approver_id)
+        self.assertTrue(req.is_privileged)
+        with self.assertRaises(AccessError):
+            req.write({'is_privileged': False})
+        req.action_submit()
+        with self.assertRaises(AccessError):
+            req.with_user(self.erp).action_approve()
+        req.with_user(self.sys_admin).action_approve()
+        self.assertEqual(req.approver_id, self.sys_admin)
 
     # ------------------------------------------------------------ GOV-04 report
     def test_report_visibility_and_no_secrets(self):

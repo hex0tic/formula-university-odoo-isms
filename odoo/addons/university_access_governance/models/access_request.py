@@ -6,8 +6,8 @@ from odoo import SUPERUSER_ID, Command, _, api, fields, models, tools
 from odoo.exceptions import AccessError, UserError, ValidationError
 
 from .governance_common import (
-    ACTION_CONTEXT, MANAGER_GROUP, effective_groups, is_system, link_groups,
-    new_sod_conflicts, privileged_groups, unlink_groups,
+    MANAGER_GROUP, effective_groups, has_privileged_groups, is_system, link_groups,
+    new_sod_conflicts, unlink_groups,
 )
 
 _logger = logging.getLogger(__name__)
@@ -16,8 +16,9 @@ REQUEST_STATES = [
     ('draft', 'Ноорог'), ('submitted', 'Илгээсэн'), ('approved', 'Батлагдсан'), ('active', 'Идэвхтэй'),
     ('expired', 'Хугацаа дууссан'), ('revoked', 'Цуцалсан'), ('rejected', 'Татгалзсан'),
 ]
-PROTECTED_FIELDS = {'state', 'approver_id', 'approved_at', 'activated_at', 'ended_at',
-                    'added_group_ids', 'outcome', 'rejected_reason'}
+REQUEST_AUDIT_FIELDS = {'approver_id', 'approved_at', 'activated_at', 'ended_at',
+                        'added_group_ids', 'outcome', 'rejected_reason'}
+PROTECTED_FIELDS = REQUEST_AUDIT_FIELDS | {'state', 'is_privileged'}
 BUSINESS_FIELDS = {'requester_id', 'target_user_id', 'group_ids', 'justification', 'start_date', 'end_date'}
 POLICY = {
     'min_justification': ('university_access_governance.min_justification_length', 20),
@@ -63,6 +64,10 @@ class AccessRequest(models.Model):
         return self.env.user if self.env.uid != SUPERUSER_ID else self.env['res.users']
 
     @api.model
+    def default_get(self, fields_list):
+        return super().default_get([name for name in fields_list if name != 'is_privileged'])
+
+    @api.model
     def _policy(self, key):
         param, default = POLICY[key]
         try:
@@ -72,9 +77,8 @@ class AccessRequest(models.Model):
 
     @api.depends('group_ids')
     def _compute_is_privileged(self):
-        priv = privileged_groups(self.env)
         for rec in self:
-            rec.is_privileged = bool(rec.group_ids & priv)
+            rec.is_privileged = has_privileged_groups(rec.group_ids)
 
     @api.depends('start_date', 'end_date')
     def _compute_duration(self):
@@ -98,14 +102,14 @@ class AccessRequest(models.Model):
             if not rec.group_ids:
                 raise ValidationError(_('Дор хаяж нэг эрхийн бүлэг сонгоно уу.'))
 
-    @api.constrains('start_date', 'end_date', 'is_privileged')
+    @api.constrains('start_date', 'end_date', 'group_ids')
     def _check_duration(self):
         for rec in self:
             if not rec.end_date:
                 raise ValidationError(_('Түр хандалтын дуусах огноо заавал байна.'))
             if rec.end_date <= rec.start_date:
                 raise ValidationError(_('Дуусах огноо нь эхлэх огнооноос хойш байх ёстой.'))
-            key = 'max_privileged_days' if rec.is_privileged else 'max_temporary_days'
+            key = 'max_privileged_days' if has_privileged_groups(rec.group_ids) else 'max_temporary_days'
             if rec.end_date - rec.start_date > timedelta(days=self._policy(key)):
                 raise ValidationError(_('Хугацаа дээд хэмжээгээ (%s өдөр) давсан байна.', self._policy(key)))
 
@@ -113,20 +117,20 @@ class AccessRequest(models.Model):
     @api.model_create_multi
     def create(self, vals_list):
         actor = self.env.user
+        vals_list = [dict(vals) for vals in vals_list]
         for vals in vals_list:
             if not self.env.su:
-                requester = vals.get('requester_id') or actor.id
-                if requester != actor.id:
+                if (vals.get('requester_id') or actor.id) != actor.id:
                     raise AccessError(_('Хүсэлтийг өөрийн нэрээр гаргана.'))
-                for key in PROTECTED_FIELDS:
-                    vals.pop(key, None)
-            vals['state'] = 'draft'
+                vals['requester_id'] = actor.id
+            vals.update(dict.fromkeys(REQUEST_AUDIT_FIELDS, False), state='draft')
+            vals.pop('is_privileged', None)
             if vals.get('name') in (None, False, 'Шинэ'):
                 vals['name'] = self.env['ir.sequence'].sudo().next_by_code('access.request') or 'Шинэ'
         return super().create(vals_list)
 
     def write(self, vals):
-        if not self.env.su and not self.env.context.get(ACTION_CONTEXT):
+        if not self.env.su:
             if set(vals) & PROTECTED_FIELDS:
                 raise AccessError(_('Төлвийг зөвхөн батлах, идэвхжүүлэх, цуцлах үйлдлээр өөрчилнө (GOV-05).'))
             if set(vals) & BUSINESS_FIELDS:
@@ -139,30 +143,26 @@ class AccessRequest(models.Model):
         return super().write(vals)
 
     def _set_state(self, state, **vals):
-        vals['state'] = state
-        self.with_context(**{ACTION_CONTEXT: True}).write(vals)
+        # Workflow callers authorize the transition. Keep the normal ORM access checks.
+        return super().write(dict(vals, state=state))
 
     def _check_not_self_or_target(self, actor):
         for rec in self:
             if actor in (rec.requester_id, rec.target_user_id):
                 raise AccessError(_('Өөрийн эсвэл эзэмшигч хэрэглэгчийн хүсэлтийг батлах, идэвхжүүлэхгүй (GOV-05).'))
 
-    def _approver_allowed(self, actor):
-        self.ensure_one()
-        if self.is_privileged:
-            return is_system(actor)
-        return actor.has_group(MANAGER_GROUP)
-
     def _check_approver(self, actor):
         self.ensure_one()
         self._check_not_self_or_target(actor)
-        if not self._approver_allowed(actor):
-            if self.is_privileged:
+        if has_privileged_groups(self.group_ids):
+            if not is_system(actor):
                 raise AccessError(_('Давуу эрхийн хүсэлтийг зөвхөн системийн администратор батлана (A.8.2).'))
+        elif not actor.has_group(MANAGER_GROUP):
             raise AccessError(_('Хүсэлтийг батлах эрх (erp менежер эсвэл администратор) байхгүй.'))
 
     # ------------------------------------------------------------ workflow
     def action_submit(self):
+        self.check_access('write')
         actor = self.env.user
         for rec in self:
             if rec.state != 'draft':
@@ -176,6 +176,7 @@ class AccessRequest(models.Model):
         return True
 
     def action_approve(self):
+        self.check_access('write')
         now = fields.Datetime.now()
         for rec in self:
             actor = self.env.user
@@ -194,6 +195,7 @@ class AccessRequest(models.Model):
         return True
 
     def action_reject(self):
+        self.check_access('write')
         for rec in self:
             actor = self.env.user
             if rec.state != 'submitted':
@@ -204,6 +206,7 @@ class AccessRequest(models.Model):
         return True
 
     def action_activate(self):
+        self.check_access('write')
         now = fields.Datetime.now()
         for rec in self:
             if rec.state != 'approved':
@@ -227,7 +230,7 @@ class AccessRequest(models.Model):
         actor = self.env.user
         if target == actor and not self.env.su:
             raise AccessError(_('Өөрийн эрхийг өөрөө өөрчлөхгүй (GOV-05).'))
-        if not self.env.su and (self.group_ids & privileged_groups(self.env)) and not is_system(actor):
+        if not self.env.su and has_privileged_groups(self.group_ids) and not is_system(actor):
             raise AccessError(_('Давуу эрхийг зөвхөн системийн администратор олгоно (A.8.2).'))
         effective = effective_groups(target.groups_id)
         added = self.group_ids - effective
@@ -241,6 +244,7 @@ class AccessRequest(models.Model):
         self.message_post(body=note)
 
     def action_revoke(self):
+        self.check_access('write')
         for rec in self:
             actor = self.env.user
             if rec.state != 'active':
@@ -257,7 +261,7 @@ class AccessRequest(models.Model):
         others = self.search([('target_user_id', '=', target.id), ('state', '=', 'active'),
                               ('id', '!=', self.id)]).mapped('added_group_ids')
         to_remove = (self.added_group_ids - others) & target.groups_id
-        if not self.env.su and (to_remove & privileged_groups(self.env)) and not is_system(self.env.user):
+        if not self.env.su and has_privileged_groups(to_remove) and not is_system(self.env.user):
             raise AccessError(_('Давуу эрхийг зөвхөн системийн администратор хасна (A.8.2).'))
         unlink_groups(target, to_remove)
         outcome = _('Хасагдсан бүлгүүд: %s', ', '.join(to_remove.mapped('name'))) if to_remove \

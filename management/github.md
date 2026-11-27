@@ -1,7 +1,7 @@
 # GitHub репозитор
 
 - URL: https://github.com/hex0tic/formula-university-odoo-isms
-- Хандалт: private; эзэмшигч `hex0tic`.
+- Хандалт: public; эзэмшигч `hex0tic` (2026-11-27-нд GitHub дээр шалгав).
 - Үндсэн branch: `main`.
 - Анхны код, материалын commit: `9db325e16a4bc256f9174bf4f30c7f89ccc73720`.
 - Нийтэлсэн өдөр: 2026-11-17.

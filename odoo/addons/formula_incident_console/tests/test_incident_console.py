@@ -4,6 +4,8 @@
 Консолын хариу нь ORM-ийн тоологтой тэнцэх ёстой (parity).
 """
 from datetime import timedelta
+from secrets import token_urlsafe
+from unittest.mock import patch
 
 from odoo import fields
 from odoo.exceptions import AccessError, UserError
@@ -21,17 +23,20 @@ class TestIncidentConsole(TransactionCase):
     def setUpClass(cls):
         super().setUpClass()
         env = cls.env
-        cls.reporter = new_test_user(env, login='fic_reporter',
+        def test_user(**values):
+            return new_test_user(env, password=token_urlsafe(24), **values)
+
+        cls.reporter = test_user(login='fic_reporter',
                                      groups='base.group_user,university_isms.group_isms_reporter')
-        cls.reporter_other = new_test_user(env, login='fic_reporter_other',
+        cls.reporter_other = test_user(login='fic_reporter_other',
                                            groups='base.group_user,university_isms.group_isms_reporter')
-        cls.analyst = new_test_user(env, login='fic_analyst',
+        cls.analyst = test_user(login='fic_analyst',
                                     groups='base.group_user,university_isms.group_isms_analyst')
-        cls.auditor = new_test_user(env, login='fic_auditor',
+        cls.auditor = test_user(login='fic_auditor',
                                     groups='base.group_user,university_isms.group_isms_auditor')
-        cls.manager = new_test_user(env, login='fic_manager',
+        cls.manager = test_user(login='fic_manager',
                                     groups='base.group_user,university_isms.group_isms_manager')
-        cls.plain = new_test_user(env, login='fic_plain', groups='base.group_user')
+        cls.plain = test_user(login='fic_plain', groups='base.group_user')
         cls.console = env['formula.incident.console']
         cls.Incident = env['isms.incident']
 
@@ -270,6 +275,32 @@ class TestIncidentConsole(TransactionCase):
         self._incident(reporter=self.reporter_other)
         everything = self._row_ids(self.analyst)
         self.assertEqual(self._row_ids(self.analyst, {'state': 'bogus', 'severity': '<script>'}), everything)
+
+    def test_search_and_queue_totals_follow_visibility(self):
+        own = self._incident(name='Сүлжээ 50% доголдол', detected_days=10)
+        self._incident(reporter=self.reporter_other, name='Сүлжээ 50% бусад', detected_days=10)
+        self._incident(name='Сүлжээ 500 хэвийн', assignee_id=self.analyst.id)
+        self.assertEqual(self._row_ids(self.reporter, {'query': '50%'}), {own.id})
+        self.assertEqual(self._row_ids(self.reporter, {'query': own.code, 'unassigned': True}), {own.id})
+        data = self.console.with_user(self.reporter).get_incident_rows({'query': own.code})
+        self.assertEqual(data['total'], 1)
+        Incident = self.Incident.with_user(self.reporter)
+        active = [('state', 'in', ['incident', 'report', 'investigate'])]
+        self.assertEqual(data['summary']['all'], Incident.search_count([]))
+        self.assertEqual(data['summary']['open'], Incident.search_count(active))
+        self.assertEqual(data['summary']['overdue'], Incident.search_count(active + [
+            ('sla_deadline', '<', fields.Datetime.now())]))
+        self.assertEqual(data['summary']['unassigned'], Incident.search_count(active + [
+            ('assignee_id', '=', False)]))
+
+    def test_older_closed_incidents_cannot_crowd_out_the_active_queue(self):
+        self._incident(state='close', detected_days=200, name='Queue priority closed')
+        active = self._incident(name='Queue priority active')
+        with patch('odoo.addons.formula_incident_console.models.incident_console.LIST_LIMIT', 1):
+            data = self.console.with_user(self.analyst).get_incident_rows({'query': 'Queue priority'})
+        self.assertEqual([r['id'] for r in data['rows']], [active.id])
+        self.assertEqual(data['total'], 2)
+        self.assertTrue(data['truncated'])
 
     def test_helpdesk_ticket_absent_is_none(self):
         rec = self._incident(reporter=self.reporter)
