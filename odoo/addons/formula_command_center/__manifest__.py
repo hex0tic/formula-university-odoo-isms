@@ -1,6 +1,6 @@
 {
     'name': 'Formula Command Center (ISMS)',
-    'version': '18.0.1.0.0',
+    'version': '18.0.1.1.0',
     'category': 'Services/ISMS',
     'summary': 'ISMS Command Center: эрхээс хамаарсан KPI, 5x5 эрсдэлийн heatmap, инцидентийн SLA, хяналтын хамрах хүрээ',
     'description': """
