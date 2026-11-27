@@ -6,20 +6,33 @@
             <div class="fic" t-on-keydown="(ev) => this.onRootKeydown(ev)">
                 <header class="fic-header">
                     <div class="fic-title">
-                        <h1 class="fic-h1">Incident Console</h1>
-                        <p class="fic-sub">SLA-гийн яаралтай байдлаар эрэмбэлсэн инцидентүүд. Харагдах бүртгэл таны эрхээс хамаарна.</p>
-                        <p class="fic-meta" t-if="state.loading === false and !state.error and !state.denied">
-                            Нийт <t t-esc="state.total"/> инцидент
-                            <t t-if="state.truncated">(эхний 200-г харуулж байна)</t>
-                        </p>
+                        <p class="fic-kicker"><span aria-hidden="true"/> FORMULA UNIVERSITY · ISMS</p>
+                        <h1 class="fic-h1">Зөрчил шийдвэрлэх төв</h1>
+                        <p class="fic-sub">Зөрчлөө эрэмбэлж, хариуцагч болон дараагийн алхмыг шалгана.</p>
                     </div>
-                    <div class="fic-toolbar">
-                        <button type="button" class="fic-btn" t-att-disabled="state.loading"
-                                t-on-click="() => this.loadList()">Шинэчлэх</button>
-                    </div>
+                    <button type="button" class="fic-btn fic-refresh" t-att-disabled="state.loading"
+                            t-on-click="() => this.loadList()"><i class="fa fa-refresh" aria-hidden="true"/> Шинэчлэх</button>
                 </header>
 
-                <form class="fic-filters" role="search" aria-label="Инцидент шүүх" t-on-submit="(ev) => ev.preventDefault()">
+                <section t-if="state.summary and !state.denied" class="fic-queues" aria-label="Зөрчлийн тойм">
+                    <button t-foreach="queues" t-as="queue" t-key="queue.key" type="button" class="fic-queue"
+                            t-att-class="{'is-current': currentQueue === queue.key}"
+                            t-att-data-queue="queue.key"
+                            t-att-aria-pressed="currentQueue === queue.key ? 'true' : 'false'"
+                            t-on-click="() => this.selectQueue(queue.key)">
+                        <span><i t-attf-class="fa fa-{{queue.icon}}" aria-hidden="true"/> <t t-esc="queue.label"/></span>
+                        <strong t-esc="queue.count"/>
+                    </button>
+                </section>
+
+                <section t-if="!state.denied" class="fic-filters" aria-label="Зөрчил шүүх">
+                    <form class="fic-field fic-search" role="search" t-on-submit="applySearch">
+                        <label class="fic-label" for="fic-search">Зөрчил хайх</label>
+                        <div class="fic-search-line">
+                            <input id="fic-search" type="search" class="fic-select" placeholder="Дугаар эсвэл гарчиг" maxlength="100" t-model="state.search"/>
+                            <button class="fic-btn" type="submit" t-att-disabled="state.loading"><i class="fa fa-search" aria-hidden="true"/> Хайх</button>
+                        </div>
+                    </form>
                     <div class="fic-field">
                         <label class="fic-label" for="fic-filter-state">Үе шат</label>
                         <select id="fic-filter-state" class="fic-select" t-att-disabled="state.loading"
@@ -45,18 +58,13 @@
                         </select>
                     </div>
                     <label class="fic-check">
-                        <input type="checkbox" t-att-checked="state.filters.overdue" t-att-disabled="state.loading"
-                               t-on-change="(ev) => this.onFilterChange('overdue', ev.target.checked)"/>
-                        <span>Хугацаа хэтэрсэн</span>
-                    </label>
-                    <label class="fic-check">
                         <input type="checkbox" t-att-checked="state.filters.mine" t-att-disabled="state.loading"
                                t-on-change="(ev) => this.onFilterChange('mine', ev.target.checked)"/>
-                        <span>Миний инцидент</span>
+                        <span>Миний зөрчил</span>
                     </label>
                     <button type="button" class="fic-btn fic-btn-link" t-if="hasActiveFilters"
                             t-on-click="() => this.clearFilters()">Шүүлтүүр цэвэрлэх</button>
-                </form>
+                </section>
 
                 <div class="fic-live" aria-live="polite">
                     <span t-if="state.loading and state.rows.length">Шинэчилж байна…</span>
@@ -64,8 +72,12 @@
 
                 <div class="fic-body" t-attf-class="{{state.selectedId !== null ? 'has-drawer' : ''}}">
                     <section class="fic-list" aria-labelledby="fic-list-title">
-                        <h2 id="fic-list-title" class="fic-h2">Инцидентийн дараалал</h2>
 
+                        <div class="fic-list-head">
+                            <h2 id="fic-list-title" class="fic-h2" tabindex="-1" t-ref="listTitle">Зөрчлийн жагсаалт</h2>
+                            <span t-if="!state.error and !state.denied and state.summary" class="fic-meta"><t t-esc="state.total"/> зөрчил</span>
+                        </div>
+                        <p class="fic-hint fic-limit" t-if="state.truncated">Эхний <t t-esc="state.rows.length"/> зөрчлийг харуулж байна. Хайлт, шүүлтүүрээр үр дүнгээ нарийвчлаарай.</p>
                         <div t-if="state.loading and !state.rows.length" class="fic-skeleton" role="status"
                              aria-busy="true" aria-label="Ачаалж байна">
                             <div class="fic-skel-row"></div>
@@ -75,7 +87,7 @@
 
                         <div t-elif="state.denied" class="fic-state fic-state-denied" role="alert">
                             <p class="fic-strong">Энэ хэсгийг харах эрх байхгүй.</p>
-                            <p class="fic-hint">Инцидентийн консолыг МАБ-ын эрхтэй хэрэглэгч ашиглана.</p>
+                            <p class="fic-hint">Зөрчил шийдвэрлэх төвийг МАБ-ын эрхтэй хэрэглэгч ашиглана.</p>
                         </div>
 
                         <div t-elif="state.error" class="fic-state fic-state-error" role="alert">
@@ -85,27 +97,27 @@
                         </div>
 
                         <div t-elif="!state.rows.length" class="fic-state fic-state-empty" role="status">
-                            <p class="fic-strong">Таны эрхээр харагдах инцидент алга.</p>
+                            <p class="fic-strong">Таны эрхээр харагдах зөрчил алга.</p>
                             <p class="fic-hint" t-if="hasActiveFilters">Шүүлтүүрээ өөрчилж үзнэ үү.</p>
                         </div>
 
-                        <ul t-else="" class="fic-items" role="list" aria-label="Инцидентүүд">
-                            <t t-foreach="sortedRows" t-as="row" t-key="row.id">
+                        <ul t-else="" class="fic-items" role="list" aria-label="Зөрчлүүд">
+                            <t t-foreach="state.rows" t-as="row" t-key="row.id">
                                 <li class="fic-item">
                                     <button type="button"
                                             t-attf-class="fic-row fic-sev-{{row.severity}} {{row.id === state.selectedId ? 'is-selected' : ''}}"
-                                            t-att-aria-current="row.id === state.selectedId ? 'true' : 'false'"
+                                            t-att-aria-expanded="row.id === state.selectedId ? 'true' : 'false'"
                                             t-att-aria-label="row.code + ' ' + row.name + ', ' + row.state_label + ', ' + row.severity_label + ', ' + slaLabel(row)"
-                                            t-on-click="() => this.openIncident(row.id)">
+                                            t-on-click="(ev) => this.openIncident(row.id, ev.currentTarget)">
                                         <span class="fic-row-top">
                                             <span class="fic-code" t-esc="row.code"/>
                                             <span t-attf-class="fic-chip fic-state-{{row.state}}" t-esc="row.state_label"/>
                                             <span t-attf-class="fic-chip fic-sevchip-{{row.severity}}" t-esc="row.severity_label"/>
                                         </span>
-                                        <span class="fic-row-title" t-esc="row.name"/>
+                                        <span class="fic-row-title" t-esc="row.name"/><i class="fa fa-angle-right fic-row-arrow" aria-hidden="true"/>
                                         <span class="fic-row-bottom">
                                             <span t-attf-class="fic-sla fic-tone-{{slaTone(row)}}" t-esc="slaLabel(row)"/>
-                                            <span class="fic-meta">Шинжээч: <t t-esc="row.assignee ? row.assignee.name : 'томилогдоогүй'"/></span>
+                                            <span class="fic-meta">Хариуцагч: <t t-esc="row.assignee ? row.assignee.name : 'томилогдоогүй'"/></span>
                                         </span>
                                     </button>
                                 </li>
@@ -113,7 +125,12 @@
                         </ul>
                     </section>
 
-                    <aside t-if="state.selectedId !== null" class="fic-drawer" aria-label="Инцидентийн дэлгэрэнгүй">
+                    <aside t-if="state.selectedId !== null" class="fic-drawer" aria-label="Зөрчлийн дэлгэрэнгүй">
+                        <div class="fic-drawer-tools">
+                            <span class="fic-label">ЗӨРЧЛИЙН ДЭЛГЭРЭНГҮЙ</span>
+                            <button type="button" class="fic-btn fic-close" t-ref="drawerClose" t-att-disabled="isBusy"
+                                    aria-label="Дэлгэрэнгүйг хаах" t-on-click="() => this.closeDetail()"><i class="fa fa-times" aria-hidden="true"/></button>
+                        </div>
                         <div t-if="state.detailLoading" class="fic-skeleton" role="status" aria-busy="true" aria-label="Дэлгэрэнгүй ачаалж байна">
                             <div class="fic-skel-row"></div>
                             <div class="fic-skel-block"></div>
@@ -121,8 +138,7 @@
                         </div>
 
                         <div t-elif="state.detailError === 'denied'" class="fic-state fic-state-denied" role="alert">
-                            <p class="fic-strong">Энэ инцидентийг харах эрх байхгүй.</p>
-                            <button type="button" class="fic-btn" t-on-click="() => this.closeDetail()">Хаах</button>
+                            <p class="fic-strong">Энэ зөрчлийг харах эрх байхгүй.</p>
                         </div>
 
                         <div t-elif="state.detailError === 'error'" class="fic-state fic-state-error" role="alert">
@@ -138,8 +154,6 @@
                                     <p class="fic-code" t-esc="d.row.code"/>
                                     <h2 class="fic-h2 fic-drawer-title" tabindex="-1" t-ref="drawerTitle" t-esc="d.row.name"/>
                                 </div>
-                                <button type="button" class="fic-btn" aria-label="Дэлгэрэнгүйг хаах"
-                                        t-on-click="() => this.closeDetail()">Хаах</button>
                             </div>
 
                             <div class="fic-chips">
@@ -148,8 +162,20 @@
                                 <span class="fic-chip fic-chip-plain" t-esc="d.row.category_label"/>
                             </div>
 
+                            <ol class="fic-stage" aria-label="Зөрчлийн үе шат">
+                                <li t-foreach="stageSteps" t-as="step" t-key="step.key"
+                                    t-att-class="{'is-current': step.current, 'is-done': step.done}"
+                                    t-att-aria-current="step.current ? 'step' : undefined">
+                                    <span class="fic-stage-num" t-esc="step.number"/><span t-esc="step.label"/>
+                                </li>
+                            </ol>
+                            <div class="fic-detail-grid">
+                                <div><span>Хариуцагч</span><strong t-esc="d.row.assignee ? d.row.assignee.name : 'Томилоогүй'"/></div>
+                                <div><span>Хариу өгөх хугацаа</span><strong t-attf-class="fic-sla fic-tone-{{slaTone(d.row)}}" t-esc="slaLabel(d.row)"/></div>
+                            </div>
+
                             <div class="fic-alerts">
-                                <p t-if="d.row.sla_overdue" class="fic-alert fic-alert-danger" role="status">
+                                <p t-if="slaTone(d.row) === 'danger'" class="fic-alert fic-alert-danger" role="status">
                                     SLA хугацаа хэтэрсэн. Эскалаци шаардлагатай эсэхийг удирдлагад мэдэгдэж шийдвэрлүүлнэ үү.
                                 </p>
                                 <p t-if="d.row.is_open and !d.row.assignee" class="fic-alert fic-alert-warning" role="status">
@@ -160,6 +186,28 @@
                                 </p>
                             </div>
 
+                            <section class="fic-section" aria-labelledby="fic-transitions-title">
+                                <h3 id="fic-transitions-title" class="fic-h3">Дараагийн алхам</h3>
+                                <div class="fic-actions" t-if="transitions.length">
+                                    <t t-foreach="transitions" t-as="t" t-key="t.action">
+                                        <button type="button" class="fic-btn fic-btn-primary"
+                                                t-att-disabled="!t.allowed or isBusy"
+                                                t-att-aria-describedby="t.allowed ? false : 'fic-reason-' + t.action"
+                                                t-att-title="t.allowed ? t.label : t.reason"
+                                                t-on-click="() => this.runTransition(t.action)">
+                                            <t t-if="state.pendingAction === t.action">Гүйцэтгэж байна…</t>
+                                            <t t-else="" t-esc="t.label"/>
+                                        </button>
+                                    </t>
+                                </div>
+                                <p t-else="" class="fic-hint">Энэ үе шатаас шилжих алхам алга.</p>
+                                <t t-foreach="blockedReasons" t-as="t" t-key="t.action">
+                                    <p class="fic-hint fic-reason" t-att-id="'fic-reason-' + t.action" t-esc="t.label + ': ' + t.reason"/>
+                                </t>
+                                <p class="fic-hint" t-if="state.pendingAction">Нэг шилжилт гүйцэтгэгдэж байна. Дуустал хүлээнэ үү.</p>
+                            </section>
+
+                            <details class="fic-section fic-disclosure"><summary>Зөрчлийн бүртгэлийн мэдээлэл</summary>
                             <dl class="fic-dl">
                                 <dt>SLA хугацаа</dt>
                                 <dd><t t-esc="formatTs(d.row.sla_deadline)"/> <span t-attf-class="fic-sla fic-tone-{{slaTone(d.row)}}" t-esc="slaLabel(d.row)"/></dd>
@@ -181,26 +229,7 @@
                                 <dd><t t-esc="d.attachment_count"/> файл</dd>
                             </dl>
 
-                            <section class="fic-section" aria-labelledby="fic-transitions-title">
-                                <h3 id="fic-transitions-title" class="fic-h3">Үе шилжилт</h3>
-                                <div class="fic-actions" t-if="transitions.length">
-                                    <t t-foreach="transitions" t-as="t" t-key="t.action">
-                                        <button type="button" class="fic-btn fic-btn-primary"
-                                                t-att-disabled="!t.allowed or isBusy"
-                                                t-att-aria-describedby="t.allowed ? false : 'fic-reason-' + t.action"
-                                                t-att-title="t.allowed ? t.label : t.reason"
-                                                t-on-click="() => this.runTransition(t.action)">
-                                            <t t-if="state.pendingAction === t.action">Гүйцэтгэж байна…</t>
-                                            <t t-else="" t-esc="t.label"/>
-                                        </button>
-                                    </t>
-                                </div>
-                                <p t-else="" class="fic-hint">Энэ үе шатаас шилжих алхам алга.</p>
-                                <t t-foreach="blockedReasons" t-as="t" t-key="t.action">
-                                    <p class="fic-hint fic-reason" t-att-id="'fic-reason-' + t.action" t-esc="t.label + ': ' + t.reason"/>
-                                </t>
-                                <p class="fic-hint" t-if="state.pendingAction">Нэг шилжилт гүйцэтгэгдэж байна. Дуустал хүлээнэ үү.</p>
-                            </section>
+                            </details>
 
                             <section class="fic-section" aria-labelledby="fic-desc-title">
                                 <h3 id="fic-desc-title" class="fic-h3">Юу болсон бэ?</h3>
@@ -242,7 +271,7 @@
                                     <p class="fic-hint">Шалгалтын тэмдэглэлийг зөвхөн МАБ шинжээч болон аудитор харна.</p>
                                 </t>
                                 <t t-else="">
-                                    <p class="fic-hint" t-if="!canSaveNotes">Энэ тэмдэглэлийг засах эрх байхгүй эсвэл инцидент хаагдсан байна.</p>
+                                    <p class="fic-hint" t-if="!canSaveNotes">Энэ тэмдэглэлийг засах эрх байхгүй эсвэл зөрчил хаагдсан байна.</p>
                                     <div class="fic-notes">
                                         <label class="fic-label" for="fic-note-containment">Хязгаарлах арга хэмжээ</label>
                                         <textarea id="fic-note-containment" class="fic-textarea" rows="2"

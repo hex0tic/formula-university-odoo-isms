@@ -1,6 +1,6 @@
 {
     'name': 'Formula Incident Console (ISMS)',
-    'version': '18.0.1.0.0',
+    'version': '18.0.1.1.0',
     'category': 'Services/ISMS',
     'summary': 'SOC-гийн маягийн инцидентийн консол: SLA, шилжилт, цагийн тэнхлэг, эрхийн шалгалт',
     'description': """

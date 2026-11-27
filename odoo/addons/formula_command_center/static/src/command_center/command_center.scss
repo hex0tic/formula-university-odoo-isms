@@ -634,7 +634,7 @@
     .fcc-hero-refresh { background: var(--fcc-brand); color: #101c32; border-color: transparent; min-height: 40px; font-weight: 730; }
     .fcc-hero-refresh:hover:not(:disabled) { background: #e8ff9d; }
     .fcc-toolbar :focus-visible { outline-color: var(--fcc-brand); }
-    .fcc-btn-primary, .fcc-seg-btn.is-active { color: var(--fcc-on-action); }
+    .fcc-btn-primary, .fcc-seg-btn.is-active { background: var(--fds-action-fill, #006b61); color: var(--fcc-on-action); }
     .fcc :is(button, select, summary):focus-visible { outline: 2px solid var(--fds-focus, #006b61); outline-offset: 2px; }
     .fcc-header :is(button, select):focus-visible { outline-color: var(--fcc-brand); }
 

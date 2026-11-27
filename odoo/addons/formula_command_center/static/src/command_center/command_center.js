@@ -23,7 +23,7 @@ const DENIED = _t("Энэ хэсгийг харах эрх байхгүй.");
 const PRIMARY_CARDS = [
     ["incidents_open", "bell", _t("Шийдвэрлэх шатанд байгаа")],
     ["risks_total", "crosshairs", _t("Эрсдэлийн бүртгэл")],
-    ["controls_implemented", "shield", _t("Хэрэгжсэн хяналт")],
+    ["controls_implemented", "shield", _t("Сонгосон хяналтын хэрэгжилт")],
     ["assets_total", "cubes", _t("Мэдээллийн хөрөнгийн бүртгэл")],
 ];
 const PRIORITIES = [

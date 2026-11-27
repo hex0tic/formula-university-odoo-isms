@@ -515,3 +515,124 @@
         }
     }
 }
+
+// Shared visual language with the ISMS dashboard.
+.o_formula_incident_console {
+    --fic-primary: var(--fds-primary, #006b61);
+    --fic-primary-text: var(--fds-primary-text, #006b61);
+    --fic-primary-soft: var(--fds-primary-soft, #e3f0ea);
+    --fic-bg: var(--fds-bg, #f7f5ee);
+    --fic-text: var(--fds-text, #101c32);
+    --fic-muted: var(--fds-text-muted, #495951);
+    --fic-radius: var(--fds-radius-lg, 12px);
+    --fic-sev-critical: var(--fds-danger-soft, #fee2e2);
+    --fic-ink-critical: var(--fds-danger-text, #991b1b);
+    --fic-ink-high: var(--fds-warning-text, #92400e);
+    --fic-sev-high: var(--fds-warning-soft, #ffedd5);
+    --fic-ink-medium: var(--fds-info-text, #075e79);
+    --fic-sev-medium: var(--fds-bg-muted, #f1f4fa);
+    --fic-ink-low: var(--fds-success-text, #166534);
+    --fic-sev-low: var(--fds-success-soft, #dcfce7);
+    --fic-state-bg: var(--fds-bg-muted, #eeeee5);
+    --fic-state-ink: var(--fic-text);
+
+    .fic { padding: clamp(12px, 2.5vw, 36px); overflow-x: clip; font-family: var(--fds-font-family, system-ui, sans-serif); }
+    .fic > * { max-width: 1520px; margin-inline: auto; }
+    .fic-header {
+        isolation: isolate;
+        position: relative;
+        overflow: hidden;
+        align-items: flex-end;
+        min-height: 174px;
+        padding: clamp(18px, 3.5vw, 42px);
+        background: var(--fds-brand-navy, #101c32);
+        color: #f7f5ee;
+        border-radius: 18px;
+    }
+    .fic-header::after {
+        position: absolute; z-index: -1; content: ""; pointer-events: none;
+        width: #{"min(70vw, 600px)"};
+        aspect-ratio: 1; right: -60px; top: -125%; border-radius: 50%;
+        background: repeating-radial-gradient(circle, transparent 0 28px, rgba(214, 241, 122, .16) 29px 30px, transparent 31px 48px);
+    }
+    .fic-kicker { color: #d6f17a; font-size: 10px; font-weight: 800; letter-spacing: .13em; margin: 0 0 12px; }
+    .fic-kicker span { display: inline-block; width: 11px; height: 11px; margin-right: 3px; border: 2px solid currentColor; border-radius: 3px 3px 8px 8px; }
+    .fic-h1 { color: inherit; font-size: clamp(26px, 4vw, 49px); letter-spacing: -.04em; line-height: 1.08; }
+    .fic-sub { margin-top: 9px; color: #c1d0ce; }
+    .fic-refresh { background: #d6f17a; color: #101c32; border-color: transparent; position: relative; }
+    .fic-refresh i, .fic-search-line i { margin-right: 6px; }
+    .fic-refresh:hover:not(:disabled) { background: #e8ff9d; }
+    .fic-refresh:focus-visible { outline-color: #d6f17a; }
+
+    .fic-queues { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; margin-bottom: 14px; }
+    .fic-queue {
+        text-align: left; display: grid; align-content: space-between; gap: 6px; min-height: 82px;
+        background: var(--fic-surface); color: var(--fic-muted); padding: 10px 12px;
+        border: 1px solid var(--fic-border); border-radius: var(--fic-radius);
+        font: inherit; font-size: 12px; font-weight: 690;
+        transition: background-color var(--fds-duration-fast, 150ms) ease, border-color var(--fds-duration-fast, 150ms) ease;
+    }
+    .fic-queue strong { color: var(--fic-text); font-size: 26px; line-height: 1; font-variant-numeric: tabular-nums; }
+    .fic-queue i { margin-right: 4px; }
+    .fic-queue:hover, .fic-queue.is-current { border-color: var(--fic-primary-text); }
+    .fic-queue.is-current { background: var(--fic-primary-soft); color: var(--fic-primary-text); box-shadow: inset 0 3px 0 var(--fic-primary-text); }
+    .fic-queue[data-queue="overdue"] strong { color: var(--fic-ink-critical); }
+
+    .fic-filters, .fic-list, .fic-drawer { box-shadow: var(--fds-shadow-card, none); }
+    .fic-filters { gap: 9px 12px; padding: 12px; }
+    .fic-field { flex: 1 1 110px; }
+    .fic-search { flex: 2 1 220px; }
+    .fic-search-line { display: flex; gap: 6px; }
+    .fic-search-line .fic-select { min-width: 0; }
+    .fic-search-line .fic-btn { flex: none; padding-inline: 9px; }
+    .fic-select { min-height: 39px; }
+    .fic-check { font-size: 12px; align-self: flex-end; min-height: 39px; }
+    .fic-btn-primary { color: var(--fds-on-action, #fff); background: var(--fds-action-fill, #006b61); border-color: var(--fds-action-fill, #006b61); }
+    .fic-btn-link { color: var(--fic-primary-text); font-size: 12px; }
+    .fic :is(button, select, input, summary):focus-visible { outline: 2px solid var(--fic-focus); outline-offset: 2px; }
+    .fic-list-head, .fic-drawer-tools { display: flex; align-items: center; justify-content: space-between; gap: 9px; margin-bottom: 11px; }
+    .fic-list-head .fic-h2 { margin-bottom: 0; font-size: 18px; font-weight: 760; }
+    .fic-limit { margin-bottom: 10px; }
+    .fic-live:empty { display: none; }
+
+    .fic-row { position: relative; padding: 10px 28px 10px 10px; transition: background-color var(--fds-duration-fast, 150ms) ease, border-color var(--fds-duration-fast, 150ms) ease; }
+    .fic-row-arrow { position: absolute; right: 11px; inset-block-start: 45%; color: var(--fic-muted); }
+    .fic-row:hover { background: var(--fic-bg); }
+    .fic-row.is-selected { background: var(--fic-primary-soft); box-shadow: inset 0 0 0 1px var(--fic-primary-text); }
+    .fic-row-title { font-weight: 720; }
+    .fic-row-bottom { justify-content: space-between; gap: 4px 9px; }
+    .fic-row-bottom .fic-meta { font-size: 11px; overflow-wrap: anywhere; }
+    .fic-chip { font-size: 11px; border-radius: 5px; }
+    .fic-code { color: var(--fic-primary-text); font-weight: 690; }
+
+    .fic-drawer { border-top: 3px solid var(--fic-primary); }
+    .fic-drawer .fic-drawer-title { font-size: clamp(17px, 2vw, 23px); font-weight: 770; }
+    .fic-drawer-tools .fic-label { color: var(--fic-primary-text); font-size: 10px; letter-spacing: .12em; font-weight: 800; }
+    .fic-close { width: 36px; padding: 0; }
+    .fic-stage { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 4px; list-style: none; padding: 8px 0; margin: 0 0 8px; border-block: 1px solid var(--fic-border); }
+    .fic-stage li { display: grid; justify-items: center; align-content: start; gap: 4px; text-align: center; color: var(--fic-muted); font-size: 10px; overflow-wrap: anywhere; }
+    .fic-stage-num { display: grid; place-items: center; width: 23px; height: 23px; border: 1px solid var(--fic-border); border-radius: 50%; font-weight: 720; }
+    .fic-stage .is-current { color: var(--fic-primary-text); font-weight: 780; }
+    .fic-stage .is-current .fic-stage-num { background: var(--fds-action-fill, #006b61); color: var(--fds-on-action, #fff); border-color: transparent; }
+    .fic-stage .is-done .fic-stage-num { background: var(--fic-primary-soft); color: var(--fic-primary-text); }
+
+    .fic-detail-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; margin: 0 0 10px; }
+    .fic-detail-grid > div { background: var(--fic-bg); border-radius: 8px; padding: 8px; overflow-wrap: anywhere; }
+    .fic-detail-grid > div > span { display: block; color: var(--fic-muted); font-size: 11px; margin-bottom: 4px; }
+    .fic-detail-grid strong { font-size: 12px; }
+    .fic-section .fic-h3, .fic-disclosure summary { color: var(--fic-text); font-size: 14px; font-weight: 740; }
+    .fic-disclosure summary { cursor: pointer; }
+    .fic-alert-warning { background: var(--fds-warning-soft, #fef3c7); color: var(--fds-warning-text, #92400e); }
+
+    @media (min-width: 680px) {
+        .fic-queues { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+        .fic-queue { padding: 12px 16px; }
+    }
+    @media (max-width: 1023.98px) {
+        .fic-body.has-drawer .fic-list { display: none; }
+    }
+    @media (min-width: 1024px) {
+        .fic-body.has-drawer { grid-template-columns: minmax(0, 1fr) minmax(0, 43%); }
+        .fic-body:not(.has-drawer) .fic-items { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+}
