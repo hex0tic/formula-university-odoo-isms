@@ -45,8 +45,8 @@ Environment variables (all optional except where noted):
 | `ISMS_FILESTORE_PATH` | `/var/lib/odoo/filestore/<db>` | filestore path inside the Odoo container (backup) |
 | `ISMS_FILESTORE_ROOT` | `/var/lib/odoo/filestore` | filestore root inside the Odoo container (restore) |
 | `ISMS_BACKUP_ROOT` | `/var/backups/isms` | primary root; must be outside the repository (enforced) |
-| `ISMS_BACKUP_COPY_DIRS` | empty | colon-separated extra local directories (second copy, mounted offsite disk, NAS) |
-| `ISMS_BACKUP_RSYNC_TARGET` | empty | `user@host:/absolute/path`, copied with rsync over ssh (BatchMode, key-based) |
+| `ISMS_BACKUP_COPY_DIRS` | empty | colon-separated mountpoints on separate filesystems (mounted backup disk or NAS). Do not list an ordinary directory or a path below the mountpoint. |
+| `ISMS_BACKUP_RSYNC_TARGET` | empty | `user@host:/absolute/path`, copied with rsync over SSH (BatchMode, pinned host key). Both endpoints need rsync. |
 | `ISMS_BACKUP_KEY_FILE` | empty | encryption key file; if empty, backups are NOT encrypted |
 | `ISMS_BACKUP_KEEP_DAILY` | `7` | newest backup of each of the last N days is kept |
 | `ISMS_BACKUP_KEEP_WEEKLY` | `4` | newest backup of each of the last N ISO weeks is kept |
@@ -78,3 +78,5 @@ Per database and per root: the newest backup of each of the last `KEEP_DAILY` UT
 - Filestore and dump are not taken in one transaction. A file added between the two steps can appear as an orphan (harmless); a file referenced by the dump but missing from the archive is detected by the attachment check.
 - `chattr +i` needs root (CAP_LINUX_IMMUTABLE) and a filesystem that supports it. Real WORM protection needs WORM media or object-lock storage: NOT VERIFIED here.
 - Remote retention runs `isms_backup_tool.py` over ssh on the offsite host (requires `python3` there).
+
+Secondary targets require encryption. A missing mount or one on the primary filesystem is reported as a copy failure; the primary archive is still published and verified. Separate filesystems may still share a device or location; verify separation with the storage owner before recording an offsite backup.

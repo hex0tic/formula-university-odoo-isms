@@ -24,6 +24,10 @@ class TestHelpdeskPortalBase(HttpCaseWithUserPortal):
             "portal-new-submitted-ticket-description-line-2",
         )
         cls.company = cls.env.ref("base.main_company")
+        cls.category = cls.env["helpdesk.ticket.category"].create({
+            "name": "Portal test category",
+            "company_id": cls.company.id,
+        })
         cls.partner_portal.parent_id = cls.company.partner_id
         # Create a basic user with no helpdesk permissions.
         cls.basic_user = new_test_user(cls.env, login="test-basic-user")
@@ -51,7 +55,7 @@ class TestHelpdeskPortalBase(HttpCaseWithUserPortal):
 
     def _submit_ticket(self, **values):
         data = {
-            "category": self.env.ref("helpdesk_mgmt.helpdesk_category_1").id,
+            "category": self.category.id,
             "csrf_token": http.Request.csrf_token(self),
             "subject": self.new_ticket_title,
             "description": "\n".join(self.new_ticket_desc_lines),

@@ -260,10 +260,12 @@ class TestIncidentConsole(TransactionCase):
 
     def test_overdue_and_state_filters(self):
         overdue = self._incident(severity='high', detected_days=10, reporter=self.reporter_other)
-        self._incident(severity='low', reporter=self.reporter_other)
+        on_track = self._incident(severity='low', reporter=self.reporter_other)
+        reported = self._incident(state='report', reporter=self.reporter_other)
+        fixtures = {overdue.id, on_track.id, reported.id}
         ids = self._row_ids(self.analyst, {'overdue': True})
-        self.assertEqual(ids, {overdue.id})
-        self.assertEqual(self._row_ids(self.analyst, {'state': 'report'}), set())
+        self.assertEqual(ids & fixtures, {overdue.id})
+        self.assertEqual(self._row_ids(self.analyst, {'state': 'report'}) & fixtures, {reported.id})
 
     def test_mine_filter_uses_reporter_and_assignee(self):
         own = self._incident(reporter=self.reporter)

@@ -53,6 +53,7 @@
                         <li><a href="/university/admissions/status">Өргөдлийн төлөв</a> хэсгээс шийдвэрээ харна.</li></ol>
                     <p>Сургалтын жишээ орчин тул иргэний үнэмлэх, банкны мэдээлэл оруулах шаардлагагүй.</p></div>
                 <form t-if="programs" class="fu-aside fu-inquiry" method="post" action="/university/admissions/apply">
+                    <p>Таны овог нэр, цахим шуудан, сонгосон хөтөлбөр, суралцах зорилгыг сургалтын алба өргөдөл шийдвэрлэхэд ашиглана. Иргэний үнэмлэхийн дугаар, нууц үг болон бусад эмзэг мэдээлэл бүү оруулаарай.</p>
                     <h2>Өргөдлийн мэдээлэл</h2>
                     <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
                     <div class="fu-honeypot" inert="inert"><label>Website <input name="website" tabindex="-1" autocomplete="off"/></label></div>

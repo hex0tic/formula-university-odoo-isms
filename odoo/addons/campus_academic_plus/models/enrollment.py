@@ -156,4 +156,7 @@ class CampusStudentAcademic(models.Model):
         if not is_registrar(self.env) and (not self.user_id or self.user_id != user):
             raise AccessError(_("Зөвхөн өөрийн транскриптыг хэвлэнэ."))
         self.check_access("read")
-        return self.env.ref("campus_academic_plus.action_report_transcript").report_action(self)
+        # The portal may read its own student record but has no generic access
+        # to report action definitions. The fixed action only returns metadata.
+        report = self.env.ref("campus_academic_plus.action_report_transcript").sudo()
+        return report.report_action(self, config=False)

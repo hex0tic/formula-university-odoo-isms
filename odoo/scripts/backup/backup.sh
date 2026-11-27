@@ -14,7 +14,7 @@
 #   ISMS_FILESTORE_PATH     filestore dir inside Odoo container   (default /var/lib/odoo/filestore/<db>)
 #   ISMS_BACKUP_ROOT        primary backup root (must be outside the repository)
 #                                                                  (default /var/backups/isms)
-#   ISMS_BACKUP_COPY_DIRS   colon-separated extra local dirs (e.g. a NAS or a mounted offsite disk)
+#   ISMS_BACKUP_COPY_DIRS   colon-separated mountpoints for separate backup disks or NAS shares
 #   ISMS_BACKUP_RSYNC_TARGET optional user@host:/absolute/path, copied over rsync+ssh (BatchMode)
 #   ISMS_BACKUP_KEY_FILE    optional path to an encryption key FILE (mode 0400/0600). The key
 #                           is never printed and never stored in the repository.
@@ -87,8 +87,8 @@ esac
   || die 1 "retention values must be non-negative integers"
 [[ "$ISMS_BACKUP_IMMUTABLE" == 0 || "$ISMS_BACKUP_IMMUTABLE" == 1 ]] || die 1 "ISMS_BACKUP_IMMUTABLE must be 0 or 1"
 
-if [[ -n "$ISMS_BACKUP_RSYNC_TARGET" ]]; then
-  case "$ISMS_BACKUP_RSYNC_TARGET" in *"'"*|*'"'*|*" "*) die 1 "rsync target must not contain quotes or spaces" ;; esac
+if [[ -n "$ISMS_BACKUP_RSYNC_TARGET" && ! "$ISMS_BACKUP_RSYNC_TARGET" =~ ^[a-zA-Z0-9_][a-zA-Z0-9_.@-]*:/[a-zA-Z0-9_./-]+$ ]]; then
+  die 1 "rsync target must be user@host:/absolute/path with plain path components"
 fi
 
 ENCRYPT=0
@@ -99,6 +99,9 @@ if [[ -n "$ISMS_BACKUP_KEY_FILE" ]]; then
   if (( 8#$mode & 8#077 )); then die 2 "key file mode must be 0400 or 0600 (found $mode)"; fi
   [[ -s "$ISMS_BACKUP_KEY_FILE" ]] || die 2 "key file is empty"
   ENCRYPT=1
+fi
+if [[ -n "$ISMS_BACKUP_COPY_DIRS$ISMS_BACKUP_RSYNC_TARGET" ]] && (( ! ENCRYPT )); then
+  die 1 "secondary backup requires ISMS_BACKUP_KEY_FILE"
 fi
 
 for c in "$ISMS_DB_CONTAINER" "$ISMS_ODOO_CONTAINER"; do
@@ -216,8 +219,10 @@ IFS=':' read -r -a COPY_LIST <<< "$ISMS_BACKUP_COPY_DIRS"
 for dir in "${COPY_LIST[@]}"; do
   [[ -n "$dir" ]] || continue
   [[ "$dir" == /* ]] || { log "copy target must be absolute: $dir"; COPY_FAILURES=$((COPY_FAILURES+1)); continue; }
-  if [[ "$(realpath -m "$dir")" == "$(realpath -m "$ISMS_BACKUP_ROOT")" ]]; then
-    log "copy target equals primary root, skipped: $dir"; COPY_FAILURES=$((COPY_FAILURES+1)); continue
+  if ! mountpoint -q -- "$dir" || [[ "$(stat -Lc %d -- "$dir")" == "$(stat -Lc %d -- "$ISMS_BACKUP_ROOT")" ]]; then
+    log "copy target is not a mounted, separate filesystem: $dir"
+    COPY_FAILURES=$((COPY_FAILURES+1))
+    continue
   fi
   target="$dir/$ISMS_DB_NAME/$TS"
   if ! { mkdir -p -- "$dir/$ISMS_DB_NAME" && mkdir -- "$target.partial"; } 2>/dev/null; then
@@ -240,9 +245,9 @@ if [[ -n "$ISMS_BACKUP_RSYNC_TARGET" ]]; then
     rhost="${BASH_REMATCH[1]}"; rpath="${BASH_REMATCH[2]%/}"
     rdir="$rpath/$ISMS_DB_NAME"
     rfinal="$rdir/$TS"
-    SSH=(ssh -o BatchMode=yes -o ConnectTimeout=20)
+    SSH=(ssh -o BatchMode=yes -o ConnectTimeout=20 -o StrictHostKeyChecking=yes)
     if "${SSH[@]}" "$rhost" "mkdir -p '$rdir' && rm -rf '$rfinal.partial' && mkdir '$rfinal.partial'" \
-       && rsync -a --partial -e "ssh -o BatchMode=yes -o ConnectTimeout=20" "$FINAL/" "$rhost:$rfinal.partial/" \
+       && rsync -a --partial -e "ssh -o BatchMode=yes -o ConnectTimeout=20 -o StrictHostKeyChecking=yes" "$FINAL/" "$rhost:$rfinal.partial/" \
        && "${SSH[@]}" "$rhost" "cd '$rfinal.partial' && sha256sum -c --quiet SHA256SUMS && mv '$rfinal.partial' '$rfinal' && touch '$rfinal/COMPLETE'"; then
       log "rsync ok: $rhost:$rfinal"
     else
