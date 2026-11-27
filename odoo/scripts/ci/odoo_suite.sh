@@ -26,10 +26,15 @@ docker run -d --name "$id-db" --network "$id" --network-alias db \
   -e POSTGRES_USER=odoo -e POSTGRES_PASSWORD="$password" \
   "${FORMULA_CI_POSTGRES_IMAGE:-postgres:16-alpine}" -c jit=off >/dev/null
 for _ in {1..60}; do
-  docker exec "$id-db" pg_isready -U odoo -d postgres >/dev/null 2>&1 && break
+  # Wait for the listener that Odoo uses, not the bootstrap Unix socket.
+  docker exec "$id-db" pg_isready -h 127.0.0.1 -U odoo -d postgres >/dev/null 2>&1 && break
+  [[ "$(docker inspect -f '{{.State.Running}}' "$id-db")" == true ]] || break
   sleep 1
 done
-docker exec "$id-db" pg_isready -U odoo -d postgres >/dev/null
+if ! docker exec "$id-db" pg_isready -h 127.0.0.1 -U odoo -d postgres; then
+  docker logs "$id-db"
+  exit 1
+fi
 
 run_odoo() {
   local path="$1"
