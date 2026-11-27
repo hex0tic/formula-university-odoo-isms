@@ -1,10 +1,13 @@
 # Copyright 2023 Tecnativa - Víctor Martínez
 # License AGPL-3 - See http://www.gnu.org/licenses/agpl-3.0.html
-from odoo.tests import new_test_user
+from odoo.tests import new_test_user, tagged
 
 from odoo.addons.base.tests.common import BaseCommon
 
 
+# The installed ISMS bridge adds fields used by ticket record rules. During
+# upgrades those rules are already stored before the bridge model is loaded.
+@tagged("post_install", "-at_install")
 class TestHelpdeskTicketBase(BaseCommon):
     @classmethod
     def setUpClass(cls):

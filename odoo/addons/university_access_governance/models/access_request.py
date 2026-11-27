@@ -2,6 +2,8 @@
 import logging
 from datetime import timedelta
 
+from psycopg2.errors import SerializationFailure
+
 from odoo import SUPERUSER_ID, Command, _, api, fields, models, tools
 from odoo.exceptions import AccessError, UserError, ValidationError
 
@@ -17,7 +19,7 @@ REQUEST_STATES = [
     ('expired', 'Хугацаа дууссан'), ('revoked', 'Цуцалсан'), ('rejected', 'Татгалзсан'),
 ]
 REQUEST_AUDIT_FIELDS = {'approver_id', 'approved_at', 'activated_at', 'ended_at',
-                        'added_group_ids', 'outcome', 'rejected_reason'}
+                        'added_group_ids', 'managed_group_ids', 'outcome', 'rejected_reason'}
 PROTECTED_FIELDS = REQUEST_AUDIT_FIELDS | {'state', 'is_privileged'}
 BUSINESS_FIELDS = {'requester_id', 'target_user_id', 'group_ids', 'justification', 'start_date', 'end_date'}
 POLICY = {
@@ -52,8 +54,11 @@ class AccessRequest(models.Model):
     ended_at = fields.Datetime('Дууссан огноо', readonly=True, copy=False)
     added_group_ids = fields.Many2many('res.groups', 'access_request_added_group_rel', 'request_id', 'group_id',
                                        'Нэмсэн бүлгүүд', readonly=True, copy=False,
-                                       help='Олголтын үед хэрэглэгчид байгаагүй, энэ хүсэлтээр нэмэгдсэн бүлгүүд. '
-                                            'Зөвхөн эдгээрийг хугацаа дуусахад хасна.')
+                                       help='Идэвхжүүлэх үед энэ хүсэлтээр шууд нэмсэн бүлгүүд.')
+    managed_group_ids = fields.Many2many(
+        'res.groups', 'access_request_managed_group_rel', 'request_id', 'group_id',
+        'Хүсэлтээр удирдах бүлгүүд', readonly=True, copy=False,
+    )
     outcome = fields.Text('Үр дүн', readonly=True, copy=False)
     rejected_reason = fields.Text('Татгалзсан шалтгаан', copy=False)
 
@@ -218,10 +223,12 @@ class AccessRequest(models.Model):
         return True
 
     def _grant(self):
-        """Бүлгүүдийг олгоно. Хэрэглэгчид аль хэдийн байгаа бүлгийг хэзээ ч хасахгүй (add-only bookkeeping)."""
+        """Track newly linked groups, including the links materialized by Odoo."""
         self.ensure_one()
+        target = self._lock_target()
+        if self.state != 'approved':
+            raise UserError(_('Зөвхөн батлагдсан хүсэлтийг идэвхжүүлнэ.'))
         now = fields.Datetime.now()
-        target = self.target_user_id
         if self.end_date <= now:
             self._set_state('expired', ended_at=now, outcome=_('Хугацаа өнгөрсөн тул олгоогүй.'))
             return
@@ -232,16 +239,36 @@ class AccessRequest(models.Model):
             raise AccessError(_('Өөрийн эрхийг өөрөө өөрчлөхгүй (GOV-05).'))
         if not self.env.su and has_privileged_groups(self.group_ids) and not is_system(actor):
             raise AccessError(_('Давуу эрхийг зөвхөн системийн администратор олгоно (A.8.2).'))
-        effective = effective_groups(target.groups_id)
+        before = target.groups_id
+        effective = effective_groups(before)
         added = self.group_ids - effective
-        conflicts = new_sod_conflicts(self.env, target.groups_id, target.groups_id | added)
+        conflicts = new_sod_conflicts(self.env, before, before | added)
         if conflicts:
             raise UserError(_('Үүргийн тусгаарлалтын зөрчил (A.5.3): %s', '; '.join(conflicts)))
         link_groups(target, added)
+        managed = target.groups_id - before
         note = _('Нэмсэн бүлгүүд: %s', ', '.join(added.mapped('name'))) if added else \
             _('Бүлэг нэмэгдээгүй (хэрэглэгчид аль хэдийн байсан).')
-        self._set_state('active', activated_at=now, added_group_ids=[Command.set(added.ids)], outcome=note)
+        self._set_state('active', activated_at=now, added_group_ids=[Command.set(added.ids)],
+                        managed_group_ids=[Command.set(managed.ids)], outcome=note)
         self.message_post(body=note)
+
+    def _lock_target(self):
+        """Serialize grant and expiry transitions for one user across workers.
+
+        The no-op update changes the row's MVCC version even for metadata-only
+        transitions. A stale Repeatable Read snapshot must retry, not decide from
+        an out-of-date list of active requests. Actual role changes use the ORM.
+        """
+        target = self.target_user_id
+        self.env.cr.execute("UPDATE res_users SET write_date = write_date WHERE id = %s", [target.id])
+        return target
+
+    def _tracked_groups(self):
+        self.ensure_one()
+        # Older grants tracked explicit links only; do not guess which inherited
+        # links predated their activation.
+        return self.managed_group_ids or self.added_group_ids
 
     def action_revoke(self):
         self.check_access('write')
@@ -254,19 +281,42 @@ class AccessRequest(models.Model):
         return True
 
     def _end_grant(self, new_state):
-        """Энэ хүсэлтээр нэмсэн бүлгүүдийг хасна. Өөр идэвхтэй хүсэлт шаарддаг бүлгийг хасахгүй."""
+        """Pass ownership of a shared temporary link to a surviving request."""
         self.ensure_one()
+        target = self._lock_target()
+        if self.state != 'active':
+            raise UserError(_('Зөвхөн идэвхтэй хүсэлтийг дуусгана.'))
         now = fields.Datetime.now()
-        target = self.target_user_id
-        others = self.search([('target_user_id', '=', target.id), ('state', '=', 'active'),
-                              ('id', '!=', self.id)]).mapped('added_group_ids')
-        to_remove = (self.added_group_ids - others) & target.groups_id
+        others = self.sudo().search([
+            ('target_user_id', '=', target.id), ('state', '=', 'active'), ('id', '!=', self.id),
+        ], order='end_date desc, id')
+        tracked = self._tracked_groups()
+        for other in others:
+            tracked |= other._tracked_groups()
+        current = target.groups_id
+        permanent = effective_groups(current - tracked)
+        to_remove = (self._tracked_groups() & current) - permanent
+        transfers = []
+        valid = others.filtered(lambda req: req.end_date > now)
+        for other in valid | (others - valid):
+            if other in valid:
+                required = effective_groups(other.group_ids)
+            else:
+                # An expired parent may still be physically linked until the cron
+                # ends that request. Odoo would re-add its implied groups on write.
+                required = effective_groups(other._tracked_groups() & current)
+            shared = to_remove & required
+            if shared:
+                transfers.append((other, other._tracked_groups() | shared))
+                to_remove -= shared
         if not self.env.su and has_privileged_groups(to_remove) and not is_system(self.env.user):
             raise AccessError(_('Давуу эрхийг зөвхөн системийн администратор хасна (A.8.2).'))
+        for successor, groups in transfers:
+            super(AccessRequest, successor).write({'managed_group_ids': [Command.set(groups.ids)]})
         unlink_groups(target, to_remove)
         outcome = _('Хасагдсан бүлгүүд: %s', ', '.join(to_remove.mapped('name'))) if to_remove \
             else _('Хасах бүлэг байхгүй (өөр хүсэлт эсвэл өмнөх эрх).')
-        self._set_state(new_state, ended_at=now, outcome=outcome)
+        self._set_state(new_state, ended_at=now, managed_group_ids=[Command.clear()], outcome=outcome)
         self.message_post(body=outcome)
 
     # ------------------------------------------------------------ scheduled jobs
@@ -290,6 +340,8 @@ class AccessRequest(models.Model):
         try:
             with self.env.cr.savepoint():
                 action(rec)
+        except SerializationFailure:
+            raise
         except Exception as exc:
             _logger.exception('Access request %s: scheduled step failed', rec.id)
             rec.sudo().message_post(body=_('Автомат алхам амжилтгүй: %s', exc))

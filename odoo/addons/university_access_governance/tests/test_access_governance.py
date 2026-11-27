@@ -277,6 +277,77 @@ class TestAccessGovernance(TransactionCase):
         self.assertEqual(req.sudo().state, 'approved')
         self.assertFalse(self.orphan.has_group('university_isms.group_isms_analyst'))
 
+    def _activate_for_orphan(self, *groups):
+        req = self._request(self.requester, self.orphan, groups)
+        req.action_submit()
+        req.with_user(self.erp).action_approve()
+        req.with_user(self.erp).action_activate()
+        return req.sudo()
+
+    def _expire_request(self, request):
+        now = fields.Datetime.now()
+        request.write({'start_date': now - timedelta(hours=3),
+                       'end_date': now - timedelta(hours=1)})
+
+    def test_overlapping_role_survives_first_expiry(self):
+        first = self._activate_for_orphan(self.analyst, self.reporter)
+        second = self._activate_for_orphan(self.analyst, self.reporter)
+        self.assertFalse(second.added_group_ids)
+        self._expire_request(first)
+        self.Request._cron_process_grants()
+        self.assertEqual(first.state, 'expired')
+        self.assertIn(self.analyst, self.orphan.groups_id)
+        self.assertFalse(second.added_group_ids, 'Activation history must stay unchanged')
+        second.with_user(self.erp).action_revoke()
+        self.assertNotIn(self.analyst, self.orphan.groups_id)
+        self.assertIn(self.reporter, self.orphan.groups_id)
+
+    def test_overlapping_role_survives_newer_request_revocation(self):
+        first = self._activate_for_orphan(self.analyst)
+        second = self._activate_for_orphan(self.analyst)
+        second.with_user(self.erp).action_revoke()
+        self.assertIn(self.analyst, self.orphan.groups_id)
+        first.with_user(self.erp).action_revoke()
+        self.assertNotIn(self.analyst, self.orphan.groups_id)
+
+    def test_overlapping_inherited_membership_follows_surviving_request(self):
+        parent = self.env['res.groups'].create({
+            'name': 'Temporary role with inherited membership',
+            'implied_ids': [Command.link(self.analyst.id)],
+        })
+        first = self._activate_for_orphan(parent)
+        second = self._activate_for_orphan(self.analyst)
+        first.with_user(self.erp).action_revoke()
+        self.assertIn(self.analyst, self.orphan.groups_id)
+        self.assertNotIn(parent, self.orphan.groups_id)
+        second.with_user(self.erp).action_revoke()
+        self.assertNotIn(self.analyst, self.orphan.groups_id)
+        self.assertIn(self.reporter, self.orphan.groups_id)
+
+    def test_expiring_overlapping_parent_and_child_cleans_both(self):
+        parent = self.env['res.groups'].create({
+            'name': 'Temporary parent',
+            'implied_ids': [Command.link(self.analyst.id)],
+        })
+        for group in (parent, self.analyst):
+            with self.subTest(first_group=group.id):
+                first = self._activate_for_orphan(group)
+                second = self._activate_for_orphan(parent if group == self.analyst else self.analyst)
+                self._expire_request(first)
+                self._expire_request(second)
+                self.Request._cron_process_grants()
+                self.assertEqual((first.state, second.state), ('expired', 'expired'))
+                self.assertFalse((self.analyst | parent) & self.orphan.groups_id)
+
+    def test_legacy_active_request_transfers_its_explicit_grant(self):
+        first = self._activate_for_orphan(self.analyst)
+        first.write({'managed_group_ids': [Command.clear()]})
+        second = self._activate_for_orphan(self.analyst)
+        first.with_user(self.erp).action_revoke()
+        self.assertIn(self.analyst, self.orphan.groups_id)
+        second.with_user(self.erp).action_revoke()
+        self.assertNotIn(self.analyst, self.orphan.groups_id)
+
     def test_requester_sees_only_own_requests(self):
         mine = self._request(self.requester, self.requester, [self.analyst])
         self.assertIn(mine.id, self.Request.with_user(self.requester).search([]).ids)

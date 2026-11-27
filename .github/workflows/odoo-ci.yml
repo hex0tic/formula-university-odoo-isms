@@ -1,0 +1,52 @@
+name: Odoo CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: odoo-ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  sources:
+    name: Python, JavaScript and XML
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - run: python3 odoo/scripts/ci/check_sources.py
+      - run: bash -n odoo/scripts/ci/odoo_suite.sh
+
+  backend:
+    name: Odoo fresh install, backend and RBAC
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - run: odoo/scripts/ci/odoo_suite.sh install
+
+  upgrade:
+    name: Odoo PR base upgrade and regression
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.base.sha }}
+          path: .ci-baseline
+          persist-credentials: false
+      - run: odoo/scripts/ci/odoo_suite.sh upgrade .ci-baseline/odoo/addons

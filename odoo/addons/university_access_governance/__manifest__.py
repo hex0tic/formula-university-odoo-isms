@@ -1,6 +1,6 @@
 {
     'name': 'University Access Governance (хандалтын засаглал)',
-    'version': '18.0.1.0.0',
+    'version': '18.0.1.1.0',
     'category': 'Services/ISMS',
     'summary': 'Эрхийн дахин баталгаажуулалт, түр ба давуу эрхийн хүсэлт, эрхийн тайлан '
                '(GOV-01, GOV-03, GOV-04, GOV-05)',
